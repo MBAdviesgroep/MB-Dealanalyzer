@@ -1280,36 +1280,31 @@ async function handlePdfImport(file) {
   try {
     const parsed = await extractTextFromDoc(file);
 
-    const response = await fetch('/api/openai', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ text: parsed.text })
-    });
+const response = await fetch('/api/analyze-document', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({
+    docType: 'kvk',
+    text: parsed.text
+  })
+});
 
-    const data = await response.json();
+const data = await response.json();
 
-    if (!response.ok) {
-      throw new Error(data.error || 'Onbekende fout');
-    }
+if (!response.ok) {
+  throw new Error(data.error || 'Onbekende fout');
+}
 
-    const aiJson = JSON.parse(data.raw);
+console.log('KVK AI output:', data);
 
-    Object.entries(aiJson).forEach(([key, value]) => {
-      if (value !== null && value !== undefined && value !== '') {
-        S.form[key] = String(value);
-        S.clientData[key] = String(value);
-      }
-    });
+statusEl.innerHTML = `
+  <div style="background:var(--gn-bg);border:1.5px solid var(--gn-bd);border-radius:8px;padding:13px 14px;margin-top:11px">
+    <div style="font-family:var(--head);font-size:10px;font-weight:700;color:var(--gn);margin-bottom:6px;text-transform:uppercase">KVK succesvol geanalyseerd</div>
+    <div style="font-size:11px;color:var(--tx2);line-height:1.6">
+      De AI-output staat nu in de console.
+    </div>
+  </div>`;
 
-    statusEl.innerHTML = `
-      <div style="background:var(--gn-bg);border:1.5px solid var(--gn-bd);border-radius:8px;padding:13px 14px;margin-top:11px">
-        <div style="font-family:var(--head);font-size:10px;font-weight:700;color:var(--gn);margin-bottom:6px;text-transform:uppercase">PDF succesvol ingelezen</div>
-        <div style="font-size:11px;color:var(--tx2);line-height:1.6">
-          De belangrijkste velden zijn ingevuld vanuit de PDF.
-        </div>
-      </div>`;
-
-    hideImportModal();
     fullRender();
 
   } catch (error) {
