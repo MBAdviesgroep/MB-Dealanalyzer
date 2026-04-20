@@ -72,7 +72,18 @@ Regels:
       }
     }
 
-    res.status(200).json({ raw: output });
+let parsed;
+
+try {
+  parsed = JSON.parse(output);
+} catch (e) {
+  return res.status(500).json({
+    error: "AI gaf geen geldige JSON terug",
+    raw: output
+  });
+}
+
+res.status(200).json(parsed);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
