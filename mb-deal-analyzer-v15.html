@@ -1,0 +1,1843 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Deal Analyzer — MB Adviesgroep</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bl:#1B597B;--bl-d:#0f3249;--bl-m:#1e6990;--bl-l:#3a8ab5;
+  --bl-bg:#EEF4F8;--bl-bg2:#ddeaf2;--bl-bd:#b8d8e8;
+  --or:#E26836;--or-d:#c95a2b;--or-bg:#FDF3EE;--or-bd:#f5c9a8;
+  --wh:#ffffff;--bg:#F4F2EF;--bg2:#EDE9E4;--bg3:#E5E1DB;
+  --bd:#E3DDD8;--bd-l:#EDE9E4;
+  --tx:#141414;--tx2:#3A3A3A;--tx3:#6B6B6B;--tx4:#A0A0A0;
+  --gn:#2A7A50;--gn-bg:#EBF5EF;--gn-bd:#b3dfc4;--gn-d:#1d5e3c;
+  --wn:#8A6000;--wn-bg:#FBF4E3;--wn-bd:#e8d4a0;
+  --rk:#8B2828;--rk-bg:#FBF0F0;--rk-bd:#e8b4b4;
+  --pur:#5A3E8A;--pur-bg:#F3F0FA;--pur-bd:#c8b8e8;
+  --font:'Sora',sans-serif;--head:'Sora',sans-serif;--mono:'JetBrains Mono',monospace;
+  --sh:0 1px 3px rgba(20,20,20,.06),0 0 0 1px rgba(20,20,20,.04);
+  --r:10px;
+}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--tx);font-family:var(--font);font-size:14px;min-height:100vh;-webkit-font-smoothing:antialiased}
+
+/* ═══ PRINT ════════════════════════════════════════════ */
+@media print {
+  .hdr-btn,.what-if-section,#PRINT_BTN_ROW,.panel-input,.panel-aside{display:none!important}
+  .app-shell{grid-template-columns:1fr!important;max-width:none}
+  .panel-main{padding:0!important}
+  .print-header{display:flex!important}
+  body{font-size:12px}
+}
+.print-header{display:none;align-items:center;justify-content:space-between;padding:0 0 12px;border-bottom:2px solid var(--bl);margin-bottom:16px}
+.print-logo{font-family:var(--head);font-size:15px;font-weight:700;color:var(--bl)}
+.print-logo span{font-size:10px;color:var(--tx4);font-weight:400;display:block;margin-top:1px}
+.print-meta{text-align:right;font-size:10px;color:var(--tx3)}
+
+/* ═══ HEADER ════════════════════════════════════════ */
+.hdr{background:linear-gradient(135deg,var(--bl-d) 0%,var(--bl) 60%,var(--bl-m) 100%);padding:0 28px;height:54px;display:flex;align-items:center;gap:10px;position:sticky;top:0;z-index:300;box-shadow:0 2px 14px rgba(15,50,76,.25)}
+.hdr::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--or),#f09060,transparent)}
+.logo-wrap{display:flex;align-items:center;gap:8px;flex-shrink:0}
+.logo-c{width:30px;height:30px;border-radius:50%;background:rgba(255,255,255,.12);border:1.5px solid rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center}
+.logo-mb{font-family:var(--head);font-size:13px;font-weight:700;color:#fff;letter-spacing:-.3px}
+.logo-ag{font-size:7px;font-weight:600;color:rgba(255,255,255,.45);letter-spacing:2px;text-transform:uppercase}
+.hdr-div{width:1px;height:18px;background:rgba(255,255,255,.15);flex-shrink:0}
+.hdr-title{font-family:var(--head);font-size:12px;font-weight:600;color:rgba(255,255,255,.9)}
+.hdr-badge{background:rgba(255,255,255,.1);color:rgba(255,255,255,.55);border:1px solid rgba(255,255,255,.13);padding:2px 7px;border-radius:20px;font-size:7.5px;font-family:var(--mono);letter-spacing:.5px;text-transform:uppercase}
+.hdr-sp{flex:1}
+.hdr-kl{font-size:10.5px;color:rgba(255,255,255,.5);font-family:var(--mono);max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.hdr-btn{display:flex;align-items:center;gap:4px;padding:5px 11px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.16);border-radius:7px;cursor:pointer;font-family:var(--head);font-size:10px;font-weight:600;color:rgba(255,255,255,.82);transition:background .15s;white-space:nowrap}
+.hdr-btn:hover{background:rgba(255,255,255,.18)}
+.hdr-btn.accent{background:rgba(226,104,54,.35);border-color:rgba(226,104,54,.5)}
+.hdr-btn.accent:hover{background:rgba(226,104,54,.5)}
+.hdr-v{background:rgba(255,255,255,.07);color:rgba(255,255,255,.4);border:1px solid rgba(255,255,255,.1);padding:2px 7px;border-radius:20px;font-size:7.5px;font-family:var(--mono)}
+
+/* ═══ APP SHELL ════════════════════════════════════════ */
+.app-shell{display:grid;grid-template-columns:296px 1fr 272px;gap:0;min-height:calc(100vh - 54px);max-width:1640px;margin:0 auto}
+.panel-input{border-right:1px solid var(--bd);background:var(--wh);height:calc(100vh - 54px);overflow-y:auto;position:sticky;top:54px;padding:18px 16px 48px}
+.panel-main{padding:20px 22px 48px;min-width:0}
+.panel-aside{border-left:1px solid var(--bd);background:var(--wh);height:calc(100vh - 54px);overflow-y:auto;position:sticky;top:54px;padding:16px 13px 48px}
+
+/* ═══ FORM ════════════════════════════════════════════ */
+.p-head{font-family:var(--head);font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:var(--tx4);padding-bottom:9px;border-bottom:1.5px solid var(--bd);margin-bottom:12px;display:flex;align-items:center;justify-content:space-between}
+.p-head-lbl{display:flex;align-items:center;gap:5px}
+.p-head-dot{width:5px;height:5px;border-radius:50%;flex-shrink:0}
+.fgrp{margin-bottom:9px}
+.fgrp label{display:block;margin-bottom:3px;font-family:var(--head);font-size:8px;font-weight:600;text-transform:uppercase;letter-spacing:.7px;color:var(--tx4)}
+.finput,.fselect{width:100%;padding:7px 9px;background:var(--bg);border:1.5px solid var(--bd);border-radius:7px;color:var(--tx);font-family:var(--mono);font-size:11.5px;outline:none;transition:border-color .15s,box-shadow .15s;-webkit-appearance:none}
+.finput:focus,.fselect:focus{border-color:var(--bl);background:var(--wh);box-shadow:0 0 0 2px rgba(27,89,123,.08)}
+.finput.from-client,.fselect.from-client{background:var(--bl-bg);border-color:var(--bl-bd)}
+.finput.err{border-color:var(--rk);background:var(--rk-bg)}
+.fg2{display:grid;grid-template-columns:1fr 1fr;gap:7px}
+.ferr{font-size:9px;color:var(--rk);margin-top:2px}
+.sec-lbl{font-family:var(--head);font-size:7px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:var(--tx4);display:flex;align-items:center;gap:5px;margin-bottom:7px;margin-top:14px}
+.sec-lbl::after{content:'';flex:1;height:1px;background:var(--bd)}
+.src{display:inline-flex;align-items:center;gap:2px;font-family:var(--head);font-size:7px;font-weight:700;letter-spacing:.4px;padding:1px 5px;border-radius:20px;text-transform:uppercase}
+.src-c{background:var(--bl-bg2);color:var(--bl);border:1px solid var(--bl-bd)}
+.src-i{background:#f0ebe5;color:var(--tx4);border:1px solid var(--bd)}
+.sl-row{display:flex;align-items:center;gap:7px}
+.sl-lbl{font-size:10.5px;color:var(--tx3);min-width:44px}
+.sl-val{font-size:11px;font-weight:600;font-family:var(--mono);color:var(--bl);min-width:38px;text-align:right}
+input[type=range]{flex:1;-webkit-appearance:none;height:3px;border-radius:2px;background:var(--bd);outline:none;cursor:pointer}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:13px;height:13px;border-radius:50%;background:var(--bl);border:2px solid var(--wh);cursor:pointer}
+
+/* ═══ DEAL SNAPSHOT ════════════════════════════════════ */
+.deal-snapshot{background:linear-gradient(135deg,var(--bl-d) 0%,var(--bl) 100%);border-radius:12px;padding:16px 18px;margin-bottom:14px;position:relative;overflow:hidden}
+.deal-snapshot::before{content:'';position:absolute;top:-40px;right:-40px;width:140px;height:140px;border-radius:50%;background:rgba(255,255,255,.03)}
+.snap-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.snap-title{font-family:var(--head);font-size:9px;font-weight:600;color:rgba(255,255,255,.45);letter-spacing:1.5px;text-transform:uppercase}
+.snap-gng{display:inline-flex;align-items:center;gap:5px;padding:4px 12px;border-radius:5px;font-family:var(--head);font-size:10.5px;font-weight:700;letter-spacing:.5px}
+.snap-gng.go{background:rgba(42,122,80,.28);color:#7ee8a2;border:1px solid rgba(42,122,80,.4)}
+.snap-gng.no{background:rgba(139,40,40,.28);color:#fca5a5;border:1px solid rgba(139,40,40,.4)}
+.snap-gng.cond{background:rgba(138,96,0,.28);color:#fde68a;border:1px solid rgba(138,96,0,.4)}
+.snap-kpis{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:12px}
+.snap-kpi-lbl{font-family:var(--head);font-size:7.5px;font-weight:600;color:rgba(255,255,255,.38);letter-spacing:.8px;text-transform:uppercase;margin-bottom:3px}
+.snap-kpi-val{font-family:var(--head);font-size:17px;font-weight:700;color:#fff;letter-spacing:-.5px;line-height:1}
+.snap-kpi-val.good{color:#7ee8a2}.snap-kpi-val.warn{color:#fde68a}.snap-kpi-val.bad{color:#fca5a5}.snap-kpi-val.neutral{color:rgba(255,255,255,.35)}
+.snap-concl{background:rgba(255,255,255,.07);border-radius:6px;padding:9px 11px;border:1px solid rgba(255,255,255,.1)}
+.snap-concl-txt{font-size:11.5px;color:rgba(255,255,255,.78);line-height:1.55}
+
+/* ═══ SECTION HEADS ═════════════════════════════════════ */
+.section-head{display:flex;align-items:center;gap:9px;margin-bottom:9px}
+.section-num{width:22px;height:22px;border-radius:50%;background:var(--bl);color:#fff;font-family:var(--head);font-size:9px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.section-head-lbl{font-family:var(--head);font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--tx3);white-space:nowrap}
+.section-head-line{flex:1;height:1px;background:var(--bd)}
+
+/* ═══ ANALYSIS CARDS ════════════════════════════════════ */
+.acard{background:var(--wh);border:1px solid var(--bd);border-radius:var(--r);padding:13px 15px;margin-bottom:9px;box-shadow:var(--sh)}
+.acard-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:11px}
+.acard-lbl{font-family:var(--head);font-size:8.5px;font-weight:700;text-transform:uppercase;letter-spacing:1.4px;color:var(--bl);display:flex;align-items:center;gap:5px}
+.acard-lbl::before{content:'';width:2.5px;height:9px;background:var(--or);border-radius:2px;flex-shrink:0}
+.mrow{display:grid;gap:6px}
+.mrow.c2{grid-template-columns:1fr 1fr}.mrow.c3{grid-template-columns:1fr 1fr 1fr}.mrow.c4{grid-template-columns:1fr 1fr 1fr 1fr}
+.metric{background:var(--bg2);border-radius:7px;padding:9px 10px;border:1px solid var(--bd-l)}
+.metric.accent{background:var(--bl-bg);border-color:var(--bl-bd)}
+.m-lbl{font-family:var(--head);font-size:7.5px;text-transform:uppercase;letter-spacing:.8px;color:var(--tx4);margin-bottom:2px}
+.m-val{font-size:15px;font-weight:700;font-family:var(--head);line-height:1;letter-spacing:-.3px}
+.m-sub{font-size:8.5px;color:var(--tx4);margin-top:2px;font-family:var(--mono)}
+.cg{color:var(--gn)}.cw{color:var(--wn)}.cr{color:var(--rk)}.cb{color:var(--bl)}.cgy{color:var(--tx4)}
+.bdg{display:inline-flex;align-items:center;padding:2px 7px;border-radius:20px;font-family:var(--head);font-size:7.5px;font-weight:700;letter-spacing:.3px}
+.bdg-g{background:var(--gn-bg);color:var(--gn);border:1px solid var(--gn-bd)}
+.bdg-w{background:var(--wn-bg);color:var(--wn);border:1px solid var(--wn-bd)}
+.bdg-r{background:var(--rk-bg);color:var(--rk);border:1px solid var(--rk-bd)}
+.bdg-b{background:var(--bl-bg);color:var(--bl);border:1px solid var(--bl-bd)}
+
+/* ═══ LTV BAR ═══════════════════════════════════════════ */
+.ltv-track{height:5px;background:var(--bd);border-radius:3px;overflow:hidden;margin:7px 0 3px}
+.ltv-fill{height:100%;border-radius:3px;transition:width .4s}
+.ltv-marks{display:flex;justify-content:space-between;font-size:8px;color:var(--tx4);font-family:var(--mono)}
+
+/* ═══ RISKS ════════════════════════════════════════════ */
+.risk-list{display:flex;flex-direction:column;gap:5px}
+.risk-item{display:flex;align-items:flex-start;gap:8px;padding:8px 10px;border-radius:7px}
+.risk-item.krit{background:var(--rk-bg);border:1px solid var(--rk-bd)}
+.risk-item.aand{background:var(--wn-bg);border:1px solid var(--wn-bd)}
+.risk-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;margin-top:3px}
+.risk-t{font-size:11.5px;font-weight:600;color:var(--tx);margin-bottom:1px;line-height:1.35}
+.risk-sub{font-size:9.5px;color:var(--tx3)}
+.risk-act{font-size:10px;color:var(--tx2);margin-top:2px}
+.risk-act::before{content:"→ ";font-weight:700;color:var(--or)}
+.action-item{display:flex;align-items:flex-start;gap:7px;padding:7px 10px;border-radius:7px;margin-bottom:4px;font-size:11.5px;line-height:1.5}
+.action-item.kritisch{background:var(--rk-bg);border-left:3px solid var(--rk)}
+.action-item.hoog{background:var(--or-bg);border-left:3px solid var(--or)}
+.action-item.medium{background:var(--bl-bg);border-left:3px solid var(--bl)}
+.action-item.laag{background:var(--gn-bg);border-left:3px solid var(--gn)}
+
+/* ═══ DOCUMENT UPLOAD (links panel) ════════════════════ */
+.doc-category{background:var(--bg);border:1.5px solid var(--bd);border-radius:8px;margin-bottom:8px;overflow:hidden}
+.doc-cat-header{display:flex;align-items:center;gap:7px;padding:8px 10px;cursor:pointer;background:var(--bg2);border-bottom:1px solid var(--bd-l)}
+.doc-cat-icon{font-size:13px;flex-shrink:0}
+.doc-cat-lbl{font-family:var(--head);font-size:9.5px;font-weight:700;flex:1;color:var(--tx)}
+.doc-cat-count{font-family:var(--mono);font-size:8.5px;color:var(--tx4);flex-shrink:0}
+.doc-cat-status{font-family:var(--head);font-size:7.5px;font-weight:700;padding:1.5px 6px;border-radius:10px;flex-shrink:0}
+.doc-cat-status.ok{background:var(--gn-bg);color:var(--gn)}
+.doc-cat-status.miss{background:var(--rk-bg);color:var(--rk)}
+.doc-cat-status.opt{background:var(--bg3);color:var(--tx4)}
+.doc-cat-body{padding:8px 10px}
+.doc-file-list{display:flex;flex-direction:column;gap:4px;margin-bottom:6px}
+.doc-file-item{display:flex;align-items:center;gap:6px;padding:5px 7px;background:var(--wh);border:1px solid var(--bd-l);border-radius:5px;font-size:10px}
+.doc-file-name{flex:1;color:var(--tx2);font-family:var(--mono);font-size:9.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.doc-file-date{color:var(--tx4);font-size:8.5px;font-family:var(--mono);flex-shrink:0}
+.doc-file-del{width:18px;height:18px;border-radius:4px;background:var(--rk-bg);border:none;cursor:pointer;color:var(--rk);font-size:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.doc-file-del:hover{background:var(--rk);color:var(--wh)}
+.doc-upload-btn{display:flex;align-items:center;justify-content:center;gap:5px;padding:6px 10px;background:var(--bl-bg);border:1.5px dashed var(--bl-bd);border-radius:6px;cursor:pointer;font-family:var(--head);font-size:9px;font-weight:600;color:var(--bl);transition:all .15s;position:relative;width:100%}
+.doc-upload-btn:hover{background:var(--bl-bg2);border-color:var(--bl)}
+.doc-upload-btn input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
+.doc-upload-btn.loading{opacity:.6;pointer-events:none}
+
+/* ═══ LENDER CARDS ═══════════════════════════════════════ */
+.lender-card{background:var(--wh);border:1px solid var(--bd);border-radius:9px;margin-bottom:8px;overflow:hidden;box-shadow:var(--sh)}
+.lender-card-header{display:flex;align-items:center;gap:10px;padding:11px 13px;border-bottom:1px solid var(--bd-l)}
+.lender-badge-type{font-family:var(--mono);font-size:7.5px;font-weight:600;text-transform:uppercase;letter-spacing:.8px;padding:2px 6px;border-radius:10px}
+.lender-badge-type.bank{background:var(--bl-bg);color:var(--bl);border:1px solid var(--bl-bd)}
+.lender-badge-type.non-bank{background:var(--pur-bg);color:var(--pur);border:1px solid var(--pur-bd)}
+.lender-name{font-family:var(--head);font-size:12px;font-weight:700;flex:1}
+.lender-score-wrap{text-align:right;flex-shrink:0}
+.lender-score{font-family:var(--head);font-size:18px;font-weight:700;line-height:1}
+.lender-score-lbl{font-size:7.5px;font-family:var(--mono);text-transform:uppercase;letter-spacing:.5px;margin-top:1px}
+.lender-bar-outer{height:3px;background:var(--bd);border-radius:2px;overflow:hidden;width:48px;margin-left:auto;margin-top:3px}
+.lender-bar-fill{height:100%;border-radius:2px;transition:width .4s}
+.lender-card-body{padding:10px 13px;display:grid;grid-template-columns:1fr 1fr;gap:7px}
+.lender-col-lbl{font-family:var(--head);font-size:7.5px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--tx4);margin-bottom:5px}
+.lender-point{display:flex;align-items:flex-start;gap:5px;font-size:10px;color:var(--tx2);margin-bottom:3px;line-height:1.4}
+.lender-point.plus::before{content:'+';color:var(--gn);font-weight:700;flex-shrink:0;font-size:10px}
+.lender-point.min::before{content:'−';color:var(--rk);font-weight:700;flex-shrink:0;font-size:10px}
+.lender-match-type{font-family:var(--head);font-size:7px;font-weight:700;padding:1.5px 6px;border-radius:10px;margin-top:4px;display:inline-block}
+.lender-match-type.sterk{background:var(--gn-bg);color:var(--gn);border:1px solid var(--gn-bd)}
+.lender-match-type.redelijk{background:var(--wn-bg);color:var(--wn);border:1px solid var(--wn-bd)}
+.lender-match-type.zwak{background:var(--rk-bg);color:var(--rk);border:1px solid var(--rk-bd)}
+.lender-descr{font-size:10px;color:var(--tx3);padding:0 13px 10px;font-style:italic}
+
+/* ═══ DOCUMENT ANALYSE BLOK ═════════════════════════════ */
+.doc-analyse-blok{background:var(--wh);border:1.5px solid var(--pur-bd);border-radius:var(--r);margin-bottom:9px;overflow:hidden;box-shadow:var(--sh)}
+.doc-analyse-header{background:linear-gradient(135deg,var(--pur-bg) 0%,var(--wh) 100%);padding:12px 16px;border-bottom:1px solid var(--pur-bd)}
+.doc-analyse-badge{background:var(--pur);color:#fff;font-family:var(--head);font-size:7.5px;font-weight:700;letter-spacing:.6px;padding:2px 7px;border-radius:20px;text-transform:uppercase;display:inline-block;margin-bottom:6px}
+.doc-analyse-title{font-family:var(--head);font-size:12px;font-weight:700;color:var(--pur)}
+.doc-analyse-grid{display:grid;grid-template-columns:1fr 1fr;gap:0;border-top:1px solid var(--bd-l)}
+.doc-analyse-section{padding:12px 16px;border-right:1px solid var(--bd-l)}
+.doc-analyse-section:last-child{border-right:none}
+.doc-analyse-section:nth-child(n+3){border-top:1px solid var(--bd-l)}
+.doc-analyse-section-lbl{font-family:var(--head);font-size:7.5px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--tx4);margin-bottom:8px;display:flex;align-items:center;gap:5px}
+.doc-analyse-section-lbl::before{content:'';width:3px;height:8px;border-radius:2px;flex-shrink:0}
+.lbl-or::before{background:var(--or)}
+.lbl-rk::before{background:var(--rk)}
+.lbl-wn::before{background:var(--wn)}
+.lbl-bl::before{background:var(--bl)}
+.lbl-gn::before{background:var(--gn)}
+.doc-analyse-placeholder{font-size:10.5px;color:var(--tx4);font-style:italic;line-height:1.55;padding:4px 0}
+.doc-analyse-placeholder em{font-style:normal;color:var(--tx3);font-weight:500}
+.doc-analyse-full{padding:12px 16px;border-top:1px solid var(--bd-l)}
+
+/* ═══ VERDICT ════════════════════════════════════════════ */
+.verdict-card{border-radius:10px;padding:13px 15px;margin-bottom:9px;border-width:1.5px;border-style:solid}
+.verdict-card.good{background:var(--gn-bg);border-color:var(--gn-bd)}
+.verdict-card.blauw{background:var(--bl-bg);border-color:var(--bl-bd)}
+.verdict-card.warn{background:var(--wn-bg);border-color:var(--wn-bd)}
+.verdict-card.oranje{background:var(--or-bg);border-color:var(--or-bd)}
+.verdict-card.bad{background:var(--rk-bg);border-color:var(--rk-bd)}
+.verdict-top{display:flex;align-items:center;gap:9px;margin-bottom:7px}
+.verdict-gng{font-family:var(--head);font-size:12px;font-weight:700}
+.verdict-lbl{font-family:var(--head);font-size:11.5px;font-weight:600}
+.verdict-txt{font-size:11.5px;color:var(--tx2);line-height:1.6}
+
+/* ═══ WHAT-IF ════════════════════════════════════════════ */
+.whatif-result{display:grid;grid-template-columns:1fr 1fr 1fr;gap:5px;margin-top:9px}
+
+/* ═══ CONFLICT ════════════════════════════════════════ */
+.cf-item{display:flex;gap:7px;padding:7px 9px;border-radius:7px;margin-bottom:4px}
+.cf-hard{background:var(--rk-bg);border:1px solid var(--rk-bd)}
+.cf-zacht{background:var(--wn-bg);border:1px solid var(--wn-bd)}
+.cf-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0;margin-top:3px}
+.cf-lbl{font-family:var(--head);font-size:10px;font-weight:600;margin-bottom:1px}
+.cf-sub{font-size:9px;color:var(--tx3)}
+.cf-act{font-size:9.5px;color:var(--tx2);margin-top:2px}
+.cf-act::before{content:"→ ";font-weight:700;color:var(--or)}
+
+/* ═══ ASIDE ═══════════════════════════════════════════ */
+.aside-row{display:flex;align-items:center;justify-content:space-between;padding:3.5px 0;border-bottom:1px solid var(--bd-l)}
+.aside-row:last-child{border-bottom:none}
+.aside-k{font-size:9.5px;color:var(--tx3)}
+.aside-v{font-family:var(--mono);font-size:10.5px;font-weight:600}
+.aside-v.cg{color:var(--gn)}.aside-v.cw{color:var(--wn)}.aside-v.cr{color:var(--rk)}.aside-v.cb{color:var(--bl)}.aside-v.cgy{color:var(--tx4)}
+.doss-bar{height:4px;background:var(--bd);border-radius:2px;overflow:hidden;margin-bottom:4px}
+.doss-fill{height:100%;border-radius:2px;transition:width .4s}
+.doss-lbl{display:flex;justify-content:space-between;font-size:9px;margin-bottom:6px}
+.rd-pills{display:flex;flex-direction:column;gap:3px}
+.rd-pill{display:flex;align-items:center;justify-content:space-between;padding:2.5px 0}
+.rd-pill-lbl{font-size:9px;color:var(--tx3)}
+.rd-pill-val{font-family:var(--head);font-size:8px;font-weight:700;padding:1.5px 5px;border-radius:10px}
+.rd-ok{background:var(--gn-bg);color:var(--gn)}.rd-bl{background:var(--bl-bg);color:var(--bl)}.rd-warn{background:var(--wn-bg);color:var(--wn)}.rd-bad{background:var(--rk-bg);color:var(--rk)}
+
+/* ═══ SCORE RING ══════════════════════════════════════ */
+.sc-w{display:flex;flex-direction:column;align-items:center;gap:5px}
+.sc-r{position:relative;width:76px;height:76px}
+.sc-tr{fill:none;stroke:var(--bd);stroke-width:7}
+.sc-fl{fill:none;stroke-width:7;stroke-linecap:round;transform:rotate(-90deg);transform-origin:center;transition:stroke-dashoffset .5s ease}
+.sc-in{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;flex-direction:column}
+.sc-n{font-family:var(--head);font-size:22px;font-weight:700;line-height:1;letter-spacing:-.5px}
+.sc-d{font-size:9px;color:var(--tx4);font-family:var(--mono)}
+.sc-lb{font-family:var(--head);font-size:9px;font-weight:600;text-align:center}
+.sub-scores{display:flex;gap:8px}
+.sub-score{text-align:center}
+.sub-s-lbl{font-size:7.5px;color:var(--tx4);font-family:var(--head);font-weight:600;text-transform:uppercase;letter-spacing:.5px}
+.sub-s-val{font-family:var(--mono);font-size:10px;font-weight:700}
+
+/* ═══ MISC ════════════════════════════════════════════ */
+.empty-state{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:300px;gap:8px}
+.es-icon{font-size:36px}
+.btn{display:inline-flex;align-items:center;gap:5px;padding:8px 15px;border-radius:7px;cursor:pointer;font-family:var(--head);font-size:10px;font-weight:600;border:none;transition:all .15s}
+.btn-sm{padding:4px 9px;font-size:9px}
+.btn-bl{background:var(--bl);color:#fff}.btn-bl:hover{background:var(--bl-d)}
+.btn-or{background:var(--or);color:#fff}.btn-or:hover{background:var(--or-d)}
+.btn-ghost{background:transparent;color:var(--tx3);border:1.5px solid var(--bd)}.btn-ghost:hover{background:var(--bg2)}
+.btn-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
+.spn{display:inline-block;width:11px;height:11px;border-radius:50%;border:2px solid var(--bd);border-top-color:var(--bl);animation:spin .7s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.af-banner{background:var(--bl-bg);border:1.5px solid var(--bl-bd);border-radius:8px;padding:8px 10px;margin-bottom:9px;display:flex;align-items:center;gap:7px}
+.af-tag{background:var(--bl);color:#fff;font-family:var(--head);font-size:7px;font-weight:700;padding:1.5px 5px;border-radius:10px;letter-spacing:.5px;text-transform:uppercase;flex-shrink:0}
+.af-txt{font-size:10.5px;color:var(--bl);flex:1}
+.sum-t{width:100%;border-collapse:collapse;font-size:10.5px}
+.sum-t td{padding:3.5px 0;border-bottom:1px solid var(--bd-l)}
+.sum-t td:first-child{color:var(--tx4);width:48%}
+.sum-t td:last-child{font-weight:600;font-family:var(--mono);text-align:right}
+.d-it{display:flex;align-items:center;gap:6px;padding:4px 0;border-bottom:1px solid var(--bd-l);font-size:10.5px;color:var(--tx2)}
+.memo{font-family:var(--mono);font-size:9.5px;line-height:1.7;white-space:pre-wrap;color:var(--tx2);background:var(--bg);border-radius:6px;padding:10px 12px}
+
+/* ═══ MODAL ════════════════════════════════════════════ */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:400;align-items:center;justify-content:center}
+.modal-box{background:var(--wh);border-radius:13px;padding:20px;max-width:500px;width:92%;box-shadow:0 8px 40px rgba(0,0,0,.18);border:1px solid var(--bd)}
+.modal-head{font-family:var(--head);font-size:12px;font-weight:700;margin-bottom:14px}
+.modal-tab-row{display:flex;border-bottom:1.5px solid var(--bd);margin-bottom:14px;gap:0}
+.modal-tab{padding:6px 13px;font-family:var(--head);font-size:9.5px;font-weight:600;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1.5px;color:var(--tx4)}
+.modal-tab.active{color:var(--bl);border-bottom-color:var(--bl)}
+.modal-section{display:none}.modal-section.active{display:block}
+.modal-btns{display:flex;gap:7px;justify-content:flex-end;margin-top:14px}
+textarea.modal-ta{width:100%;height:120px;padding:8px 10px;border:1.5px solid var(--bd);border-radius:7px;font-family:var(--mono);font-size:11px;resize:none;outline:none;background:var(--bg)}
+.pdf-drop{border:2px dashed var(--bd);border-radius:8px;padding:24px;text-align:center;cursor:pointer;position:relative;transition:all .15s}
+.pdf-drop:hover{border-color:var(--bl);background:var(--bl-bg)}
+.pdf-drop input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer}
+.pdf-drop-icon{font-size:24px;margin-bottom:6px}
+.pdf-drop-lbl{font-family:var(--head);font-size:11px;font-weight:600;color:var(--tx2);margin-bottom:3px}
+.pdf-drop-sub{font-size:10px;color:var(--tx4)}
+</style>
+</head>
+<body>
+
+<!-- ═══ HEADER ═══════════════════════════════════════════ -->
+<div class="hdr">
+  <div class="logo-wrap">
+    <div class="logo-c"><div style="line-height:1"><div class="logo-mb">MB</div><div class="logo-ag">Adv.</div></div></div>
+  </div>
+  <div class="hdr-div"></div>
+  <div class="hdr-title">Deal Analyzer</div>
+  <div class="hdr-badge">v15</div>
+  <div class="hdr-sp"></div>
+  <div id="HDR_K" class="hdr-kl"></div>
+  <button class="hdr-btn" onclick="showImportModal()">↓ Importeren</button>
+  <button class="hdr-btn accent" onclick="printReport()">⎙ Print</button>
+  <button class="hdr-btn" onclick="resetApp()">↺ Reset</button>
+</div>
+
+<!-- ═══ IMPORT MODAL ══════════════════════════════════════ -->
+<div class="modal-overlay" id="IMPORT_MODAL">
+  <div class="modal-box">
+    <div class="modal-head">Dealgegevens importeren</div>
+    <div class="modal-tab-row">
+      <div class="modal-tab active" id="TAB_JSON_BTN" onclick="switchTab('json')">JSON</div>
+      <div class="modal-tab" id="TAB_PDF_BTN" onclick="switchTab('pdf')">PDF</div>
+    </div>
+    <div class="modal-section active" id="TAB_JSON">
+      <textarea class="modal-ta" id="IMPORT_JSON" placeholder='{"naamKlant":"…","typeKlant":"bv","marktwaarde":"450000",…}'></textarea>
+    </div>
+    <div class="modal-section" id="TAB_PDF">
+      <div class="pdf-drop">
+        <input type="file" accept=".pdf,.txt" onchange="handlePdfImport(this.files[0])">
+        <div class="pdf-drop-icon">📄</div>
+        <div class="pdf-drop-lbl">PDF uploaden</div>
+        <div class="pdf-drop-sub">Klik of sleep het bestand hier</div>
+      </div>
+      <div id="PDF_IMPORT_STATUS"></div>
+    </div>
+    <div class="modal-btns">
+      <button class="btn btn-ghost btn-sm" onclick="hideImportModal()">Sluiten</button>
+      <button class="btn btn-or btn-sm" id="IMPORT_BTN" onclick="doImport()">JSON importeren</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ APP SHELL ═══════════════════════════════════════ -->
+<div class="app-shell">
+  <div class="panel-input" id="PANEL_INPUT"></div>
+  <div class="panel-main" id="PANEL_MAIN"></div>
+  <div class="panel-aside" id="PANEL_ASIDE"></div>
+</div>
+
+<script>
+'use strict';
+
+// ════════════════════════════════════════════════════
+// ① CONFIG — DOC_TYPES
+// ════════════════════════════════════════════════════
+const DOC_TYPES = {
+  kvk: {
+    label: 'KVK-uittreksel',
+    icon: '🏢',
+    multiple: false,
+    category: 'legal',
+    accepts: '.pdf,.txt',
+    requiredFor: ['bancair','nonbank'],
+    weight: 2,
+    description: 'Uittreksel Kamer van Koophandel'
+  },
+  graydon: {
+    label: 'Kredietrapport',
+    icon: '📊',
+    multiple: false,
+    category: 'financial',
+    accepts: '.pdf,.txt',
+    requiredFor: ['bancair'],
+    weight: 3,
+    description: 'Graydon / CreditSafe / ander bureau'
+  },
+  woz: {
+    label: 'WOZ / Taxatie',
+    icon: '🏠',
+    multiple: true,
+    category: 'property',
+    accepts: '.pdf,.txt',
+    requiredFor: ['bancair','nonbank'],
+    weight: 3,
+    description: 'WOZ-beschikking of taxatierapport'
+  },
+  kadaster: {
+    label: 'Kadasterinformatie',
+    icon: '📋',
+    multiple: true,
+    category: 'property',
+    accepts: '.pdf,.txt',
+    requiredFor: ['bancair'],
+    weight: 2,
+    description: 'Eigendomsakte / kadastraal uittreksel'
+  },
+  jaarrekeningen: {
+    label: 'Jaarrekeningen',
+    icon: '📈',
+    multiple: true,
+    category: 'financial',
+    accepts: '.pdf,.txt',
+    requiredFor: ['bancair'],
+    weight: 3,
+    description: 'Jaarrekeningen (min. 2 jaar bij BV)'
+  }
+};
+
+// ════════════════════════════════════════════════════
+// ② CONFIG — LENDERS (uitgebreide engine)
+// ════════════════════════════════════════════════════
+const LENDERS = [
+  {
+    id: 'rnhb',
+    naam: 'RNHB',
+    type: 'non-bank',
+    beschrijving: 'Specialist bijzonder vastgoed, buitenlandse klanten en nichesegmenten.',
+    minLTV: 0, maxLTV: 85,
+    minDSCR: 0.9,
+    minLening: 150000, maxLening: 5000000,
+    klantTypes: ['particulier','bv'],
+    woonlanden: ['nl','eu','buiten-eu'],
+    vastgoedTypes: ['woning','bedrijfspand','horeca','recreatie','mixed','overig'],
+    trackrecordVereist: false,
+    doelen: ['aankoop','herfinanciering','overwaarde'],
+    buitenland: true, horeca: true, recreatie: true
+  },
+  {
+    id: 'nibc',
+    naam: 'NIBC',
+    type: 'non-bank',
+    beschrijving: 'Mid-market vastgoed, flexibel bij hogere LTV voor woningverhuur.',
+    minLTV: 0, maxLTV: 82,
+    minDSCR: 1.0,
+    minLening: 200000, maxLening: 10000000,
+    klantTypes: ['particulier','bv'],
+    woonlanden: ['nl','eu'],
+    vastgoedTypes: ['woning','bedrijfspand','horeca','mixed','overig'],
+    trackrecordVereist: false,
+    doelen: ['aankoop','herfinanciering'],
+    buitenland: false, horeca: true, recreatie: false
+  },
+  {
+    id: 'llb',
+    naam: 'LLB Nederland',
+    type: 'non-bank',
+    beschrijving: 'Internationale klanten, verhuurde woningen en stabiel buy-to-let.',
+    minLTV: 0, maxLTV: 80,
+    minDSCR: 1.0,
+    minLening: 200000, maxLening: 5000000,
+    klantTypes: ['particulier','bv'],
+    woonlanden: ['nl','eu','buiten-eu'],
+    vastgoedTypes: ['woning','mixed','overig'],
+    trackrecordVereist: false,
+    doelen: ['aankoop','herfinanciering'],
+    buitenland: true, horeca: false, recreatie: false
+  },
+  {
+    id: 'ing',
+    naam: 'ING Zakelijk',
+    type: 'bank',
+    beschrijving: 'Bancaire financiering voor woningvastgoed met lage LTV en stabiel profiel.',
+    minLTV: 0, maxLTV: 75,
+    minDSCR: 1.25,
+    minLening: 100000, maxLening: 5000000,
+    klantTypes: ['particulier','bv'],
+    woonlanden: ['nl'],
+    vastgoedTypes: ['woning','bedrijfspand','mixed'],
+    trackrecordVereist: false,
+    doelen: ['aankoop','herfinanciering'],
+    buitenland: false, horeca: false, recreatie: false
+  },
+  {
+    id: 'abn',
+    naam: 'ABN AMRO Zakelijk',
+    type: 'bank',
+    beschrijving: 'Woningvastgoed met trackrecord. Lage LTV, stabiel inkomen of huurprofiel.',
+    minLTV: 0, maxLTV: 75,
+    minDSCR: 1.25,
+    minLening: 150000, maxLening: 7500000,
+    klantTypes: ['particulier','bv'],
+    woonlanden: ['nl'],
+    vastgoedTypes: ['woning','bedrijfspand'],
+    trackrecordVereist: true,
+    doelen: ['aankoop','herfinanciering'],
+    buitenland: false, horeca: false, recreatie: false
+  }
+];
+
+// ════════════════════════════════════════════════════
+// ③ CONFIG — SCORE + DOSSIER
+// ════════════════════════════════════════════════════
+const SCORE_CFG = {
+  BASE: 5,
+  CAPS: { DSCR_K:4, LTV_85:5, GEEN_CASH:3, COMBO:4, GRAYDON_H:6 },
+  LTV: [{max:60,d:2.5},{max:65,d:2.0},{max:70,d:1.5},{max:75,d:0.5},{max:80,d:0},{max:85,d:-1.5},{max:999,d:-3.0}],
+  DSCR: [{min:1.5,d:2.0},{min:1.3,d:1.5},{min:1.25,d:1.0},{min:1.0,d:-0.5},{min:0,d:-2.5}]
+};
+
+const DOSSIER_REQS = {
+  bancair: {
+    label: 'Bancaire route',
+    vereisten: [
+      {id:'woz',    label:'WOZ of taxatierapport', prioriteit:'kritisch', check:(d,f,m)=>d.woz.files.some(f=>f.parsed?._definitieveWaarde)},
+      {id:'dscr',   label:'DSCR ≥ 1.25 (IO)',     prioriteit:'kritisch', check:(d,f,m)=>m.dscrIO!==null&&m.dscrIO>=1.25},
+      {id:'ltv',    label:'LTV ≤ 80%',             prioriteit:'kritisch', check:(d,f,m)=>m.ltv!==null&&m.ltv<=80},
+      {id:'kad',    label:'Kadaster bevestiging',   prioriteit:'hoog',    check:(d,f,m)=>d.kadaster.files.some(f=>f.parsed?._eigenaarRaw||f.parsed?._koopsomWaarde)},
+      {id:'kvk',    label:'KVK-uittreksel (bij BV)',prioriteit:'hoog',    check:(d,f,m)=>f.typeKlant!=='bv'||d.kvk.files.some(f=>f.parsed?._rechtsvormRaw)},
+      {id:'jaarr',  label:'Jaarrekeningen (bij BV)',prioriteit:'hoog',    check:(d,f,m)=>f.typeKlant!=='bv'||d.jaarrekeningen.files.length>=1},
+      {id:'land',   label:'NL of EU ingezetene',    prioriteit:'hoog',    check:(d,f,m)=>f.woonland!=='buiten-eu'},
+    ]
+  },
+  nonbank: {
+    label: 'Non-bank route',
+    vereisten: [
+      {id:'cash',  label:'Inkomen of huuronderbouwing', prioriteit:'kritisch', check:(d,f,m)=>parseFloat(f.inkomen)>0||parseFloat(f.huurPerMaand)>0},
+      {id:'ltv',   label:'LTV ≤ 85%',                  prioriteit:'kritisch', check:(d,f,m)=>m.ltv!==null&&m.ltv<=85},
+      {id:'kvk',   label:'KVK-uittreksel (bij BV)',     prioriteit:'hoog',    check:(d,f,m)=>f.typeKlant!=='bv'||d.kvk.files.some(f=>f.parsed?._rechtsvormRaw)},
+    ]
+  }
+};
+
+// ════════════════════════════════════════════════════
+// ④ UTILS
+// ════════════════════════════════════════════════════
+const fE = n => n!=null&&!isNaN(n) ? '€'+Math.round(n).toLocaleString('nl-NL') : '—';
+const fP = (n,d=1) => n!=null&&!isNaN(n) ? n.toFixed(d)+'%' : '—';
+const SC_STROKE = {good:'#15803d',blauw:'#2F6B86',warn:'#b45309',oranje:'#E8773A',bad:'#b91c1c'};
+const SC_LABEL  = {good:'Goed financierbaar',blauw:'Bancair mogelijk',warn:'Non-bank aanbevolen',oranje:'Lastig',bad:'Niet financierbaar'};
+const SC_ICON   = {good:'✅',blauw:'🔵',warn:'🟡',oranje:'🟠',bad:'🔴'};
+
+// ════════════════════════════════════════════════════
+// ⑤ REGEX + PARSERS
+// ════════════════════════════════════════════════════
+const RX_RV=[/\b(besloten\s+vennootschap)\b/i,/\b(BV|B\.V\.)\b/,/\b(naamloze\s+vennootschap)\b/i,/\b(NV|N\.V\.)\b/,/\b(eenmanszaak)\b/i,/\b(VOF|V\.O\.F\.)\b/i,/\b(maatschap)\b/i];
+const RX_KVK_NR=/\bKVK[-\s]?(?:nummer|nr\.?)?[\s:]*(\d{8})\b/i;
+const RX_OPRICH=[/\b(?:opgericht|oprichtingsdatum)[\s:]+(\d{1,2}[-\/]\d{1,2}[-\/]\d{2,4})/i];
+const RX_SBI=/\bSBI[-\s]?(?:code)?[\s:]*(\d{4,5})\b/i;
+const RX_GRY_SCORE=[/(?:kredietscore|credit\s*score|score)[\s:]*([A-D][+\-]?)/i];
+const RX_GRY_NEG=["negatief","verhoogd risico","hoog risico","betalingsachterstand","betalingsincident","faillissement","surseance","schuldsanering","wanbetaling","incasso","deurwaarder"];
+const RX_GRY_INC=/(\d+)\s*(?:incasso(?:'s)?|gerechtelijk)/i;
+const RX_WOZ_W=[/(?:WOZ[-\s]?waarde|vastgestelde\s+waarde)[\s:]*€?\s*([\d.,]+)/i];
+const RX_TAX_W=[/(?:(?:getaxeerde?\s+)?marktwaarde|taxatiewaarde|onderhandse\s+verkoopwaarde)[\s:]*€?\s*([\d.,]+)/i];
+const RX_PEIL=[/(?:waardepeildatum|peildatum|taxatiedatum)[\s:]+(\d{1,2}[-\/]\d{1,2}[-\/]\d{2,4})/i];
+const RX_TAX_IND=["taxatiewaarde","taxatierapport","nwwi","nvm","rics","mrics","taxateur"];
+const RX_KAD_EIG=[/(?:eigenaar|t\.n\.v\.|ten\s+name\s+van)[\s:]+([^\n,;]{3,70})/i];
+const RX_KAD_KS=[/(?:koopsom|koopprijs|verkoopsom)[\s:]+€?\s*([\d.,]+)/i];
+const RX_KAD_LDAT=[/(?:datum\s+levering|leveringsdatum|gepasseerd\s+op)[\s:]+(\d{1,2}[-\/]\d{1,2}[-\/]\d{2,4})/i];
+const RX_EUROS=/€\s*([\d.,]+)/g;
+
+function parseBedrag(s){if(!s)return null;let t=s.trim().replace(/\s/g,"");if(/^\d{1,3}(\.\d{3})+$/.test(t)||/^\d{1,3}(\.\d{3})+,\d{2}$/.test(t)){t=t.replace(/\./g,"").replace(",",".");}else{t=t.replace(/,/g,"");}const n=parseFloat(t);return isNaN(n)||n<1000||n>50000000?null:Math.round(n);}
+function norRv(s){if(!s)return null;const m=s.toLowerCase();if(m.includes("besloten")||m==="bv"||m==="b.v.")return"BV";if(m.includes("naamloze")||m==="nv"||m==="n.v.")return"NV";if(m.includes("vof")||m.includes("vennootschap onder firma"))return"VOF";if(m.includes("eenmanszaak"))return"Eenmanszaak";if(m.includes("maatschap"))return"Maatschap";return s.trim();}
+function telKw(t,kws){const l=t.toLowerCase();return kws.reduce((a,k)=>a+(l.match(new RegExp(k.replace(/[.*+?^${}()|[\]\\]/g,"\\$&"),"gi"))||[]).length,0);}
+function matchFirst(t,pats){for(const p of pats){const m=t.match(p);if(m)return m[1]||m[0];}return null;}
+function heuEuros(t,mn=50000,mx=5000000){return[...t.matchAll(RX_EUROS)].map(m=>parseBedrag(m[1])).filter(v=>v&&v>=mn&&v<=mx).sort((a,b)=>b-a);}
+function fieldConf(w,base,kw){if(!w)return 0;const km={goed:1.0,matig:0.75,slecht:0.4}[kw]||0.5;return Math.min(0.97,base*km);}
+function mkField(w,c,b){return{waarde:w??null,confidence:Math.round(c*100)/100,bron:b};}
+
+// ════════════════════════════════════════════════════
+// ⑥ FILE READERS
+// ════════════════════════════════════════════════════
+async function readPdfText(file) {
+  return new Promise(resolve => {
+    const r = new FileReader();
+    r.onload = e => {
+      const buf = new Uint8Array(e.target.result); let text = '';
+      for(let i=0;i<Math.min(buf.length,400000);i++){const c=buf[i];if(c>=32&&c<127)text+=String.fromCharCode(c);else if(c===10||c===13)text+=' ';}
+      const words = text.match(/[a-zA-Z]{3,}/g)||[];
+      resolve({text,wordCount:words.length,kwaliteit:words.length>200?'goed':words.length>50?'matig':'slecht'});
+    };
+    r.readAsArrayBuffer(file);
+  });
+}
+async function extractTextFromDoc(file) {
+  if(file.type==='application/pdf') return await readPdfText(file);
+  if(file.type.startsWith('text/')||file.name.endsWith('.txt')) {
+    return new Promise(res=>{const r=new FileReader();r.onload=e=>{const t=e.target.result||'';const w=t.match(/[a-zA-Z]{3,}/g)||[];res({text:t,wordCount:w.length,kwaliteit:w.length>50?'goed':'matig'});};r.readAsText(file);});
+  }
+  return {text:'',wordCount:0,kwaliteit:'slecht'};
+}
+
+// ════════════════════════════════════════════════════
+// ⑦ DOCUMENT PARSERS (per type)
+// ════════════════════════════════════════════════════
+function extractKvk(parsed,fn){
+  const{text,kwaliteit:k}=parsed;const al=text+' '+fn;
+  let rv=null;for(const p of RX_RV){const m=al.match(p);if(m){rv=norRv(m[1]||m[0]);break;}}
+  if(!rv&&/\bbv\b|holding/i.test(fn))rv='BV';
+  const kvkNr=text.match(RX_KVK_NR);
+  const bnM=text.match(/(?:(?:handels|bedrijfs)?naam|onderneming)[\s:]+([^\n]{2,60})/i);
+  const bn=bnM?bnM[1].trim().substring(0,60):null;
+  const opr=matchFirst(text,RX_OPRICH);const sbi=text.match(RX_SBI);const pc=text.match(/\b(\d{4}\s*[A-Z]{2})\b/);
+  return{rechtsvorm:mkField(rv,fieldConf(rv,0.90,k),'KVK'),bedrijfsnaam:mkField(bn,fieldConf(bn,0.80,k),'KVK'),kvkNummer:mkField(kvkNr?.[1],fieldConf(kvkNr?.[1],0.97,k),'KVK'),oprichtingsdatum:mkField(opr,fieldConf(opr,0.85,k),'KVK'),sbiCode:mkField(sbi?.[1],fieldConf(sbi?.[1],0.80,k),'KVK'),vestigingsadres:mkField(pc?.[0],fieldConf(pc?.[0],0.75,k),'KVK'),_rechtsvormRaw:rv,_isBV:rv==='BV'||rv==='NV',_heeftTekst:parsed.wordCount>50,_docKwaliteit:k};
+}
+function extractGraydon(parsed,fn){
+  const{text,kwaliteit:k}=parsed;const al=text+' '+fn;
+  const negScore=telKw(al,RX_GRY_NEG);const incM=text.match(RX_GRY_INC);const inc=incM?parseInt(incM[1]):0;
+  const isH=negScore>=2||inc>=1||/verhoogd\s+risico|hoog\s+risico/i.test(al);
+  const isM=!isH&&(negScore===1||/matig\s+risico/i.test(al));
+  const rn=isH?'hoog':isM?'gemiddeld':'laag';
+  const sM=matchFirst(text,RX_GRY_SCORE);const sL=sM||{hoog:'C — Verhoogd risico',gemiddeld:'B — Matig risico',laag:'A — Laag risico'}[rn];
+  const betM=text.match(/(?:betalingsgedrag|betalingservaring)[\s:]+(.{5,80})/i);const bet=betM?betM[1].trim():inc>0?`${inc} incasso(s) gedetecteerd`:isH?'Achterstand gesignaleerd':'Geen bijzonderheden';
+  return{kredietscore:mkField(sL,fieldConf(sL,sM?0.88:0.65,k),'Graydon'),risicoklasse:mkField({hoog:'Hoog',gemiddeld:'Gemiddeld',laag:'Laag'}[rn],fieldConf('x',0.80,k),'Graydon'),betalingsgedrag:mkField(bet,fieldConf('x',betM?0.82:0.60,k),'Graydon'),_risicoNiveau:rn,_incassoCount:inc,_heeftTekst:parsed.wordCount>50,_docKwaliteit:k};
+}
+function extractWoz(parsed,fn){
+  const{text,kwaliteit:k}=parsed;
+  const itInd=telKw(text,RX_TAX_IND);const isTax=itInd>=1||fn.includes('taxatie');
+  const wozS=matchFirst(text,RX_WOZ_W);const wozW=wozS?parseBedrag(wozS):null;
+  const taxS=matchFirst(text,RX_TAX_W);const taxW=taxS?parseBedrag(taxS):null;
+  let heuW=null;if(!wozW&&!taxW){const bs=heuEuros(text);heuW=bs[0]??null;}
+  const dw=taxW||wozW||heuW;const br=taxW?'Taxatie':wozW?'WOZ':isTax?'Taxatie':'WOZ';
+  const wc=taxW?0.92:wozW?0.88:heuW?0.50:0;
+  const pd=matchFirst(text,RX_PEIL);const adM=text.match(/(?:objectadres|adres\s+object)[\s:]+([^\n]{5,60})/i);
+  const bjM=text.match(/\b(?:bouwjaar)[\s:]+(\d{4})\b/i);const opM=text.match(/\b(?:gebruiksoppervlakte?|woonoppervlakte?)[\s:]+(\d+)\s*m²?\b/i);
+  return{waardeLeidend:mkField(dw?'€'+dw.toLocaleString():null,wc,br),peildatum:mkField(pd,fieldConf(pd,0.85,k),br),adresObject:mkField(adM?adM[1].trim():null,fieldConf(adM,0.78,k),br),bouwjaar:mkField(bjM?bjM[1]:null,fieldConf(bjM,0.83,k),br),oppervlakte:mkField(opM?opM[1]+' m²':null,fieldConf(opM,0.80,k),br),_definitieveWaarde:dw,_isTaxatie:isTax||!!taxW,_bronLabel:br,_heeftTekst:parsed.wordCount>50,_docKwaliteit:k};
+}
+function extractKadaster(parsed,fn){
+  const{text,kwaliteit:k}=parsed;
+  const eigS=matchFirst(text,RX_KAD_EIG);let eig=eigS?.trim()??null;if(eig&&eig.length>70)eig=eig.substring(0,70);
+  const adM=text.match(/(?:kadastraal\s+adres|perceeladres|objectadres)[\s:]+([^\n]{5,60})/i);
+  const ksS=matchFirst(text,RX_KAD_KS);let ks=ksS?parseBedrag(ksS):null;if(!ks){const bs=heuEuros(text);ks=bs[0]??null;}
+  const dd=matchFirst(text,RX_KAD_LDAT);
+  const hypM=text.match(/(?:hypotheek(?:inschrijving|recht)?)[\s:]+€?\s*([\d.,]+)/i);const hypB=hypM?parseBedrag(hypM[1]):null;
+  const heeftHyp=!!hypB||(text.includes('hypotheek')&&!/(geen|nihil|nvt)/i.test(text.slice(text.indexOf('hypotheek'),text.indexOf('hypotheek')+50)));
+  return{eigenaar:mkField(eig,fieldConf(eig,0.80,k),'Kadaster'),adres:mkField(adM?adM[1].trim():null,fieldConf(adM,0.78,k),'Kadaster'),koopsom:mkField(ks?'€'+ks.toLocaleString():null,fieldConf(ks,ksS?0.85:0.50,k),'Kadaster'),datumLevering:mkField(dd,fieldConf(dd,0.82,k),'Kadaster'),hypotheekInschrijving:mkField(heeftHyp?(hypB?'Aanwezig — €'+hypB.toLocaleString():'Aanwezig'):'Geen inschrijving',fieldConf('x',0.75,k),'Kadaster'),_koopsomWaarde:ks,_eigenaarRaw:eig,_heeftHypotheek:heeftHyp,_heeftTekst:parsed.wordCount>50,_docKwaliteit:k};
+}
+function extractJaarrekening(parsed,fn){
+  const{text,kwaliteit:k}=parsed;
+  const jrM=text.match(/\b(20\d{2})\b/g);
+  const jaren=[...new Set((jrM||[]).filter(j=>parseInt(j)>=2015&&parseInt(j)<=2030))].sort().reverse();
+  const omzetM=text.match(/(?:omzet|netto[-\s]?omzet)[\s:]+€?\s*([\d.,]+)/i);
+  const omzet=omzetM?parseBedrag(omzetM[1]):null;
+  const ebitdaM=text.match(/(?:ebitda|bedrijfsresultaat)[\s:]+€?\s*([\d.,]+)/i);
+  const ebitda=ebitdaM?parseBedrag(ebitdaM[1]):null;
+  return{jaar:mkField(jaren[0]||null,fieldConf(jaren[0],0.80,k),'Jaarrekening'),omzet:mkField(omzet?'€'+omzet.toLocaleString():null,fieldConf(omzet,0.75,k),'Jaarrekening'),ebitda:mkField(ebitda?'€'+ebitda.toLocaleString():null,fieldConf(ebitda,0.70,k),'Jaarrekening'),_jaar:jaren[0]||null,_omzet:omzet,_heeftTekst:parsed.wordCount>50,_docKwaliteit:k};
+}
+
+async function parseDoc(type, file) {
+  await new Promise(r => setTimeout(r, 300+Math.random()*400));
+  const parsed = await extractTextFromDoc(file);
+  const fn = file.name.toLowerCase();
+  let velden = {};
+  if(type==='kvk')         velden = extractKvk(parsed,fn);
+  else if(type==='graydon')velden = extractGraydon(parsed,fn);
+  else if(type==='woz')    velden = extractWoz(parsed,fn);
+  else if(type==='kadaster')velden = extractKadaster(parsed,fn);
+  else if(type==='jaarrekeningen') velden = extractJaarrekening(parsed,fn);
+  const flds = Object.entries(velden).filter(([k])=>!k.startsWith('_')).filter(([,v])=>v&&typeof v==='object'&&v.waarde!==null);
+  const oc = flds.length ? Math.round(flds.reduce((a,[,v])=>a+(v.confidence||0),0)/flds.length*100) : 0;
+  return {
+    ...velden,
+    _meta: {
+      bestandsnaam: file.name,
+      uploadDatum: new Date().toLocaleDateString('nl-NL'),
+      type,
+      wordCount: parsed.wordCount,
+      documentKwaliteit: parsed.kwaliteit,
+      overallConfidence: oc,
+      rawText: parsed.text,
+      extractedText: parsed.text,
+      parsedFields: velden,
+      parserType: 'regex-v1',
+      confidence: oc
+    }
+  };
+}
+
+// ════════════════════════════════════════════════════
+// ⑧ STATE
+// ════════════════════════════════════════════════════
+const S = {
+  errors: {},
+  autoFill: {},
+  clientData: {},
+  activeImportTab: 'json',
+  // Nieuwe document structuur
+  docs: {
+    kvk:          { multiple: false, files: [] },
+    graydon:      { multiple: false, files: [] },
+    woz:          { multiple: true,  files: [] },
+    kadaster:     { multiple: true,  files: [] },
+    jaarrekeningen:{ multiple: true, files: [] }
+  },
+  loading: {},
+  // AI-ready placeholders
+  documentSummary: null,
+  documentInsights: null,
+  documentRisks: null,
+  documentNextSteps: null,
+  form: {
+    naamKlant:'', inkomen:'', vermogen:'', aantalPanden:'1',
+    woonland:'nl', typeKlant:'particulier', doelFinanciering:'aankoop',
+    aankoopprijs:'', marktwaarde:'', huurPerMaand:'', huurType:'bestaand',
+    typeVastgoed:'woning', gewensteLening:'', eigenInbreng:'',
+    rente:'0.05', looptijd:'20', metAflossing:'nee',
+    dossiernr:'', adviseur:'', notitie:''
+  }
+};
+
+// ════════════════════════════════════════════════════
+// ⑨ DOCUMENT HELPERS (nieuwe structuur)
+// ════════════════════════════════════════════════════
+
+// Eerste parsed doc per type (voor compatibility met conflict/score engines)
+function getFirstParsed(type) {
+  return S.docs[type]?.files[0]?.parsed || null;
+}
+
+// Flatten docs naar legacy format voor engines die dat verwachten
+function getLegacyDocs() {
+  return {
+    kvk:       getFirstParsed('kvk'),
+    graydon:   getFirstParsed('graydon'),
+    woz:       getFirstParsed('woz'),
+    kadaster:  getFirstParsed('kadaster'),
+    jaarrekeningen: getFirstParsed('jaarrekeningen')
+  };
+}
+
+// Totaal aantal geüploade bestanden (uniek)
+function totalFilesCount() {
+  return Object.values(S.docs).reduce((a,d)=>a+d.files.length,0);
+}
+
+// Aantal categorieën met minstens 1 bestand
+function filledCategoriesCount() {
+  return Object.values(S.docs).filter(d=>d.files.length>0).length;
+}
+
+// ════════════════════════════════════════════════════
+// ⑩ AUTO-FILL
+// ════════════════════════════════════════════════════
+function buildAutoFill(docs) {
+  const af = {};
+  const woz = getFirstParsed('woz');
+  const kadaster = getFirstParsed('kadaster');
+  const kvk = getFirstParsed('kvk');
+  if(woz?._definitieveWaarde)   af.marktwaarde = {waarde:String(woz._definitieveWaarde),bron:woz._isTaxatie?'Taxatie':'WOZ',veldLabel:'Marktwaarde'};
+  if(kadaster?._koopsomWaarde)  af.aankoopprijs = {waarde:String(kadaster._koopsomWaarde),bron:'Kadaster',veldLabel:'Aankoopprijs'};
+  if(kvk?._rechtsvormRaw&&['BV','NV'].includes(kvk._rechtsvormRaw)) af.typeKlant = {waarde:'bv',bron:'KVK',veldLabel:'Type klant'};
+  return af;
+}
+
+// ════════════════════════════════════════════════════
+// ⑪ CONFLICT CHECKS
+// ════════════════════════════════════════════════════
+function checkConflicts(form, docs) {
+  const hard=[], zacht=[], onverif=[], bevestigd=[];
+  const kvk = getFirstParsed('kvk');
+  const graydon = getFirstParsed('graydon');
+  const woz = getFirstParsed('woz');
+  const kadaster = getFirstParsed('kadaster');
+  const ingMV=parseFloat(form.marktwaarde)||0, ingA=parseFloat(form.aankoopprijs)||0;
+  if(kvk){
+    const rv=kvk._rechtsvormRaw,isBV=rv&&['BV','NV'].includes(rv);
+    if(isBV&&form.typeKlant==='particulier') hard.push({code:'KVK_TYPE',veld:'Type klant',ingevoerd:'Particulier',document:`${rv} (KVK)`,impact:'BV maar als particulier ingevuld',actie:'Verifieer via welke entiteit'});
+    else if(!isBV&&rv&&form.typeKlant==='bv') zacht.push({code:'KVK_TYPE_INV',veld:'Type klant',ingevoerd:'BV',document:`${rv} (KVK)`,impact:'Intake BV maar KVK toont andere rechtsvorm',actie:'Controleer entiteit'});
+    else if(rv) bevestigd.push({veld:'Rechtsvorm',waarde:rv,bron:'KVK'});
+    if(kvk.kvkNummer?.waarde) bevestigd.push({veld:'KVK-nummer',waarde:kvk.kvkNummer.waarde,bron:'KVK'});
+  } else if(form.typeKlant==='bv') onverif.push({veld:'Rechtsvorm BV',impact:'BV aangeduid maar KVK ontbreekt'});
+  if(woz){
+    const dw=woz._definitieveWaarde;
+    if(dw&&ingMV>0){const af=Math.abs(ingMV-dw)/dw*100;
+      if(af>15) hard.push({code:'WOZ_MV',veld:'Marktwaarde',ingevoerd:fE(ingMV),document:`${fE(dw)} (${woz._bronLabel})`,impact:`Afwijking ${af.toFixed(0)}%`,actie:'Gebruik documentwaarde of actuele taxatie'});
+      else if(af>7) zacht.push({code:'WOZ_SM',veld:'Marktwaarde',ingevoerd:fE(ingMV),document:`${fE(dw)} (${woz._bronLabel})`,impact:`Beperkte afwijking ${af.toFixed(0)}%`,actie:'Controleer actualiteit'});
+      else bevestigd.push({veld:'Marktwaarde',waarde:fE(dw),bron:woz._bronLabel});
+    }
+  } else if(ingMV>0) onverif.push({veld:'Marktwaarde',impact:`${fE(ingMV)} niet documentair onderbouwd`});
+  if(kadaster){
+    const dk=kadaster._koopsomWaarde;
+    if(dk&&ingA>0){const af=Math.abs(dk-ingA)/ingA*100;if(af>10)hard.push({code:'KAD_KS',veld:'Aankoopprijs',ingevoerd:fE(ingA),document:`${fE(dk)} (Kadaster)`,impact:`Afwijking ${af.toFixed(0)}%`,actie:'Verifieer welk bedrag leidend is'});else bevestigd.push({veld:'Aankoopprijs',waarde:fE(dk),bron:'Kadaster'});}
+    if(kadaster._heeftHypotheek) zacht.push({code:'KAD_HYP',veld:'Hypotheek',ingevoerd:'Niet opgegeven',document:'Aanwezig (Kadaster)',impact:'Bestaande inschrijving kan rangorde beïnvloeden',actie:'Verifieer omvang en rang'});
+    if(kadaster._eigenaarRaw) bevestigd.push({veld:'Eigenaar',waarde:kadaster._eigenaarRaw,bron:'Kadaster'});
+  } else onverif.push({veld:'Eigendom',impact:'Eigendom niet via Kadaster geverifieerd'});
+  if(graydon){
+    if(graydon._risicoNiveau==='hoog') hard.push({code:'GRAY_H',veld:'Kredietprofiel',ingevoerd:'—',document:'Verhoogd risico (Graydon)',impact:'Negatieve betaalhistorie',actie:'Bespreek met klant, onderbouw'});
+    else if(graydon._risicoNiveau==='gemiddeld') zacht.push({code:'GRAY_M',veld:'Kredietprofiel',ingevoerd:'—',document:'Matig risico (Graydon)',impact:'Bancaire drempel kan spelen',actie:'Toelichting voorbereiden'});
+    else bevestigd.push({veld:'Kredietprofiel',waarde:'Geen bijzonderheden',bron:'Graydon'});
+  }
+  // BV zonder jaarrekeningen
+  if(form.typeKlant==='bv' && S.docs.jaarrekeningen.files.length===0) {
+    onverif.push({veld:'Jaarrekeningen',impact:'BV vereist jaarrekeningen — ontbreken'});
+  }
+  return {hard,zacht,onverif,bevestigd};
+}
+
+// ════════════════════════════════════════════════════
+// ⑫ METRICS
+// ════════════════════════════════════════════════════
+function calcMetrics(form) {
+  const a=parseFloat(form.aankoopprijs)||0,mv=parseFloat(form.marktwaarde)||0,l=parseFloat(form.gewensteLening)||0,inb=parseFloat(form.eigenInbreng)||0,h=parseFloat(form.huurPerMaand)||0,r=parseFloat(form.rente)||0.05,lo=parseInt(form.looptijd)||20,ann=form.metAflossing==='ja';
+  const ref=mv>0?Math.min(a,mv):a;
+  const ltv=ref>0?(l/ref)*100:null,ltvA=a>0?(l/a)*100:null,ltvM=mv>0?(l/mv)*100:null;
+  const mlIO=l>0?(l*r)/12:0,mlAnn=l>0&&r>0?l*(r/12)/(1-Math.pow(1+r/12,-(lo*12))):0,ml=ann?mlAnn:mlIO;
+  const dscrIO=mlIO>0&&h>0?h/mlIO:null,dscrAnn=mlAnn>0&&h>0?h/mlAnn:null,dscr=ann?dscrAnn:dscrIO;
+  const cf=h-ml,ibP=a>0?(inb/a)*100:null;
+  return{a,mv,l,inb,h,r,lo,ann,ltv,ltvA,ltvM,ref,ml,mlIO,mlAnn,dscrIO,dscrAnn,dscr,cf,ibP,maxLeningIO:h>0?(h/1.25)*12/r:null,maxLening80:ref>0?ref*.8:null,e80:ltv!==null&&ltv>80&&ref>0?Math.max(0,l-ref*.8):0,e70:ltv!==null&&ltv>70&&ref>0?Math.max(0,l-ref*.7):0,bh125:ml>0?ml*1.25:null};
+}
+
+// ════════════════════════════════════════════════════
+// ⑬ SCORE
+// ════════════════════════════════════════════════════
+function calculateScore(form, m, docs, dossier) {
+  const p=parseInt(form.aantalPanden)||0;
+  const kvk=getFirstParsed('kvk'),g=getFirstParsed('graydon'),woz=getFirstParsed('woz'),kad=getFirstParsed('kadaster');
+  let A=0;
+  if(m.ltv!==null){const x=SCORE_CFG.LTV.find(r=>m.ltv<r.max);if(x)A+=x.d;}
+  if(m.dscr!==null){const x=SCORE_CFG.DSCR.find(r=>m.dscr>=r.min);if(x)A+=x.d;}else if(!parseFloat(form.huurPerMaand))A-=1;
+  if(m.ibP!==null){if(m.ibP>=35)A+=1;else if(m.ibP>=25)A+=.5;else if(m.ibP<15)A-=.5;}
+  A=Math.max(-5,Math.min(5,A));
+  let B=0;
+  if(p>=5)B+=1.5;else if(p>=3)B+=1;else if(p>=2)B+=.5;else if(p===0)B-=1;
+  if(form.woonland==='buiten-eu')B-=1.5;else if(form.woonland==='eu')B-=.75;
+  if(form.typeVastgoed==='recreatie')B-=1.25;else if(form.typeVastgoed==='horeca')B-=1;
+  if(form.huurType==='bestaand'&&parseFloat(form.huurPerMaand)>0)B+=.5;else if(form.huurType==='prognose')B-=.25;
+  if(form.doelFinanciering==='herfinanciering')B+=.25;if(form.typeKlant==='bv')B+=.25;
+  if(p===0&&m.ltv>75)B-=.5;B=Math.max(-4,Math.min(3,B));
+  let C=0;
+  if(g?._risicoNiveau==='hoog')C-=1.5;else if(g?._risicoNiveau==='gemiddeld')C-=.4;else if(g?._risicoNiveau==='laag')C+=.3;
+  if(kvk?._isBV&&form.typeKlant==='bv')C+=.3;
+  if(woz?._definitieveWaarde){const dw=woz._definitieveWaarde,iw=parseFloat(form.marktwaarde)||0;if(iw>0&&iw>dw*1.15)C-=.75;else if(iw>0&&iw<=dw*1.05)C+=.25;if(woz._isTaxatie)C+=.15;}
+  if(kad?._koopsomWaarde){const dk=kad._koopsomWaarde,ia=parseFloat(form.aankoopprijs)||0;if(ia>0&&Math.abs(ia-dk)/dk<=.05)C+=.2;else if(ia>0&&Math.abs(ia-dk)/dk>.15)C-=.5;}
+  if(S.docs.jaarrekeningen.files.length>0)C+=.2;
+  if(dossier){if(dossier.score>=75)C+=.3;else if(dossier.score<25)C-=.3;}
+  C=Math.max(-3,Math.min(2,C));
+  let totaal=SCORE_CFG.BASE+A+B+C;let cap=10;
+  if(m.dscr!==null&&m.dscr<1.0)cap=Math.min(cap,SCORE_CFG.CAPS.DSCR_K);
+  if(m.ltv!==null&&m.ltv>85)cap=Math.min(cap,SCORE_CFG.CAPS.LTV_85);
+  if(!parseFloat(form.inkomen)&&!parseFloat(form.huurPerMaand))cap=Math.min(cap,SCORE_CFG.CAPS.GEEN_CASH);
+  if(form.woonland!=='nl'&&['horeca','recreatie'].includes(form.typeVastgoed))cap=Math.min(cap,SCORE_CFG.CAPS.COMBO);
+  if(g?._risicoNiveau==='hoog')cap=Math.min(cap,SCORE_CFG.CAPS.GRAYDON_H);
+  totaal=Math.max(1,Math.min(cap,Math.round(totaal*10)/10));
+  const isCapped=cap<10;
+  const capReden=g?._risicoNiveau==='hoog'?'Graydon hoog risico':m.dscr!==null&&m.dscr<1?'DSCR < 1.0':m.ltv!==null&&m.ltv>85?'LTV > 85%':isCapped?'Hard cap':'';
+  let label,klasse,route;
+  if(totaal>=7.5){label='Goed financierbaar';klasse='good';route='bancair';}
+  else if(totaal>=6){label='Bancair mogelijk';klasse='blauw';route='bancair';}
+  else if(totaal>=4){label='Non-bank aanbevolen';klasse='warn';route='non-bank';}
+  else if(totaal>=2.5){label='Lastig';klasse='oranje';route='moeilijk';}
+  else{label='Niet financierbaar';klasse='bad';route='niet';}
+  return{score:totaal,label,klasse,route,isCapped,capReden,subScores:{A:Math.round(A*10)/10,B:Math.round(B*10)/10,C:Math.round(C*10)/10}};
+}
+
+// ════════════════════════════════════════════════════
+// ⑭ DOSSIER KWALITEIT (dynamisch op basis van weights)
+// ════════════════════════════════════════════════════
+function calcDossierQuality(docs, conf, form) {
+  let score=0; const det=[];
+  const g=getFirstParsed('graydon'), woz=getFirstParsed('woz');
+  // Dynamisch: per categorie met weight
+  Object.entries(DOC_TYPES).forEach(([key, dt]) => {
+    const catFiles = S.docs[key].files;
+    if(catFiles.length > 0) {
+      score += dt.weight * 4;
+      det.push({l:`${dt.label} aanwezig (${catFiles.length} bestand${catFiles.length>1?'en':''})`,p:dt.weight*4,pos:true});
+      // Kwaliteitsbonus
+      const goed = catFiles.filter(f=>f.parsed?._meta?.documentKwaliteit==='goed').length;
+      if(goed > 0) { score += 2; det.push({l:`${dt.label}: goed leesbaar`,p:2,pos:true}); }
+    }
+  });
+  // Bevestigingen
+  const bevP = Math.min((conf?.bevestigd?.length||0)*4,15);
+  score += bevP;
+  if(bevP>0) det.push({l:`${conf.bevestigd.length} kernveld(en) bevestigd`,p:bevP,pos:true});
+  // Conflicten aftrek
+  const hk=(conf?.hard?.length||0)*12; score-=hk;
+  if(hk>0) det.push({l:`${conf.hard.length} hard conflict(en)`,p:-hk,pos:false});
+  const zk=(conf?.zacht?.length||0)*4; score-=zk;
+  if(zk>0) det.push({l:`${conf.zacht.length} zachte afwijking(en)`,p:-zk,pos:false});
+  const ok=(conf?.onverif?.length||0)*3; score-=ok;
+  if(ok>0) det.push({l:`${conf.onverif.length} veld(en) niet geverifieerd`,p:-ok,pos:false});
+  // Graydon
+  if(g){const gp=g._risicoNiveau==='hoog'?-15:g._risicoNiveau==='gemiddeld'?-5:5;score+=gp;det.push({l:`Graydon: ${g._risicoNiveau} risico`,p:gp,pos:gp>0});}
+  if(woz?._isTaxatie){score+=3;det.push({l:'Taxatierapport (sterk bewijs)',p:3,pos:true});}
+  // BV bonus jaarrekeningen
+  if(form.typeKlant==='bv' && S.docs.jaarrekeningen.files.length>=2){score+=5;det.push({l:'Jaarrekeningen 2+ jaar aanwezig',p:5,pos:true});}
+  score=Math.max(0,Math.min(100,Math.round(score)));
+  let label,klasse;
+  if(score>=75){label='Sterk dossier';klasse='good';}
+  else if(score>=50){label='Voldoende dossier';klasse='blauw';}
+  else if(score>=25){label='Matig dossier';klasse='warn';}
+  else{label='Zwak dossier';klasse='bad';}
+  return{score,label,klasse,det};
+}
+
+// ════════════════════════════════════════════════════
+// ⑮ READINESS
+// ════════════════════════════════════════════════════
+function detectReadiness(form, m, docs, conf, sc) {
+  function evalRoute(rk, route) {
+    const res = route.vereisten.map(req => {const v=req.check(S.docs,form,m,conf);return{...req,voldoet:v};});
+    const kFail=res.filter(r=>r.prioriteit==='kritisch'&&!r.voldoet),hFail=res.filter(r=>r.prioriteit==='hoog'&&!r.voldoet);
+    const ind=kFail.length===0,compl=kFail.length===0&&hFail.length===0;
+    let status,statusKlasse;
+    if(compl){status=rk==='bancair'?'Bank-ready':'Non-bank-ready';statusKlasse='good';}
+    else if(ind){status='Bijna klaar';statusKlasse='blauw';}
+    else{status='Niet indienbaar';statusKlasse='bad';}
+    return{route:rk,label:route.label,status,statusKlasse,resultaten:res,kritischFail:kFail,hoogFail:hFail,indienbaar:ind,compleet:compl};
+  }
+  const bancair=evalRoute('bancair',DOSSIER_REQS.bancair),nonbank=evalRoute('nonbank',DOSSIER_REQS.nonbank);
+  const aanb=sc?.route==='bancair'?'bancair':'nonbank';
+  let overallStatus,overallKlasse;
+  if(bancair.compleet){overallStatus='Bank-ready';overallKlasse='good';}
+  else if(nonbank.compleet){overallStatus='Non-bank-ready';overallKlasse='blauw';}
+  else if(nonbank.indienbaar){overallStatus='Bijna non-bank-ready';overallKlasse='warn';}
+  else{overallStatus='Nog niet indienbaar';overallKlasse='bad';}
+  return{bancair,nonbank,aanb,overallStatus,overallKlasse};
+}
+
+// ════════════════════════════════════════════════════
+// ⑯ RISKS
+// ════════════════════════════════════════════════════
+function detectRisks(form, m, docs, conf) {
+  const krit=[], aand=[];
+  const p=parseInt(form.aantalPanden)||0;
+  const g=getFirstParsed('graydon');
+  if(m.dscr!==null&&m.dscr<1.0)        krit.push({code:'DSCR_K',t:`DSCR ${m.dscr.toFixed(2)} — huurinkomsten dekken maandlasten niet`,i:'Deal breaker',a:m.bh125?`Huur naar min. ${fE(m.bh125)}/mnd`:'Huur of lening aanpassen',oplosbaar:true});
+  if(m.ltv!==null&&m.ltv>90)            krit.push({code:'LTV_E',t:`LTV ${fP(m.ltv)} — buiten alle normen`,i:'Geen financier actief',a:`${fE(m.e80)} extra voor LTV 80%`,oplosbaar:true});
+  if(!parseFloat(form.inkomen)&&!parseFloat(form.huurPerMaand)) krit.push({code:'CASH',t:'Geen inkomen én geen huurinkomsten',i:'Cashflow onbekend',a:'Inkomensbewijs of huurcontract vereist',oplosbaar:true});
+  if(form.woonland!=='nl'&&['horeca','recreatie'].includes(form.typeVastgoed)) krit.push({code:'COMBO',t:'Buitenland + risicovastgoed',i:'Zelfs specialisten terughoudend',a:'Heroverweeg structuur',oplosbaar:false});
+  if(g?._risicoNiveau==='hoog')          krit.push({code:'GRAY_H',t:'Graydon: verhoogd kredietrisico',i:'Negatieve betaalhistorie',a:'Onderbouw bij financier',oplosbaar:true});
+  if(conf?.hard?.some(c=>c.code==='KVK_TYPE')) krit.push({code:'KVK_ST',t:'KVK spreekt klanttype/rechtsvorm tegen',i:'Structuurmismatch',a:'Verifieer via welke entiteit',oplosbaar:true});
+  if(form.typeKlant==='bv'&&S.docs.jaarrekeningen.files.length===0) krit.push({code:'JAARR',t:'BV zonder jaarrekeningen',i:'Inkomenstoets bancair niet mogelijk',a:'Minimaal 2 jaar jaarrekeningen opvragen',oplosbaar:true});
+  if(m.ltv>80&&m.ltv<=90)    aand.push({code:'LTV_H',t:`LTV ${fP(m.ltv)} boven bancaire norm`,i:'Banken niet actief >80%',a:`${fE(m.e80)} extra → LTV 80%`,oplosbaar:true});
+  if(m.dscr!==null&&m.dscr>=1&&m.dscr<1.25) aand.push({code:'DSCR_L',t:`DSCR ${m.dscr.toFixed(2)} onder norm 1.25`,i:'Bancaire drempel',a:`Huur naar ${fE(m.bh125)}/mnd`,oplosbaar:true});
+  if(form.woonland==='buiten-eu') aand.push({code:'BUIT',t:'Buiten EU — beperkt financiersuniversum',i:'Vrijwel alleen RNHB',a:'Richt op RNHB',oplosbaar:false});
+  else if(form.woonland==='eu') aand.push({code:'EU',t:'EU (niet NL) — bancair beperkt',i:'NL-banken doorgaans inactief',a:'Non-bank route',oplosbaar:false});
+  if(form.typeVastgoed==='horeca') aand.push({code:'HOR',t:'Horeca — verhoogd risico',i:'Banken mijden horeca',a:'RNHB of NIBC',oplosbaar:false});
+  if(form.typeVastgoed==='recreatie') aand.push({code:'REC',t:'Recreatie — nichemarkt',i:'Slechts enkele financiers',a:'RNHB',oplosbaar:false});
+  if(p===0&&m.ltv>75) aand.push({code:'NERV',t:'Geen ervaring + hoge LTV',i:'Uitvoeringsrisico',a:'Co-belegger overwegen',oplosbaar:true});
+  if(form.huurType==='prognose') aand.push({code:'PROG',t:'Huur op prognose',i:'Zwaarder gewogen door financier',a:'Taxateur validatie',oplosbaar:true});
+  if(g?._risicoNiveau==='gemiddeld') aand.push({code:'GRAY_M',t:'Graydon: gemiddeld risico',i:'Bancaire drempel kan spelen',a:'Toelichting voorbereiden',oplosbaar:true});
+  if(conf?.hard?.some(c=>c.code==='WOZ_MV')) aand.push({code:'WOZ_AFW',t:'WOZ/taxatie wijkt af van marktwaarde',i:'LTV mogelijk onjuist',a:'Corrigeer marktwaarde',oplosbaar:true});
+  return{krit,aand};
+}
+
+// ════════════════════════════════════════════════════
+// ⑰ ADVICE
+// ════════════════════════════════════════════════════
+function generateAdvice(form, m, risks, sc, docs, doss, readiness) {
+  const acties = [];
+  const g=getFirstParsed('graydon'), woz=getFirstParsed('woz'), kad=getFirstParsed('kadaster'), kvk=getFirstParsed('kvk');
+  risks.krit.forEach(r => acties.push({p:'kritisch',t:r.a}));
+  if(m.dscr!==null&&m.dscr<1.25&&m.bh125){const tk=Math.ceil(m.bh125-m.h);if(tk>0)acties.push({p:'hoog',t:`Huur ${fE(tk)} hoger nodig (→ ${fE(m.bh125)}/mnd) voor DSCR 1.25`});}
+  if(m.ltv>85&&m.e80>0) acties.push({p:'kritisch',t:`${fE(m.e80)} extra inbreng voor LTV → 80%`});
+  else if(m.ltv>80&&m.ltv<=85&&m.e80>0) acties.push({p:'hoog',t:`${fE(m.e80)} extra inbreng → LTV 80%, opent bancaire route`});
+  if(g?._risicoNiveau==='hoog') acties.push({p:'hoog',t:'Graydon verhoogd risico — onderbouw betalingshistorie'});
+  if(woz?._definitieveWaarde){const dw=woz._definitieveWaarde,iw=parseFloat(form.marktwaarde)||0;
+    if(iw>dw*1.15) acties.push({p:'hoog',t:`${woz._bronLabel} (${fE(dw)}) bevestigt marktwaarde (${fE(iw)}) niet`});
+    else acties.push({p:'laag',t:`${woz._isTaxatie?'Taxatierapport':'WOZ'} bevestigt marktwaarde — sterk dossieronderdeel`});
+  } else acties.push({p:'medium',t:'Geen WOZ/taxatie — marktwaarde niet onderbouwd.'});
+  if(kad?._heeftHypotheek) acties.push({p:'medium',t:'Kadaster: bestaande hypotheekinschrijving — verifieer omvang'});
+  if(kvk?._isBV&&form.typeKlant==='bv') acties.push({p:'laag',t:'KVK bevestigt BV-structuur — positief'});
+  if(readiness){
+    const pr=readiness[readiness.aanb];
+    pr?.kritischFail?.forEach(r=>acties.push({p:'kritisch',t:`Vereist voor indiening: ${r.label}`}));
+    pr?.hoogFail?.forEach(r=>acties.push({p:'hoog',t:`Wenselijk: ${r.label}`}));
+  }
+  if(sc.route==='bancair'&&readiness?.bancair?.indienbaar) acties.push({p:'laag',t:'Profiel en dossier lijken klaar voor bancaire indiening'});
+  else if(sc.route==='non-bank') acties.push({p:'medium',t:'Richt aanvraag op non-bank financiers'});
+  return acties;
+}
+
+// ════════════════════════════════════════════════════
+// ⑱ LENDER MATCH ENGINE (verbeterd)
+// ════════════════════════════════════════════════════
+function matchLenders(form, m, sc, docs, doss) {
+  const p=parseInt(form.aantalPanden)||0;
+  const g=getFirstParsed('graydon'), woz=getFirstParsed('woz');
+  return LENDERS.map(l => {
+    let score = 60; // basis — niet alles is 100%
+    const plus = [], min = [], beperking = [];
+
+    // LTV
+    if(m.ltv !== null) {
+      if(m.ltv > l.maxLTV) {
+        const overshoot = m.ltv - l.maxLTV;
+        score -= Math.min(45, overshoot * 5);
+        min.push(`LTV ${fP(m.ltv)} overschrijdt max ${l.maxLTV}%`);
+      } else if(m.ltv <= l.maxLTV * 0.85) {
+        score += 15; plus.push(`LTV ruim binnen norm (${fP(m.ltv)} ≤ ${l.maxLTV}%)`);
+      } else {
+        score += 5; plus.push(`LTV binnen norm (${fP(m.ltv)} ≤ ${l.maxLTV}%)`);
+      }
+    } else { score -= 5; min.push('LTV onbekend'); }
+
+    // DSCR
+    if(m.dscr !== null) {
+      if(m.dscr < l.minDSCR) {
+        score -= 28; min.push(`DSCR ${m.dscr.toFixed(2)} onder minimum ${l.minDSCR}`);
+      } else if(m.dscr >= 1.5) {
+        score += 15; plus.push(`Sterke cashflow DSCR ${m.dscr.toFixed(2)}`);
+      } else if(m.dscr >= 1.25) {
+        score += 8; plus.push(`DSCR voldoende (${m.dscr.toFixed(2)})`);
+      } else {
+        score += 2; plus.push(`DSCR net voldoende (${m.dscr.toFixed(2)})`);
+      }
+    } else { score -= 12; min.push('DSCR niet bepaald (geen huur)'); }
+
+    // Woonland
+    if(!l.woonlanden.includes(form.woonland)) {
+      score -= 50; beperking.push('Woonland buiten beleid');
+    } else if(form.woonland === 'nl') {
+      score += 5; plus.push('NL-ingezetene — standaard');
+    } else if(l.buitenland) {
+      score += 3; plus.push('Actief voor buitenlandse klanten');
+    }
+
+    // Vastgoedtype
+    if(!l.vastgoedTypes.includes(form.typeVastgoed)) {
+      score -= 40; beperking.push(`${form.typeVastgoed} buiten beleid`);
+    } else if(['horeca','recreatie'].includes(form.typeVastgoed)) {
+      if(l[form.typeVastgoed]) { score += 5; plus.push(`${form.typeVastgoed} binnen beleid`); }
+      else { score -= 40; beperking.push(`${form.typeVastgoed} niet toegestaan`); }
+    }
+
+    // Lening ticket
+    if(m.l > 0) {
+      if(m.l < l.minLening) { score -= 20; min.push(`Bedrag onder min ${fE(l.minLening)}`); }
+      else if(m.l > l.maxLening) { score -= 20; beperking.push(`Bedrag boven max ${fE(l.maxLening)}`); }
+      else { score += 5; plus.push('Lening binnen ticket-range'); }
+    }
+
+    // Klanttype
+    if(!l.klantTypes.includes(form.typeKlant)) {
+      score -= 25; beperking.push('Klanttype niet in beleid');
+    }
+
+    // Doel
+    if(!l.doelen.includes(form.doelFinanciering)) {
+      score -= 15; min.push('Financieringsdoel buiten beleid');
+    } else { plus.push(`${form.doelFinanciering} geaccepteerd`); }
+
+    // Trackrecord
+    if(l.trackrecordVereist && p === 0) {
+      score -= 20; beperking.push('Trackrecord vereist — ontbreekt');
+    } else if(p >= 3) {
+      score += 8; plus.push(`${p} panden — goed trackrecord`);
+    } else if(p >= 1) {
+      score += 3; plus.push('Aanwezig trackrecord');
+    }
+
+    // Graydon
+    if(g?._risicoNiveau === 'hoog') {
+      if(l.type === 'bank') { score -= 30; min.push('Graydon hoog risico: bancaire route niet realistisch'); }
+      else { score -= 10; min.push('Graydon hoog risico: toelichting vereist'); }
+    } else if(g?._risicoNiveau === 'laag') {
+      score += 8; plus.push('Goed kredietprofiel (Graydon)');
+    } else if(!g) {
+      score -= 5;
+    }
+
+    // Dossier kwaliteit
+    if(doss) {
+      if(doss.score >= 75 && l.type === 'bank') { score += 8; plus.push('Sterk dossier voor bancaire route'); }
+      else if(doss.score >= 75) { score += 5; plus.push('Sterk dossier'); }
+      else if(doss.score < 30 && l.type === 'bank') { score -= 12; min.push('Dossier te mager voor bank'); }
+      else if(doss.score < 30) { score -= 5; min.push('Matig dossier'); }
+    }
+
+    // WOZ / Taxatie bonus
+    if(woz?._definitieveWaarde && l.type === 'bank') {
+      score += 5; plus.push('Waarde gedocumenteerd — sterk onderdeel');
+    }
+
+    score = Math.max(0, Math.min(100, Math.round(score)));
+    const matchType = score >= 72 ? 'sterk' : score >= 48 ? 'redelijk' : 'zwak';
+    const kl = score >= 72 ? 'good' : score >= 48 ? 'warn' : 'bad';
+
+    return {...l, score, kl, matchType, plus: plus.slice(0,3), min: min.slice(0,3), beperking: beperking.slice(0,2)};
+  }).sort((a,b) => b.score - a.score);
+}
+
+// ════════════════════════════════════════════════════
+// ⑲ CONCLUSIE
+// ════════════════════════════════════════════════════
+function genConclusie(sc, conf, doss, readiness) {
+  const g=getFirstParsed('graydon'), kk=(conf?.hard?.length||0)>0;
+  if(g?._risicoNiveau==='hoog') return 'Op basis van Graydon is bancaire financiering niet realistisch. Non-bank financiers bieden mogelijk ruimte mits kredietprofiel wordt toegelicht.';
+  if(kk) return `Harde afwijkingen gedetecteerd — eerst verifiëren voordat een aanvraag wordt ingediend.`;
+  if(readiness?.overallStatus==='Bank-ready') return 'Economisch en dossiermatig lijkt deze deal bank-ready.';
+  if(readiness?.overallStatus==='Non-bank-ready') return 'Haalbaar voor non-bank financiers. Dossier mist nog elementen voor bancaire route.';
+  if(sc.route==='bancair'&&sc.score>=7.5) return `Deal lijkt goed financierbaar via bancaire financiers${doss?.score<50?', maar dossier vereist versterking':''}.`;
+  if(sc.route==='bancair') return 'Bancaire financiering haalbaar, mits dossier verder wordt versterkt.';
+  if(sc.route==='non-bank') return 'Non-bank financiers zijn de meest realistische route.';
+  if(sc.route==='moeilijk') return 'Kritische knelpunten belemmeren financiering.';
+  return 'In huidige vorm niet financierbaar. Significante aanpassingen noodzakelijk.';
+}
+
+// ════════════════════════════════════════════════════
+// ⑳ AI-READY FUNCTIES (stubs — implementatie volgt)
+// ════════════════════════════════════════════════════
+
+// Roep later aan met: analyseDocuments(S.docs)
+// eslint-disable-next-line no-unused-vars
+async function analyseDocuments(docs) {
+  // TODO: Implementeer AI analyse via Anthropic API
+  // S.documentSummary = await callAI('summarize', docs);
+  // S.documentInsights = await callAI('insights', docs);
+  // S.documentRisks = await callAI('risks', docs);
+  // S.documentNextSteps = await callAI('nextsteps', docs);
+  return null;
+}
+
+// ════════════════════════════════════════════════════
+// ㉑ VALIDATIE (uitgebreid)
+// ════════════════════════════════════════════════════
+function validate() {
+  const e = {};
+  const a=parseFloat(S.form.aankoopprijs),l=parseFloat(S.form.gewensteLening),i=parseFloat(S.form.eigenInbreng);
+  if(!S.form.naamKlant?.trim()) e.naamKlant='Naam is verplicht';
+  if(!S.form.aankoopprijs) e.aankoopprijs='Aankoopprijs verplicht';
+  if(!S.form.gewensteLening) e.gewensteLening='Leningsbedrag verplicht';
+  if(!S.form.eigenInbreng) e.eigenInbreng='Eigen inbreng verplicht';
+  if(l>0&&a>0&&l>a*1.1) e.gewensteLening='Hoger dan aankoopprijs';
+  if(a>0&&l>0&&i>0){const d=Math.abs(l+i-a);if(d>10000)e._sw=`Lening+inbreng wijkt ${fE(d)} af`;}
+  return e;
+}
+
+// ════════════════════════════════════════════════════
+// ㉒ STATE UPDATES
+// ════════════════════════════════════════════════════
+let _renderDebounce = null;
+
+function upd(k, v) {
+  S.form[k] = v;
+  scheduleAnalysisUpdate();
+}
+
+function scheduleAnalysisUpdate() {
+  clearTimeout(_renderDebounce);
+  _renderDebounce = setTimeout(() => updateAnalysisPanels(), 120);
+}
+
+function updateAnalysisPanels() {
+  S.errors = validate();
+  const m=calcMetrics(S.form), conf=checkConflicts(S.form,S.docs);
+  const doss=calcDossierQuality(S.docs,conf,S.form);
+  const risks=detectRisks(S.form,m,S.docs,conf);
+  const sc=calculateScore(S.form,m,S.docs,doss);
+  const readiness=detectReadiness(S.form,m,S.docs,conf,sc);
+  const acties=generateAdvice(S.form,m,risks,sc,S.docs,doss,readiness);
+  const lenders=matchLenders(S.form,m,sc,S.docs,doss);
+  const concl=genConclusie(sc,conf,doss,readiness);
+  document.getElementById('HDR_K').textContent = S.form.naamKlant||'';
+  document.getElementById('PANEL_MAIN').innerHTML = renderMain(m,sc,risks,conf,doss,readiness,acties,lenders,concl);
+  renderAside(m,sc,doss,readiness);
+  updateFieldErrors();
+}
+
+function updateFieldErrors() {
+  Object.keys(S.errors).filter(k=>!k.startsWith('_')).forEach(k=>{const el=document.getElementById('fi_'+k);if(el)el.classList.add('err');});
+  document.querySelectorAll('.finput.err').forEach(el=>{const k=el.id.replace('fi_','');if(!S.errors[k])el.classList.remove('err');});
+}
+
+function fullRender() {
+  S.errors = validate();
+  const m=calcMetrics(S.form), conf=checkConflicts(S.form,S.docs);
+  const doss=calcDossierQuality(S.docs,conf,S.form);
+  const risks=detectRisks(S.form,m,S.docs,conf);
+  const sc=calculateScore(S.form,m,S.docs,doss);
+  const readiness=detectReadiness(S.form,m,S.docs,conf,sc);
+  const acties=generateAdvice(S.form,m,risks,sc,S.docs,doss,readiness);
+  const lenders=matchLenders(S.form,m,sc,S.docs,doss);
+  const concl=genConclusie(sc,conf,doss,readiness);
+  document.getElementById('HDR_K').textContent = S.form.naamKlant||'';
+  document.getElementById('PANEL_INPUT').innerHTML = renderInput();
+  document.getElementById('PANEL_MAIN').innerHTML = renderMain(m,sc,risks,conf,doss,readiness,acties,lenders,concl);
+  renderAside(m,sc,doss,readiness);
+}
+
+// ════════════════════════════════════════════════════
+// ㉓ UPLOAD LOGICA (nieuwe structuur)
+// ════════════════════════════════════════════════════
+async function handleUpload(type, file) {
+  if(!file) return;
+  const dt = DOC_TYPES[type];
+  S.loading[type+'_loading'] = true;
+  // Update enkel de doc-sectie in het linkerpanel
+  const panel = document.getElementById(`DOC_CAT_${type}`);
+  if(panel) {
+    const btn = panel.querySelector('.doc-upload-btn');
+    if(btn) btn.classList.add('loading');
+  }
+
+  try {
+    const parsed = await parseDoc(type, file);
+    const fileEntry = {
+      id: Date.now()+'_'+Math.random().toString(36).slice(2),
+      naam: file.name,
+      uploadDatum: new Date().toLocaleDateString('nl-NL'),
+      parsed
+    };
+    if(!dt.multiple) {
+      S.docs[type].files = [fileEntry]; // vervang
+    } else {
+      S.docs[type].files.push(fileEntry); // voeg toe
+    }
+    S.autoFill = buildAutoFill(S.docs);
+    S.loading[type+'_loading'] = false;
+    fullRender();
+  } catch(e) {
+    console.error('Upload fout:', e);
+    S.loading[type+'_loading'] = false;
+    fullRender();
+  }
+}
+
+function deleteFile(type, fileId) {
+  S.docs[type].files = S.docs[type].files.filter(f => f.id !== fileId);
+  S.autoFill = buildAutoFill(S.docs);
+  fullRender();
+}
+
+function doAutoFill() {
+  Object.entries(S.autoFill).forEach(([k,v]) => {
+    S.form[k] = v.waarde; S.clientData[k] = v.waarde;
+    const el = document.getElementById('fi_'+k);
+    if(el) el.value = v.waarde;
+  });
+  S.autoFill = {};
+  fullRender();
+}
+
+function resetApp() {
+  Object.assign(S, {
+    errors:{}, autoFill:{}, clientData:{}, activeImportTab:'json',
+    docs:{kvk:{multiple:false,files:[]},graydon:{multiple:false,files:[]},woz:{multiple:true,files:[]},kadaster:{multiple:true,files:[]},jaarrekeningen:{multiple:true,files:[]}},
+    loading:{},
+    documentSummary:null,documentInsights:null,documentRisks:null,documentNextSteps:null,
+    form:{naamKlant:'',inkomen:'',vermogen:'',aantalPanden:'1',woonland:'nl',typeKlant:'particulier',doelFinanciering:'aankoop',aankoopprijs:'',marktwaarde:'',huurPerMaand:'',huurType:'bestaand',typeVastgoed:'woning',gewensteLening:'',eigenInbreng:'',rente:'0.05',looptijd:'20',metAflossing:'nee',dossiernr:'',adviseur:'',notitie:''}
+  });
+  fullRender();
+}
+
+// ════════════════════════════════════════════════════
+// ㉔ IMPORT MODAL
+// ════════════════════════════════════════════════════
+function showImportModal() { document.getElementById('IMPORT_MODAL').style.display='flex'; }
+function hideImportModal() { document.getElementById('IMPORT_MODAL').style.display='none'; }
+function switchTab(tab) {
+  S.activeImportTab=tab;
+  document.getElementById('TAB_JSON_BTN').className='modal-tab'+(tab==='json'?' active':'');
+  document.getElementById('TAB_PDF_BTN').className='modal-tab'+(tab==='pdf'?' active':'');
+  document.getElementById('TAB_JSON').className='modal-section'+(tab==='json'?' active':'');
+  document.getElementById('TAB_PDF').className='modal-section'+(tab==='pdf'?' active':'');
+  document.getElementById('IMPORT_BTN').style.display=tab==='json'?'inline-flex':'none';
+}
+function doImport() {
+  const raw=document.getElementById('IMPORT_JSON').value.trim();if(!raw)return;
+  try{
+    const data=JSON.parse(raw); S.clientData={};
+    const map={typeKlant:'typeKlant',doelFinanciering:'doelFinanciering',typeVastgoed:'typeVastgoed',marktwaarde:'marktwaarde',gewensteLening:'gewensteLening',jaarinkomen:'inkomen',naamKlant:'naamKlant',aantalPanden:'aantalPanden',inkomen:'inkomen'};
+    Object.entries(map).forEach(([src,dst])=>{if(data[src]!=null&&data[src]!==''){S.form[dst]=String(data[src]);S.clientData[dst]=String(data[src]);}});
+    if(data.huurinkomsten&&parseFloat(data.huurinkomsten)>0){const mo=String(Math.round(parseFloat(data.huurinkomsten)/12));S.form.huurPerMaand=mo;S.clientData.huurPerMaand=mo;}
+    hideImportModal(); fullRender();
+  }catch(e){alert('Ongeldige JSON.');}
+}
+async function handlePdfImport(file) {
+  if(!file)return;
+  document.getElementById('PDF_IMPORT_STATUS').innerHTML=`<div style="background:var(--wn-bg);border:1.5px solid var(--wn-bd);border-radius:8px;padding:13px 14px;margin-top:11px"><div style="font-family:var(--head);font-size:10px;font-weight:700;color:var(--wn);margin-bottom:6px;text-transform:uppercase">⚙️ PDF import niet beschikbaar</div><div style="font-size:11px;color:var(--tx2);line-height:1.6">Gebruik de JSON import of vul velden handmatig in.</div></div>`;
+}
+
+// ════════════════════════════════════════════════════
+// ㉕ PRINT
+// ════════════════════════════════════════════════════
+function printReport() {
+  const datum=new Date().toLocaleDateString('nl-NL',{day:'2-digit',month:'long',year:'numeric'});
+  const ref=`MBA-${Date.now().toString().slice(-6)}`;
+  const ph=document.getElementById('PRINT_HEADER');
+  ph.style.display='flex';
+  ph.innerHTML=`<div class="print-logo">MB Adviesgroep <span>Deal Analyzer — Intern Kredietmemo</span></div><div class="print-meta"><strong>${f('naamKlant')||'Anoniem'}</strong>${datum} · Ref: ${ref}${f('adviseur')?' · '+f('adviseur'):''}</div>`;
+  window.print();
+  setTimeout(()=>{ph.style.display='none';},500);
+}
+
+function doCopy(id,btnId){
+  const el=document.getElementById(id);if(!el)return;
+  navigator.clipboard.writeText(el.innerText||el.textContent).then(()=>{const btn=document.getElementById(btnId);if(btn){btn.textContent='✓ Gekopieerd';setTimeout(()=>btn.textContent='Kopiëren',2200);}});
+}
+
+// ════════════════════════════════════════════════════
+// ㉖ UI HELPERS
+// ════════════════════════════════════════════════════
+function f(k){return S.form[k]||'';}
+function fv(k){return parseFloat(S.form[k])||0;}
+
+function inp(key,type='text',ph=''){
+  const v=(S.form[key]||'').replace(/"/g,'&quot;');
+  const fc=S.clientData[key]!==undefined?' from-client':'';
+  const ec=S.errors[key]?' err':'';
+  return `<input type="${type}" id="fi_${key}" class="finput${fc}${ec}" value="${v}" placeholder="${ph}" oninput="S.form['${key}']=this.value;scheduleAnalysisUpdate()" onchange="S.form['${key}']=this.value;scheduleAnalysisUpdate()">`;
+}
+function sel(key,opts){
+  const v=S.form[key]||'';const fc=S.clientData[key]!==undefined?' from-client':'';
+  return `<select id="fi_${key}" class="fselect${fc}" onchange="S.form['${key}']=this.value;fullRender()">${opts.map(([val,lbl])=>`<option value="${val}"${v===val?' selected':''}>${lbl}</option>`).join('')}</select>`;
+}
+function fg(label,input,err=''){return `<div class="fgrp">${label?`<label>${label}</label>`:''}${input}${err?`<div class="ferr">${err}</div>`:''}</div>`;}
+function fg2(a,b){return `<div class="fg2">${a}${b}</div>`;}
+
+function scoreRing(sc,kl,sub,cap){
+  const r=34,c=2*Math.PI*r,off=c*(1-sc/10);
+  const str=SC_STROKE[kl]||'#1B597B';
+  const subHtml=sub?`<div class="sub-scores">${[['A','Haalb.',sub.A],['B','Risico',sub.B],['C','Doss.',sub.C]].map(([k,l,v])=>`<div class="sub-score"><div class="sub-s-lbl">${l}</div><div class="sub-s-val" style="color:${v>0?'var(--gn)':v<-.5?'var(--rk)':'var(--tx3)'}">${v>0?'+':''}${v.toFixed(1)}</div></div>`).join('')}</div>`:'';
+  return `<div class="sc-w"><div class="sc-r"><svg width="76" height="76" viewBox="0 0 80 80"><circle class="sc-tr" cx="40" cy="40" r="${r}"/><circle class="sc-fl" cx="40" cy="40" r="${r}" stroke="${str}" stroke-dasharray="${c.toFixed(1)}" stroke-dashoffset="${off.toFixed(1)}"/></svg><div class="sc-in"><span class="sc-n" style="color:${str}">${sc}</span><span class="sc-d">/10</span></div></div><div class="sc-lb" style="color:${str}">${SC_LABEL[kl]}</div>${cap?`<div style="font-size:8.5px;color:var(--rk);margin-top:2px;text-align:center">${cap}</div>`:''}</div>${subHtml}`;
+}
+
+// ════════════════════════════════════════════════════
+// ㉗ DOCUMENT CATEGORIE UI (links panel)
+// ════════════════════════════════════════════════════
+function renderDocCategory(key) {
+  const dt = DOC_TYPES[key];
+  const cat = S.docs[key];
+  const files = cat.files;
+  const isLoading = S.loading[key+'_loading'];
+  const hasFiles = files.length > 0;
+  const isRequired = dt.requiredFor.length > 0;
+  const statusCls = hasFiles ? 'ok' : isRequired ? 'miss' : 'opt';
+  const statusLbl = hasFiles ? (dt.multiple?`${files.length} bestand${files.length>1?'en':''}`:'✓ Aanwezig') : (isRequired?'Vereist':'Optioneel');
+
+  return `
+  <div class="doc-category" id="DOC_CAT_${key}">
+    <div class="doc-cat-header" onclick="this.parentElement.querySelector('.doc-cat-body').style.display=this.parentElement.querySelector('.doc-cat-body').style.display==='none'?'block':'none'">
+      <span class="doc-cat-icon">${dt.icon}</span>
+      <span class="doc-cat-lbl">${dt.label}</span>
+      <span class="doc-cat-count">${files.length}</span>
+      <span class="doc-cat-status ${statusCls}">${statusLbl}</span>
+    </div>
+    <div class="doc-cat-body">
+      ${files.length>0?`<div class="doc-file-list">
+        ${files.map(f=>`
+          <div class="doc-file-item">
+            <span style="font-size:10px;flex-shrink:0">${dt.icon}</span>
+            <span class="doc-file-name" title="${f.naam}">${f.naam}</span>
+            <span class="doc-file-date">${f.uploadDatum}</span>
+            ${f.parsed?._meta?.documentKwaliteit?`<span style="font-size:7.5px;font-weight:700;padding:1.5px 4px;border-radius:8px;${f.parsed._meta.documentKwaliteit==='goed'?'background:var(--gn-bg);color:var(--gn)':f.parsed._meta.documentKwaliteit==='matig'?'background:var(--wn-bg);color:var(--wn)':'background:var(--rk-bg);color:var(--rk)'}">${f.parsed._meta.documentKwaliteit==='goed'?'OK':f.parsed._meta.documentKwaliteit==='matig'?'Deels':'Slecht'}</span>`:''}
+            <button class="doc-file-del" onclick="deleteFile('${key}','${f.id}')" title="Verwijderen">✕</button>
+          </div>`).join('')}
+      </div>`:''}
+      <div class="doc-upload-btn${isLoading?' loading':''}">
+        <input type="file" accept="${dt.accepts}" onchange="handleUpload('${key}', this.files[0])">
+        ${isLoading?`<span class="spn"></span> Verwerken…`:`+ ${dt.multiple&&hasFiles?'Nog een':'Uploaden'}`}
+      </div>
+    </div>
+  </div>`;
+}
+
+// ════════════════════════════════════════════════════
+// ㉘ DOCUMENT ANALYSE BLOK (centraal, placeholder)
+// ════════════════════════════════════════════════════
+function renderDocAnalyseBlok() {
+  const totalFiles = totalFilesCount();
+  const filledCats = filledCategoriesCount();
+  if(totalFiles === 0) return '';
+
+  // Dynamische inzichten op basis van lokale parsing
+  const kvk = getFirstParsed('kvk');
+  const g = getFirstParsed('graydon');
+  const woz = getFirstParsed('woz');
+  const kad = getFirstParsed('kadaster');
+  const jaarr = getFirstParsed('jaarrekeningen');
+
+  // Samenvatting — placeholder + beschikbare data
+  const samenvattingItems = [];
+  if(kvk?._rechtsvormRaw) samenvattingItems.push(`Rechtsvorm <em>${kvk._rechtsvormRaw}</em> bevestigd via KVK`);
+  if(g?._risicoNiveau) samenvattingItems.push(`Kredietprofiel: <em>${g._risicoNiveau} risico</em> (Graydon)`);
+  if(woz?._definitieveWaarde) samenvattingItems.push(`${woz._isTaxatie?'Taxatiewaarde':'WOZ-waarde'}: <em>${fE(woz._definitieveWaarde)}</em>`);
+  if(kad?._eigenaarRaw) samenvattingItems.push(`Eigendom op naam van <em>${kad._eigenaarRaw}</em>`);
+  if(jaarr?._jaar) samenvattingItems.push(`Jaarrekening <em>${jaarr._jaar}</em> aanwezig`);
+
+  // Inzichten
+  const inzichtItems = [];
+  if(kvk?._isBV && S.form.typeKlant==='bv') inzichtItems.push('KVK bevestigt BV-structuur — consistent met profiel');
+  if(woz?._isTaxatie) inzichtItems.push('Taxatierapport aanwezig — hogere bewijskracht dan WOZ');
+  if(kad?._heeftHypotheek) inzichtItems.push('Bestaande hypotheekinschrijving gevonden — rangorde aandachtspunt');
+  if(S.docs.jaarrekeningen.files.length >= 2) inzichtItems.push(`${S.docs.jaarrekeningen.files.length} jaarrekeningen aanwezig — voldoende voor bancaire inkomenstoets`);
+  else if(S.form.typeKlant==='bv' && S.docs.jaarrekeningen.files.length < 2) inzichtItems.push('Minder dan 2 jaarrekeningen — onvoldoende voor bancaire inkomenstoets');
+  if(inzichtItems.length === 0) inzichtItems.push('Meer documenten nodig voor diepgaande inzichten.');
+
+  // Risico's
+  const risicoItems = [];
+  if(g?._risicoNiveau==='hoog') risicoItems.push('Graydon verhoogd risico — bancaire route waarschijnlijk niet haalbaar');
+  if(kvk && S.form.typeKlant==='bv' && !kvk._isBV) risicoItems.push('Structuurconflict: BV ingevuld maar KVK toont andere rechtsvorm');
+  if(woz?._definitieveWaarde && parseFloat(S.form.marktwaarde)>0 && Math.abs(parseFloat(S.form.marktwaarde)-woz._definitieveWaarde)/woz._definitieveWaarde*100>15) risicoItems.push(`Waarde-afwijking > 15% — marktwaarde en ${woz._bronLabel} inconsistent`);
+  if(S.form.typeKlant==='bv' && S.docs.jaarrekeningen.files.length===0) risicoItems.push('Jaarrekeningen ontbreken — inkomenstoets BV niet mogelijk');
+  if(risicoItems.length===0) risicoItems.push('Geen documentaire risico\'s gedetecteerd op basis van beschikbare bestanden.');
+
+  // Aandachtspunten
+  const aandachtItems = [];
+  if(woz?._peildatum || !woz) aandachtItems.push(woz?._definitieveWaarde ? 'Controleer actualiteit taxatierapport (max 6 maanden oud voor bancaire indiening)' : 'Taxatierapport ontbreekt — vereist voor bancaire route');
+  if(kad?._heeftHypotheek) aandachtItems.push('Verifieer omvang en rang bestaande hypotheek via notaris');
+  if(g?._incassoCount>0) aandachtItems.push(`${g._incassoCount} incasso(s) in kredietrapport — schriftelijke toelichting vereist`);
+  if(aandachtItems.length===0) aandachtItems.push('Geen directe aandachtspunten op basis van huidige documenten.');
+
+  // Vervolgstappen
+  const vervolgItems = [];
+  if(!S.docs.woz.files.length) vervolgItems.push('Taxatierapport opvragen (max 6 maanden oud)');
+  if(!S.docs.kadaster.files.length) vervolgItems.push('Kadastraal uittreksel opvragen bij notaris of Kadaster');
+  if(S.form.typeKlant==='bv' && S.docs.jaarrekeningen.files.length<2) vervolgItems.push('Minimaal 2 jaar jaarrekeningen opvragen bij klant');
+  if(!S.docs.graydon.files.length) vervolgItems.push('Kredietrapport opvragen (Graydon/CreditSafe)');
+  if(vervolgItems.length===0) vervolgItems.push('Dossier voldoende compleet — voorbereiding indiening mogelijk starten.');
+
+  return `
+  <div class="section-head" style="margin-top:16px">
+    <span class="section-num" style="background:var(--pur)">4</span>
+    <span class="section-head-lbl">Documentanalyse</span>
+    <div class="section-head-line"></div>
+    <span class="bdg" style="background:var(--pur-bg);color:var(--pur);border:1px solid var(--pur-bd)">${filledCats} categorie${filledCats!==1?'ën':''} · ${totalFiles} bestand${totalFiles!==1?'en':''}</span>
+  </div>
+
+  <div class="doc-analyse-blok">
+    <div class="doc-analyse-header">
+      <div class="doc-analyse-badge">Documentanalyse</div>
+      <div class="doc-analyse-title">Samenvatting geüploade documenten</div>
+    </div>
+
+    <div class="doc-analyse-grid">
+      <div class="doc-analyse-section">
+        <div class="doc-analyse-section-lbl lbl-bl">Samenvatting</div>
+        ${samenvattingItems.length>0
+          ? samenvattingItems.map(i=>`<div class="doc-analyse-placeholder">· ${i}</div>`).join('')
+          : `<div class="doc-analyse-placeholder">Nog onvoldoende documenten voor automatische samenvatting. Upload meer bestanden.</div>`}
+      </div>
+      <div class="doc-analyse-section">
+        <div class="doc-analyse-section-lbl lbl-gn">Inzichten</div>
+        ${inzichtItems.map(i=>`<div class="doc-analyse-placeholder">→ ${i}</div>`).join('')}
+      </div>
+      <div class="doc-analyse-section">
+        <div class="doc-analyse-section-lbl lbl-rk">Risico's</div>
+        ${risicoItems.map(i=>`<div class="doc-analyse-placeholder">⚠ ${i}</div>`).join('')}
+      </div>
+      <div class="doc-analyse-section">
+        <div class="doc-analyse-section-lbl lbl-wn">Aandachtspunten</div>
+        ${aandachtItems.map(i=>`<div class="doc-analyse-placeholder">· ${i}</div>`).join('')}
+      </div>
+    </div>
+    <div class="doc-analyse-full">
+      <div class="doc-analyse-section-lbl lbl-or">Vervolgstappen</div>
+      ${vervolgItems.map((i,idx)=>`<div class="doc-analyse-placeholder"><strong>${idx+1}.</strong> ${i}</div>`).join('')}
+    </div>
+  </div>`;
+}
+
+// ════════════════════════════════════════════════════
+// ㉙ LEFT PANEL
+// ════════════════════════════════════════════════════
+function renderInput() {
+  const hasClient = Object.keys(S.clientData).length > 0;
+  const hasAF = Object.keys(S.autoFill).length > 0;
+  return `
+    <div class="p-head">
+      <div class="p-head-lbl"><div class="p-head-dot" style="background:var(--or)"></div>Dealgegevens</div>
+      ${hasClient?`<span class="src src-c">✓ Klant</span>`:''}
+    </div>
+    ${hasAF?`<div class="af-banner"><span class="af-tag">Auto</span><span class="af-txt">${Object.keys(S.autoFill).length} veld(en) uitgelezen.</span><button class="btn btn-bl btn-sm" onclick="doAutoFill()">Overnemen</button></div>`:''}
+    ${S.errors._sw?`<div style="background:var(--wn-bg);border:1px solid var(--wn-bd);border-radius:6px;padding:7px 9px;font-size:11px;color:#7a4e00;margin-bottom:9px">⚠ ${S.errors._sw}</div>`:''}
+
+    <div class="sec-lbl"><span>Klant</span></div>
+    ${fg2(fg('Naam klant *',inp('naamKlant','text','Jan de Vries'),S.errors.naamKlant||''),fg('Type',sel('typeKlant',[['particulier','Particulier'],['bv','BV / Holding']])))}
+    ${fg2(fg('Inkomen €/jr',inp('inkomen','number','120000')),fg('Vermogen €',inp('vermogen','number','250000')))}
+    ${fg2(fg('Woonland',sel('woonland',[['nl','Nederland'],['eu','EU'],['buiten-eu','Buiten EU']])),fg('Panden',inp('aantalPanden','number','1')))}
+    ${fg('Doel',sel('doelFinanciering',[['aankoop','Aankoop'],['herfinanciering','Herfinanciering'],['overwaarde','Overwaarde opname']]))}
+
+    <div class="sec-lbl"><span>Vastgoed</span></div>
+    ${fg2(fg('Aankoopprijs € *',inp('aankoopprijs','number','450000'),S.errors.aankoopprijs||''),fg('Marktwaarde €',inp('marktwaarde','number','480000')))}
+    ${fg2(fg('Type',sel('typeVastgoed',[['woning','Woning (verhuur)'],['bedrijfspand','Bedrijfspand'],['horeca','Horeca'],['recreatie','Recreatie'],['mixed','Mixed-use'],['overig','Overig']])),fg('Huur',sel('huurType',[['bestaand','Contract'],['prognose','Prognose']])))}
+    ${fg('Huur/mnd €',inp('huurPerMaand','number','1800'))}
+
+    <div class="sec-lbl"><span>Structuur</span></div>
+    ${fg2(fg('Lening € *',inp('gewensteLening','number','350000'),S.errors.gewensteLening||''),fg('Inbreng € *',inp('eigenInbreng','number','100000'),S.errors.eigenInbreng||''))}
+    <div class="fgrp">
+      <label>Rente</label>
+      <div class="sl-row">
+        <input type="range" min="0.03" max="0.09" step="0.005" value="${f('rente')}" oninput="S.form.rente=this.value;this.nextElementSibling.textContent=(parseFloat(this.value)*100).toFixed(1)+'%';scheduleAnalysisUpdate()">
+        <span class="sl-val">${(parseFloat(f('rente')||.05)*100).toFixed(1)}%</span>
+      </div>
+    </div>
+    ${fg('Structuur',sel('metAflossing',[['nee','Interest only (IO)'],['ja','Annuïtair']]))}
+
+    <div class="sec-lbl"><span>Intern</span></div>
+    ${fg2(fg('Dossiernr.',inp('dossiernr','text','MBA-001')),fg('Adviseur',inp('adviseur','text','')))}
+    <div class="fgrp">
+      <label>Notitie</label>
+      <textarea id="fi_notitie" style="width:100%;padding:7px 9px;background:var(--bg);border:1.5px solid var(--bd);border-radius:7px;font-family:var(--mono);font-size:11px;resize:none;min-height:60px;outline:none;color:var(--tx)" oninput="S.form.notitie=this.value" placeholder="Context, bijzonderheden…">${f('notitie')}</textarea>
+    </div>
+
+    <div class="sec-lbl"><span>Documenten</span></div>
+    ${Object.keys(DOC_TYPES).map(key => renderDocCategory(key)).join('')}
+
+    ${hasAF?`<div style="margin-top:7px;padding:8px 10px;background:var(--bl-bg);border:1px solid var(--bl-bd);border-radius:7px">
+      <div style="font-family:var(--head);font-size:8px;font-weight:700;text-transform:uppercase;color:var(--bl);margin-bottom:5px;display:flex;justify-content:space-between;align-items:center">Uitgelezen<button class="btn btn-or btn-sm" onclick="doAutoFill()">Overnemen</button></div>
+      ${Object.entries(S.autoFill).map(([k,v])=>`<div style="display:flex;justify-content:space-between;padding:2.5px 0;border-bottom:1px solid var(--bd-l);font-size:9.5px"><span style="color:var(--tx3)">${v.veldLabel}</span><span style="font-weight:600;font-family:var(--mono)">${fE(parseFloat(v.waarde))}</span></div>`).join('')}
+    </div>`:''}
+  `;
+}
+
+// ════════════════════════════════════════════════════
+// ㉚ CENTER PANEL
+// ════════════════════════════════════════════════════
+function renderMain(m, sc, risks, conf, doss, readiness, acties, lenders, concl) {
+  const afl=f('metAflossing')==='ja'?'ann.':'IO';
+  const ltvC=c=>c===null?'neutral':c<70?'good':c>80?'bad':'warn';
+  const dscrC=c=>c===null?'neutral':c>=1.25?'good':c>=1?'warn':'bad';
+  const hasHard=(conf?.hard?.length||0)>0;
+  const isGo=sc.score>=6&&!hasHard&&readiness.bancair.statusKlasse==='good';
+  const isNogo=sc.score<3||(hasHard&&sc.score<5);
+  const gngLabel=isGo?'GO':isNogo?'NO-GO':'CONDITIONEEL';
+  const gngCls=isGo?'go':isNogo?'no':'cond';
+  const hasDeal=fv('aankoopprijs')>0&&fv('gewensteLening')>0;
+  const datum=new Date().toLocaleDateString('nl-NL',{day:'2-digit',month:'long',year:'numeric'});
+
+  if(!hasDeal) return `<div class="empty-state"><div class="es-icon">📋</div><div style="font-family:var(--head);font-size:13px;font-weight:600;margin-bottom:5px;color:var(--tx3)">Vul dealgegevens in</div><div style="color:var(--tx4)">Voer aankoopprijs en gewenste lening in om de analyse te starten.</div></div>`;
+
+  // Lenders: top 4 tonen
+  const topLenders = lenders.filter(l=>l.score>=30).slice(0,4);
+
+  return `
+  <!-- PRINT HEADER -->
+  <div id="PRINT_HEADER" class="print-header" style="display:none"></div>
+
+  <!-- ① DEAL SNAPSHOT -->
+  <div class="deal-snapshot">
+    <div class="snap-header">
+      <span class="snap-title">Deal Snapshot — ${datum}</span>
+      <div style="display:flex;align-items:center;gap:8px">
+        ${f('naamKlant')?`<span style="font-family:var(--head);font-size:10.5px;color:rgba(255,255,255,.55)">${f('naamKlant')}</span>`:''}
+        <span class="snap-gng ${gngCls}">${gngLabel}</span>
+      </div>
+    </div>
+    <div class="snap-kpis">
+      <div class="snap-kpi"><div class="snap-kpi-lbl">Score</div><div class="snap-kpi-val ${sc.klasse==='good'?'good':sc.klasse==='bad'?'bad':'warn'}">${sc.score}<span style="font-size:10px;opacity:.5">/10</span></div></div>
+      <div class="snap-kpi"><div class="snap-kpi-lbl">LTV</div><div class="snap-kpi-val ${ltvC(m.ltv)}">${m.ltv?fP(m.ltv):'—'}</div></div>
+      <div class="snap-kpi"><div class="snap-kpi-lbl">DSCR</div><div class="snap-kpi-val ${dscrC(m.dscr)}">${m.dscr?m.dscr.toFixed(2):'N/B'}</div></div>
+      <div class="snap-kpi"><div class="snap-kpi-lbl">Cashflow/mnd</div><div class="snap-kpi-val ${!m.h||!m.ml?'neutral':m.cf>0?'good':'bad'}">${m.h&&m.ml?fE(m.cf):'—'}</div></div>
+      <div class="snap-kpi"><div class="snap-kpi-lbl">Maandlast</div><div class="snap-kpi-val">${m.ml?fE(m.ml):'—'}</div></div>
+    </div>
+    <div class="snap-concl"><div class="snap-concl-txt">${concl}</div></div>
+  </div>
+
+  <!-- ② FINANCIËLE ANALYSE -->
+  <div class="section-head section-financieel">
+    <span class="section-num">2</span><span class="section-head-lbl">Financiële Analyse</span><div class="section-head-line"></div>
+  </div>
+
+  <div class="acard">
+    <div class="acard-hd"><span class="acard-lbl">LTV</span><span class="bdg ${m.ltv===null?'bdg-b':m.ltv<70?'bdg-g':m.ltv>80?'bdg-r':'bdg-w'}">${m.ltv?fP(m.ltv):'—'}</span></div>
+    <div class="mrow c2" style="margin-bottom:9px">
+      <div class="metric"><div class="m-lbl">Op aankoopprijs</div><div class="m-val ${m.ltvA<70?'cg':m.ltvA>80?'cr':'cw'}">${m.ltvA?fP(m.ltvA):'—'}</div></div>
+      <div class="metric"><div class="m-lbl">Op marktwaarde</div><div class="m-val ${ltvC(m.ltvM)==='good'?'cg':ltvC(m.ltvM)==='bad'?'cr':'cw'}">${m.ltvM?fP(m.ltvM):'—'}</div><div class="m-sub">${getFirstParsed('woz')?._definitieveWaarde?'✓ '+getFirstParsed('woz')._bronLabel:'Geen taxatie'}</div></div>
+    </div>
+    <div class="ltv-track"><div class="ltv-fill" style="width:${Math.min(m.ltv||0,100)}%;background:${(m.ltv||0)<70?'var(--gn)':(m.ltv||0)>80?'var(--rk)':'var(--wn)'}"></div></div>
+    <div class="ltv-marks"><span>0%</span><span>70%</span><span>80%</span><span>100%</span></div>
+  </div>
+
+  <div class="acard">
+    <div class="acard-hd"><span class="acard-lbl">Cashflow & Draagkracht</span></div>
+    <div class="mrow c3">
+      <div class="metric"><div class="m-lbl">DSCR (${afl})</div><div class="m-val ${dscrC(m.dscr)==='good'?'cg':dscrC(m.dscr)==='bad'?'cr':'cw'}">${m.dscr?m.dscr.toFixed(2):'N/B'}</div><div class="m-sub">${m.dscr?m.dscr>=1.25?'✓ Voldoende':m.dscr>=1?'Onder norm':'Kritisch':'Geen huur'}</div></div>
+      <div class="metric"><div class="m-lbl">Huur/mnd</div><div class="m-val">${m.h?fE(m.h):'—'}</div><div class="m-sub">${f('huurType')==='bestaand'?'Contract':'Prognose'}</div></div>
+      <div class="metric"><div class="m-lbl">Cashflow</div><div class="m-val ${!m.h||!m.ml?'cgy':m.cf>0?'cg':'cr'}">${m.h&&m.ml?fE(m.cf):'—'}</div><div class="m-sub">Na lasten</div></div>
+    </div>
+    ${m.bh125?`<div style="margin-top:8px;padding:7px 9px;background:var(--bg);border-radius:6px;font-size:10.5px;color:var(--tx3)">Min. huur DSCR 1.25: <strong style="color:var(--tx);font-family:var(--mono)">${fE(m.bh125)}/mnd</strong>${m.h&&m.h<m.bh125?` — tekort ${fE(m.bh125-m.h)}/mnd`:' ✓'}</div>`:''}
+  </div>
+
+  <div class="acard">
+    <div class="acard-hd"><span class="acard-lbl">Structuur</span></div>
+    <div class="mrow c4">
+      <div class="metric"><div class="m-lbl">Lening</div><div class="m-val">${fE(m.l)}</div></div>
+      <div class="metric"><div class="m-lbl">Inbreng</div><div class="m-val">${fE(m.inb)}</div><div class="m-sub">${m.ibP?fP(m.ibP):''}</div></div>
+      <div class="metric"><div class="m-lbl">Maandlast</div><div class="m-val cb">${fE(m.ml)}</div><div class="m-sub">${afl}</div></div>
+      <div class="metric"><div class="m-lbl">Rente</div><div class="m-val">${(parseFloat(f('rente')||.05)*100).toFixed(1)}%</div></div>
+    </div>
+  </div>
+
+  <!-- ③ RISICO'S -->
+  <div class="section-head" style="margin-top:16px">
+    <span class="section-num" style="${risks.krit.length>0?'background:var(--rk)':''}">3</span>
+    <span class="section-head-lbl">Risico's & Aandachtspunten</span>
+    <div class="section-head-line"></div>
+    ${risks.krit.length>0?`<span class="bdg bdg-r">${risks.krit.length} kritisch</span>`:''}
+  </div>
+
+  <div class="acard">
+    ${risks.krit.length===0&&risks.aand.length===0
+      ?`<div style="text-align:center;padding:14px;color:var(--gn);font-size:12px">✓ Geen kritieke risico's gedetecteerd</div>`
+      :`<div class="risk-list">
+        ${risks.krit.map(r=>`<div class="risk-item krit"><div class="risk-dot" style="background:var(--rk)"></div><div><div class="risk-t">${r.t}</div><div class="risk-sub">${r.i} · ${r.oplosbaar?'Oplosbaar':'Niet oplosbaar'}</div>${r.a?`<div class="risk-act">${r.a}</div>`:''}</div></div>`).join('')}
+        ${risks.aand.map(r=>`<div class="risk-item aand"><div class="risk-dot" style="background:var(--wn)"></div><div><div class="risk-t">${r.t}</div><div class="risk-sub">${r.i}</div>${r.a?`<div class="risk-act">${r.a}</div>`:''}</div></div>`).join('')}
+      </div>`}
+  </div>
+
+  <div class="acard">
+    <div class="acard-hd"><span class="acard-lbl">Volgende Stappen</span><span style="font-size:9.5px;color:var(--tx4)">${acties.length} acties</span></div>
+    ${acties.length===0
+      ?`<div style="text-align:center;padding:12px;color:var(--gn);font-size:11.5px">✓ Geen directe acties vereist</div>`
+      :acties.map(a=>`<div class="action-item ${a.p}"><span style="font-size:11px">${a.p==='kritisch'?'🔴':a.p==='hoog'?'🟠':a.p==='laag'?'🟢':'🔵'}</span><span>${a.t}</span></div>`).join('')}
+  </div>
+
+  <!-- WHAT-IF -->
+  <div class="acard what-if-section">
+    <div class="acard-hd"><span class="acard-lbl">What-if</span><span style="font-size:9px;color:var(--tx4)">Live herberekening</span></div>
+    ${[
+      ['rente','Rente','0.03','0.09','0.005',v=>(parseFloat(v)*100).toFixed(1)+'%'],
+      ['gewensteLening','Lening','50000','2000000','10000',v=>'€'+Math.round(v).toLocaleString()],
+      ['eigenInbreng','Inbreng','0','1000000','5000',v=>'€'+Math.round(v).toLocaleString()],
+      ['huurPerMaand','Huur/mnd','0','10000','50',v=>'€'+Math.round(v).toLocaleString()]
+    ].map(([k,l,mn,mx,st,fmt])=>`
+      <div class="sl-row" style="margin-bottom:7px">
+        <span class="sl-lbl">${l}</span>
+        <input type="range" min="${mn}" max="${mx}" step="${st}" value="${f(k)||'0'}" oninput="S.form['${k}']=this.value;scheduleAnalysisUpdate()">
+        <span class="sl-val">${fmt(f(k)||'0')}</span>
+      </div>`).join('')}
+    <div class="whatif-result">
+      <div class="metric"><div class="m-lbl">Score</div><div class="m-val ${sc.klasse==='good'?'cg':sc.klasse==='bad'?'cr':'cw'}">${sc.score}/10</div></div>
+      <div class="metric"><div class="m-lbl">DSCR</div><div class="m-val ${dscrC(m.dscr)==='good'?'cg':dscrC(m.dscr)==='bad'?'cr':'cw'}">${m.dscr?m.dscr.toFixed(2):'—'}</div></div>
+      <div class="metric"><div class="m-lbl">LTV</div><div class="m-val ${ltvC(m.ltv)==='good'?'cg':ltvC(m.ltv)==='bad'?'cr':'cw'}">${m.ltv?fP(m.ltv):'—'}</div></div>
+    </div>
+  </div>
+
+  <!-- ④ DOCUMENTANALYSE -->
+  ${renderDocAnalyseBlok()}
+
+  <!-- ⑤ FINANCIERINGSMATCH -->
+  <div class="section-head" style="margin-top:16px">
+    <span class="section-num">5</span><span class="section-head-lbl">Financieringsmogelijkheden</span><div class="section-head-line"></div>
+  </div>
+
+  ${topLenders.length===0
+    ?`<div class="acard"><div style="font-size:11.5px;color:var(--tx4);font-style:italic">Geen geldverstrekkers voldoen aan huidige parameters.</div></div>`
+    :topLenders.map(l=>{
+      const clr=l.score>=72?'var(--gn)':l.score>=48?'var(--wn)':'var(--rk)';
+      return `<div class="lender-card">
+        <div class="lender-card-header">
+          <span class="lender-badge-type ${l.type}">${l.type==='bank'?'Bank':'Non-bank'}</span>
+          <span class="lender-name">${l.naam}</span>
+          <div class="lender-score-wrap">
+            <div class="lender-score" style="color:${clr}">${l.score}<span style="font-size:10px;color:var(--tx4)">%</span></div>
+            <div class="lender-score-lbl" style="color:${clr}">match</div>
+            <div class="lender-bar-outer"><div class="lender-bar-fill" style="width:${l.score}%;background:${clr}"></div></div>
+          </div>
+        </div>
+        <div class="lender-descr">${l.beschrijving}</div>
+        <div class="lender-card-body">
+          <div>
+            <div class="lender-col-lbl">Pluspunten</div>
+            ${l.plus.map(p=>`<div class="lender-point plus">${p}</div>`).join('')}
+          </div>
+          <div>
+            <div class="lender-col-lbl">Aandachtspunten</div>
+            ${l.min.map(p=>`<div class="lender-point min">${p}</div>`).join('')}
+            ${l.beperking.map(p=>`<div class="lender-point min">${p}</div>`).join('')}
+          </div>
+        </div>
+        <div style="padding:6px 13px 10px;display:flex;gap:6px;align-items:center">
+          <span class="lender-match-type ${l.matchType}">${l.matchType==='sterk'?'Sterke match':l.matchType==='redelijk'?'Redelijke match':'Zwakke match'}</span>
+          <span style="font-size:9px;color:var(--tx4);font-family:var(--mono)">LTV max ${l.maxLTV}% · DSCR min ${l.minDSCR} · ${fE(l.minLening)}–${fE(l.maxLening)}</span>
+        </div>
+      </div>`;
+    }).join('')}
+
+  <!-- ⑥ INTERN OORDEEL -->
+  <div class="section-head section-oordeel" style="margin-top:16px">
+    <span class="section-num">6</span><span class="section-head-lbl">Intern Oordeel</span><div class="section-head-line"></div>
+  </div>
+  <div class="verdict-card ${sc.klasse}">
+    <div class="verdict-top">
+      <span style="font-size:17px">${SC_ICON[sc.klasse]}</span>
+      <span class="verdict-gng">${gngLabel}</span>
+      <span class="verdict-lbl" style="flex:1">${SC_LABEL[sc.klasse]}</span>
+      ${sc.isCapped?`<span class="bdg bdg-r">Begrensd: ${sc.capReden}</span>`:''}
+    </div>
+    <div class="verdict-txt">${concl}</div>
+    ${f('notitie')?`<div style="margin-top:9px;padding-top:9px;border-top:1px solid rgba(0,0,0,.06);font-size:11px;color:var(--tx3);font-style:italic">${f('notitie')}</div>`:''}
+  </div>
+
+  ${(conf?.hard?.length||0)+(conf?.zacht?.length||0)>0?`
+  <div class="acard">
+    <div class="acard-hd"><span class="acard-lbl">Conflicten</span></div>
+    ${[...(conf.hard||[]).map(c=>({...c,cat:'hard'})),...(conf.zacht||[]).map(c=>({...c,cat:'zacht'}))].map(item=>`
+      <div class="cf-item cf-${item.cat}">
+        <div class="cf-dot" style="background:${item.cat==='hard'?'var(--rk)':'var(--wn)'}"></div>
+        <div><div class="cf-lbl">${item.veld||item.code}</div>
+        ${item.ingevoerd?`<div class="cf-sub">Klant: ${item.ingevoerd} · Doc: ${item.document||'—'}</div>`:''}
+        ${item.actie?`<div class="cf-act">${item.actie}</div>`:''}</div>
+      </div>`).join('')}
+  </div>`:''}
+
+  <!-- ⑦ DEALOVERZICHT -->
+  <div class="section-head" style="margin-top:16px">
+    <span class="section-num">7</span><span class="section-head-lbl">Dealoverzicht & Kredietmemo</span><div class="section-head-line"></div>
+  </div>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:9px">
+    <div class="acard" style="margin-bottom:0">
+      <div class="acard-hd"><span class="acard-lbl">Dealoverzicht</span></div>
+      <table class="sum-t">
+        ${[['Klant',f('naamKlant')||'—'],['Aankoopprijs',fE(m.a)],['Marktwaarde',fE(m.mv)||'—'],['Lening',fE(m.l)],['LTV',fP(m.ltv)],['DSCR',m.dscr?m.dscr.toFixed(2)+' ('+afl+')':'N/B'],['Dossier',doss.score+'/100'],['Bancair',readiness.bancair.status]].map(([k,v])=>`<tr><td>${k}</td><td>${v}</td></tr>`).join('')}
+      </table>
+    </div>
+    <div class="acard" style="margin-bottom:0">
+      <div class="acard-hd"><span class="acard-lbl">Checklist</span></div>
+      ${['Geldig identiteitsbewijs',f('typeKlant')==='bv'?'Jaarrekeningen (2 jr) + KvK':'Jaaropgave 2 jaar','Taxatierapport (max 6 mnd)','Eigendomsakte / koopcontract',...(m.h>0?[f('huurType')==='bestaand'?'Huurcontracten':'Huurprognoserapport']:[]),...(f('woonland')!=='nl'?['Verblijfsstatus bewijs']:[])].map(d=>`<div class="d-it"><span style="color:var(--tx4)">☐</span>${d}</div>`).join('')}
+    </div>
+  </div>
+
+  <div class="acard">
+    <div class="acard-hd"><span class="acard-lbl">Kredietmemo</span><button class="btn btn-ghost btn-sm" id="MEMO_CPY_BTN" onclick="doCopy('MEMO_OUT','MEMO_CPY_BTN')">Kopiëren</button></div>
+    <div class="memo" id="MEMO_OUT">KREDIETMEMO — MB ADVIESGROEP
+Datum: ${datum}  ·  Ref: MBA-${Date.now().toString().slice(-6)}
+─────────────────────────────────────────
+
+KLANT
+Naam              : ${f('naamKlant')||'—'}
+Type              : ${f('typeKlant')==='bv'?'BV / Holding':'Particulier'}
+Woonland          : ${f('woonland')==='nl'?'Nederland':f('woonland')==='eu'?'EU (niet NL)':'Buiten EU'}
+Inkomen/jr        : ${f('inkomen')?'€'+parseInt(f('inkomen')).toLocaleString():'Niet opgegeven'}
+
+PAND
+Type              : ${f('typeVastgoed')}  ·  Doel: ${f('doelFinanciering')||'aankoop'}
+Aankoopprijs      : ${fE(m.a)}
+Marktwaarde       : ${fE(m.mv)||'—'}
+Huurinkomsten     : ${m.h?fE(m.h)+'/mnd':'Geen'}
+
+FINANCIERING
+Gewenste lening   : ${fE(m.l)}
+LTV               : ${fP(m.ltv)}
+DSCR              : ${m.dscr?m.dscr.toFixed(2)+' ('+afl+')':'N/B'}
+Maandlast         : ${fE(m.ml)} (${f('metAflossing')==='ja'?'annuitair':'interest only'})
+
+DOCUMENTEN
+Categorieën       : ${filledCategoriesCount()}/${Object.keys(DOC_TYPES).length} aanwezig
+Bestanden         : ${totalFilesCount()} geüpload
+
+BEOORDELING
+Score             : ${sc.score}/10 — ${sc.label}
+Dossier           : ${doss?.score||0}/100 — ${doss?.label||'—'}
+Readiness         : ${readiness?.overallStatus||'—'}
+Oordeel           : ${concl}
+
+TOP ACTIES:
+${acties.slice(0,5).map((a,i)=>i+1+'. '+a.t).join('\n')}
+
+─────────────────────────────────────────
+MB Deal Analyzer v15 | Indicatief — geen rechten ontleenbaar</div>
+  </div>
+  <div class="btn-row" id="PRINT_BTN_ROW">
+    <button class="btn btn-bl" onclick="printReport()">PDF afdrukken</button>
+    <button class="btn btn-ghost" onclick="resetApp()">Nieuwe deal</button>
+  </div>
+  `;
+}
+
+// ════════════════════════════════════════════════════
+// ㉛ RIGHT SIDEBAR
+// ════════════════════════════════════════════════════
+function renderAside(m, sc, doss, readiness) {
+  const ltvC=m.ltv===null?'cgy':m.ltv<70?'cg':m.ltv>80?'cr':'cw';
+  const dscrC=m.dscr===null?'cgy':m.dscr>=1.25?'cg':m.dscr>=1?'cw':'cr';
+  const dqC={good:'var(--gn)',blauw:'var(--bl)',warn:'var(--wn)',bad:'var(--rk)'}[doss?.klasse]||'var(--tx3)';
+  const rdB=readiness?.bancair,rdNB=readiness?.nonbank;
+  const rdCls=r=>({good:'rd-ok',blauw:'rd-bl',warn:'rd-warn',bad:'rd-bad'}[r?.statusKlasse]||'rd-bl');
+  const totalFiles=totalFilesCount();
+  const filledCats=filledCategoriesCount();
+  const totalCats=Object.keys(DOC_TYPES).length;
+
+  document.getElementById('PANEL_ASIDE').innerHTML = `
+    <div class="p-head"><div class="p-head-lbl"><div class="p-head-dot" style="background:var(--bl)"></div>Live Dashboard</div></div>
+
+    <div style="background:var(--wh);border:1px solid var(--bd);border-radius:var(--r);padding:11px;margin-bottom:7px;box-shadow:var(--sh)">
+      ${scoreRing(sc.score,sc.klasse,sc.subScores,sc.isCapped?sc.capReden:null)}
+    </div>
+
+    <div style="background:var(--wh);border:1px solid var(--bd);border-radius:var(--r);margin-bottom:7px;overflow:hidden;box-shadow:var(--sh)">
+      <div style="padding:6px 10px;background:var(--bg);border-bottom:1px solid var(--bd-l);font-family:var(--head);font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:1.2px;color:var(--tx4)">Kerncijfers</div>
+      <div style="padding:8px 10px">
+        <div class="aside-row"><span class="aside-k">LTV</span><span class="aside-v ${ltvC}">${m.ltv?fP(m.ltv):'—'}</span></div>
+        <div class="aside-row"><span class="aside-k">DSCR</span><span class="aside-v ${dscrC}">${m.dscr?m.dscr.toFixed(2):'—'}</span></div>
+        <div class="aside-row"><span class="aside-k">Maandlast</span><span class="aside-v cb">${m.ml?fE(m.ml):'—'}</span></div>
+        <div class="aside-row"><span class="aside-k">Cashflow</span><span class="aside-v ${m.cf>0?'cg':m.cf<0?'cr':'cgy'}">${m.h&&m.ml?fE(m.cf):'—'}</span></div>
+        <div class="aside-row"><span class="aside-k">Inbreng %</span><span class="aside-v">${m.ibP!==null?fP(m.ibP):'—'}</span></div>
+      </div>
+    </div>
+
+    <div style="background:var(--wh);border:1px solid var(--bd);border-radius:var(--r);margin-bottom:7px;overflow:hidden;box-shadow:var(--sh)">
+      <div style="padding:6px 10px;background:var(--bg);border-bottom:1px solid var(--bd-l);font-family:var(--head);font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:1.2px;color:var(--tx4)">Readiness</div>
+      <div style="padding:8px 10px">
+        <div class="doss-bar"><div class="doss-fill" style="width:${doss?.score||0}%;background:${dqC}"></div></div>
+        <div class="doss-lbl"><span style="color:var(--tx4)">Dossier</span><span style="font-weight:700;font-family:var(--mono);color:${dqC}">${doss?.score||0}/100</span></div>
+        <div class="rd-pills">
+          <div class="rd-pill"><span class="rd-pill-lbl">Bancair</span><span class="rd-pill-val ${rdCls(rdB)}">${rdB?.status||'—'}</span></div>
+          <div class="rd-pill"><span class="rd-pill-lbl">Non-bank</span><span class="rd-pill-val ${rdCls(rdNB)}">${rdNB?.status||'—'}</span></div>
+          <div class="rd-pill"><span class="rd-pill-lbl">Documenten</span><span class="rd-pill-val rd-bl">${filledCats}/${totalCats} cat. · ${totalFiles} best.</span></div>
+        </div>
+      </div>
+    </div>
+
+    ${f('naamKlant')?`
+    <div style="background:var(--wh);border:1px solid var(--bd);border-radius:var(--r);overflow:hidden;box-shadow:var(--sh);margin-bottom:7px">
+      <div style="padding:6px 10px;background:var(--bg);border-bottom:1px solid var(--bd-l);font-family:var(--head);font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:1.2px;color:var(--tx4)">Klant</div>
+      <div style="padding:8px 10px">
+        <div style="font-family:var(--head);font-size:11.5px;font-weight:600;margin-bottom:2px">${f('naamKlant')}</div>
+        <div style="font-size:9.5px;color:var(--tx3)">${f('typeKlant')==='bv'?'BV':'Particulier'} · ${f('woonland')==='nl'?'NL':f('woonland')==='eu'?'EU':'Buiten EU'}</div>
+        ${f('dossiernr')?`<div style="font-size:9px;color:var(--tx4);margin-top:3px;font-family:var(--mono)">${f('dossiernr')}</div>`:''}
+        ${f('adviseur')?`<div style="font-size:9px;color:var(--tx4);font-family:var(--mono)">${f('adviseur')}</div>`:''}
+      </div>
+    </div>`:''}
+
+    <div style="background:var(--wh);border:1px solid var(--bd);border-radius:var(--r);overflow:hidden;box-shadow:var(--sh)">
+      <div style="padding:6px 10px;background:var(--bg);border-bottom:1px solid var(--bd-l);font-family:var(--head);font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:1.2px;color:var(--tx4)">Documenten</div>
+      <div style="padding:8px 10px">
+        ${Object.entries(DOC_TYPES).map(([key,dt])=>{
+          const files=S.docs[key].files;
+          const hasFiles=files.length>0;
+          const bestKwal=files.reduce((best,f)=>{const k=f.parsed?._meta?.documentKwaliteit;return k==='goed'?'goed':best==='goed'?'goed':k==='matig'?'matig':best;},null);
+          return `<div class="aside-row">
+            <span class="aside-k" style="font-size:9px">${dt.icon} ${dt.label.substring(0,14)}</span>
+            <span style="font-size:8.5px;font-weight:700;font-family:var(--head);padding:1.5px 5px;border-radius:10px;${!hasFiles?'background:var(--bg2);color:var(--tx4)':bestKwal==='goed'?'background:var(--gn-bg);color:var(--gn)':bestKwal==='matig'?'background:var(--wn-bg);color:var(--wn)':'background:var(--bl-bg);color:var(--bl)'}">
+              ${!hasFiles?'—':`${files.length} best.`}
+            </span>
+          </div>`;
+        }).join('')}
+      </div>
+    </div>
+  `;
+}
+
+// ════════════════════════════════════════════════════
+// INIT
+// ════════════════════════════════════════════════════
+fullRender();
+</script>
+</body>
+</html>
