@@ -1277,48 +1277,49 @@ async function handlePdfImport(file) {
       <div style="font-size:11px;color:var(--tx2);line-height:1.6">Tekst wordt uitgelezen en naar OpenAI gestuurd...</div>
     </div>`;
 
-try {
-  const parsed = await extractTextFromDoc(file);
+  try {
+    const parsed = await extractTextFromDoc(file);
 
-  const response = await fetch('/api/openai', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ text: parsed.text })
-  });
+    const response = await fetch('/api/openai', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ text: parsed.text })
+    });
 
-  const data = await response.json();
+    const data = await response.json();
 
-  if (!response.ok) {
-    throw new Error(data.error || 'Onbekende fout');
-  }
-
-  Object.entries(data).forEach(([key, value]) => {
-    if (value !== null && value !== undefined && value !== '') {
-      S.form[key] = String(value);
-      S.clientData[key] = String(value);
+    if (!response.ok) {
+      throw new Error(data.error || 'Onbekende fout');
     }
-  });
 
-  statusEl.innerHTML = `
-    <div style="background:var(--gn-bg);border:1.5px solid var(--gn-bd);border-radius:8px;padding:13px 14px;margin-top:11px">
-      <div style="font-family:var(--head);font-size:10px;font-weight:700;color:var(--gn);margin-bottom:6px;text-transform:uppercase">PDF succesvol ingelezen</div>
-      <div style="font-size:11px;color:var(--tx2);line-height:1.6">
-        De belangrijkste velden zijn ingevuld vanuit de PDF.
-      </div>D
-    </div>`;
+    Object.entries(data).forEach(([key, value]) => {
+      if (value !== null && value !== undefined && value !== '') {
+        S.form[key] = String(value);
+        S.clientData[key] = String(value);
+      }
+    });
 
-  hideImportModal();
-  fullRender();
+    statusEl.innerHTML = `
+      <div style="background:var(--gn-bg);border:1.5px solid var(--gn-bd);border-radius:8px;padding:13px 14px;margin-top:11px">
+        <div style="font-family:var(--head);font-size:10px;font-weight:700;color:var(--gn);margin-bottom:6px;text-transform:uppercase">PDF succesvol ingelezen</div>
+        <div style="font-size:11px;color:var(--tx2);line-height:1.6">
+          De belangrijkste velden zijn ingevuld vanuit de PDF.
+        </div>
+      </div>`;
 
-} catch (error) {
-  statusEl.innerHTML = `
-    <div style="background:var(--rk-bg);border:1.5px solid var(--rk-bd);border-radius:8px;padding:13px 14px;margin-top:11px">
-      <div style="font-family:var(--head);font-size:10px;font-weight:700;color:var(--rk);margin-bottom:6px;text-transform:uppercase">PDF import mislukt</div>
-      <div style="font-size:11px;color:var(--tx2);line-height:1.6">
-        ${error.message}
-      </div>
-    </div>`;
-  console.error(error);
+    hideImportModal();
+    fullRender();
+
+  } catch (error) {
+    statusEl.innerHTML = `
+      <div style="background:var(--rk-bg);border:1.5px solid var(--rk-bd);border-radius:8px;padding:13px 14px;margin-top:11px">
+        <div style="font-family:var(--head);font-size:10px;font-weight:700;color:var(--rk);margin-bottom:6px;text-transform:uppercase">PDF import mislukt</div>
+        <div style="font-size:11px;color:var(--tx2);line-height:1.6">
+          ${error.message}
+        </div>
+      </div>`;
+    console.error(error);
+  }
 }
 // ════════════════════════════════════════════════════
 // ㉕ PRINT
