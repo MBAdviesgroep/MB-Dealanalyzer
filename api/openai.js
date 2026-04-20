@@ -67,12 +67,22 @@ Regels:
       })
     });
 
-    const data = await response.json();
-    const output = data.output_text || "";
+const data = await response.json();
 
-    res.status(200).json({
-      raw: output
-    });
+// 🔥 pak de echte tekst uit de response
+let output = "";
+
+if (data.output && data.output.length > 0) {
+  const content = data.output[0].content;
+  if (content && content.length > 0) {
+    output = content[0].text || "";
+  }
+}
+
+res.status(200).json({
+  raw: output,
+  debug: data // handig voor debuggen
+});
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
