@@ -1484,6 +1484,37 @@ function renderDocAnalyseBlok() {
   if(!S.docs.graydon.files.length) vervolgItems.push('Kredietrapport opvragen (Graydon/CreditSafe)');
   if(vervolgItems.length===0) vervolgItems.push('Dossier voldoende compleet — voorbereiding indiening mogelijk starten.');
 
+  const kvkFiles = S.docs.kvk?.files || [];
+const kvkAi = kvkFiles.find(f => f.ai)?.ai || null;
+
+if (kvkAi) {
+  if (kvkAi.summary) {
+    samenvattingItems = [kvkAi.summary, ...samenvattingItems];
+  }
+
+  if (kvkAi.risks && kvkAi.risks.length) {
+  if (typeof risicoItems !== 'undefined') {
+  risicoItems = [...kvkAi.risks, ...risicoItems];
+}
+  }
+
+  if (kvkAi.actions && kvkAi.actions.length) {
+    vervolgItems = [...kvkAi.actions, ...vervolgItems];
+  }
+
+  if (kvkAi.fields) {
+    const kvkFieldLines = [
+      kvkAi.fields.bedrijfsnaam ? `Bedrijfsnaam: ${kvkAi.fields.bedrijfsnaam}` : null,
+      kvkAi.fields.rechtsvorm ? `Rechtsvorm: ${kvkAi.fields.rechtsvorm}` : null,
+      kvkAi.fields.kvkNummer ? `KVK-nummer: ${kvkAi.fields.kvkNummer}` : null,
+      kvkAi.fields.sbiCode ? `SBI-code: ${kvkAi.fields.sbiCode}` : null,
+      kvkAi.fields.oprichtingsdatum ? `Oprichtingsdatum: ${kvkAi.fields.oprichtingsdatum}` : null,
+      kvkAi.fields.vestigingsadres ? `Vestigingsadres: ${kvkAi.fields.vestigingsadres}` : null
+    ].filter(Boolean);
+
+    inzichtItems = [...kvkFieldLines, ...inzichtItems];
+  }
+}
   return `
   <div class="section-head" style="margin-top:16px">
     <span class="section-num" style="background:var(--pur)">4</span>
