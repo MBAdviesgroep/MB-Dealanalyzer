@@ -1,5 +1,15 @@
 export default async function handler(req, res) {
+  if (req.method !== "POST") {
+    return res.status(405).json({ error: "Alleen POST toegestaan" });
+  }
+
   try {
+    const { text } = req.body || {};
+
+    if (!text || !text.trim()) {
+      return res.status(400).json({ error: "Geen tekst ontvangen" });
+    }
+
     const response = await fetch("https://api.openai.com/v1/responses", {
       method: "POST",
       headers: {
@@ -8,12 +18,61 @@ export default async function handler(req, res) {
       },
       body: JSON.stringify({
         model: "gpt-4.1-mini",
-        input: "Zeg alleen: OpenAI koppeling werkt"
+        input: [
+          {
+            role: "system",
+            content: `
+Je haalt dealgegevens uit een financieringsindicatie of vergelijkbaar document.
+
+Geef ALLEEN geldige JSON terug.
+Geen uitleg, geen markdown, geen tekst erbuiten.
+
+Gebruik exact deze keys:
+{
+  "naamKlant": "",
+  "typeKlant": "",
+  "woonland": "",
+  "inkomen": "",
+  "vermogen": "",
+  "aantalPanden": "",
+  "doelFinanciering": "",
+  "aankoopprijs": "",
+  "marktwaarde": "",
+  "huurPerMaand": "",
+  "huurType": "",
+  "typeVastgoed": "",
+  "gewensteLening": "",
+  "eigenInbreng": "",
+  "rente": "",
+  "adviseur": "",
+  "dossiernr": ""
+}
+
+Regels:
+- onbekend = leeg laten
+- bedragen zonder euroteken
+- gebruik alleen waarden die echt in de tekst staan
+- typeKlant alleen: "particulier" of "bv"
+- woonland alleen: "nl", "eu" of "buiten-eu"
+- doelFinanciering alleen: "aankoop", "herfinanciering" of "overwaarde"
+- huurType alleen: "bestaand" of "prognose"
+- typeVastgoed alleen: "woning", "bedrijfspand", "horeca", "recreatie", "mixed" of "overig"
+`
+          },
+          {
+            role: "user",
+            content: text
+          }
+        ]
       })
     });
 
     const data = await response.json();
-    res.status(200).json(data);
+    const output = data.output_text || "";
+
+    res.status(200).json({
+      raw: output
+    });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
