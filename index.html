@@ -1194,13 +1194,37 @@ async function handleUpload(type, file) {
   }
 
   try {
-    const parsed = await parseDoc(type, file);
-    const fileEntry = {
-      id: Date.now()+'_'+Math.random().toString(36).slice(2),
-      naam: file.name,
-      uploadDatum: new Date().toLocaleDateString('nl-NL'),
-      parsed
-    };
+const parsed = await parseDoc(type, file);
+
+let ai = null;
+
+if (type === 'kvk') {
+  const response = await fetch('/api/analyze-document', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      docType: 'kvk',
+      text: parsed._meta?.rawText || parsed._meta?.extractedText || ''
+    })
+  });
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error(data.error || 'AI analyse mislukt');
+  }
+
+  ai = data;
+  console.log('KVK AI output:', data);
+}
+
+const fileEntry = {
+  id: Date.now() + '_' + Math.random().toString(36).slice(2),
+  naam: file.name,
+  uploadDatum: new Date().toLocaleDateString('nl-NL'),
+  parsed,
+  ai
+};
     if(!dt.multiple) {
       S.docs[type].files = [fileEntry]; // vervang
     } else {
