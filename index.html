@@ -1183,15 +1183,66 @@ function fullRender() {
 // ㉓ UPLOAD LOGICA (nieuwe structuur)
 // ════════════════════════════════════════════════════
 async function handleUpload(type, file) {
-  if(!file) return;
+  if (!file) return;
   const dt = DOC_TYPES[type];
-  S.loading[type+'_loading'] = true;
-  // Update enkel de doc-sectie in het linkerpanel
+  S.loading[type + '_loading'] = true;
+ 
   const panel = document.getElementById(`DOC_CAT_${type}`);
-  if(panel) {
+  if (panel) {
     const btn = panel.querySelector('.doc-upload-btn');
-    if(btn) btn.classList.add('loading');
+    if (btn) btn.classList.add('loading');
   }
+ 
+  try {
+    const parsed = await parseDoc(type, file);
+ 
+    // AI analyse voor ALLE 5 types
+    let ai = null;
+    const rawText = parsed._meta?.rawText || parsed._meta?.extractedText || '';
+ 
+    if (rawText.trim().length > 30) {
+      try {
+        const response = await fetch('/api/analyze-document', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ docType: type, text: rawText })
+        });
+        const data = await response.json();
+        if (response.ok) {
+          ai = data;
+          console.log(`${type.toUpperCase()} AI output:`, data);
+        } else {
+          console.warn(`${type} AI fout:`, data.error);
+        }
+      } catch (aiErr) {
+        console.warn(`${type} AI call mislukt:`, aiErr);
+      }
+    }
+ 
+    const fileEntry = {
+      id: Date.now() + '_' + Math.random().toString(36).slice(2),
+      naam: file.name,
+      uploadDatum: new Date().toLocaleDateString('nl-NL'),
+      parsed,
+      ai
+    };
+ 
+    if (!dt.multiple) {
+      S.docs[type].files = [fileEntry];
+    } else {
+      S.docs[type].files.push(fileEntry);
+    }
+ 
+    S.autoFill = buildAutoFill(S.docs);
+    S.loading[type + '_loading'] = false;
+    fullRender();
+ 
+  } catch (e) {
+    console.error('Upload fout:', e);
+    S.loading[type + '_loading'] = false;
+    fullRender();
+  }
+}
 
   try {
 const parsed = await parseDoc(type, file);
@@ -1435,85 +1486,204 @@ function renderDocCategory(key) {
 function renderDocAnalyseBlok() {
   const totalFiles = totalFilesCount();
   const filledCats = filledCategoriesCount();
-  if(totalFiles === 0) return '';
-
-  // Dynamische inzichten op basis van lokale parsing
-  const kvk = getFirstParsed('kvk');
-  const g = getFirstParsed('graydon');
-  const woz = getFirstParsed('woz');
-  const kad = getFirstParsed('kadaster');
-  const jaarr = getFirstParsed('jaarrekeningen');
-
-  // Samenvatting — placeholder + beschikbare data
+  if (totalFiles === 0) return '';
+ 
+  // ── Helpers ──────────────────────────────────────────────────
+  function getAi(type) {
+    return S.docs[type]?.files.find(f => f.ai)?.ai || null;
+  }
+  function fmtBedrag(v) {
+    const n = parseFloat(v);
+    return (!v || isNaN(n)) ? null : '€' + Math.round(n).toLocaleString('nl-NL');
+  }
+ 
+  const aiKvk   = getAi('kvk');
+  const aiGray  = getAi('graydon');
+  const aiWoz   = getAi('woz');
+  const aiKad   = getAi('kadaster');
+  const aiJaarr = getAi('jaarrekeningen');
+ 
+  // Lokale regex-parsed waarden (fallback)
+  const kvk    = getFirstParsed('kvk');
+  const gray   = getFirstParsed('graydon');
+  const woz    = getFirstParsed('woz');
+  const kad    = getFirstParsed('kadaster');
+  const jaarr  = getFirstParsed('jaarrekeningen');
+ 
+  // ── Samenvatting ─────────────────────────────────────────────
   const samenvattingItems = [];
-  if(kvk?._rechtsvormRaw) samenvattingItems.push(`Rechtsvorm <em>${kvk._rechtsvormRaw}</em> bevestigd via KVK`);
-  if(g?._risicoNiveau) samenvattingItems.push(`Kredietprofiel: <em>${g._risicoNiveau} risico</em> (Graydon)`);
-  if(woz?._definitieveWaarde) samenvattingItems.push(`${woz._isTaxatie?'Taxatiewaarde':'WOZ-waarde'}: <em>${fE(woz._definitieveWaarde)}</em>`);
-  if(kad?._eigenaarRaw) samenvattingItems.push(`Eigendom op naam van <em>${kad._eigenaarRaw}</em>`);
-  if(jaarr?._jaar) samenvattingItems.push(`Jaarrekening <em>${jaarr._jaar}</em> aanwezig`);
-
-  // Inzichten
+  if (aiKvk?.summary)   samenvattingItems.push(aiKvk.summary);
+  else if (kvk?._rechtsvormRaw) samenvattingItems.push(`Rechtsvorm <em>${kvk._rechtsvormRaw}</em> bevestigd via KVK`);
+ 
+  if (aiGray?.summary)  samenvattingItems.push(aiGray.summary);
+  else if (gray?._risicoNiveau) samenvattingItems.push(`Kredietprofiel: <em>${gray._risicoNiveau} risico</em> (Graydon)`);
+ 
+  if (aiWoz?.summary)   samenvattingItems.push(aiWoz.summary);
+  else if (woz?._definitieveWaarde) samenvattingItems.push(`${woz._isTaxatie ? 'Taxatiewaarde' : 'WOZ-waarde'}: <em>${fE(woz._definitieveWaarde)}</em>`);
+ 
+  if (aiKad?.summary)   samenvattingItems.push(aiKad.summary);
+  else if (kad?._eigenaarRaw) samenvattingItems.push(`Eigendom op naam van <em>${kad._eigenaarRaw}</em>`);
+ 
+  if (aiJaarr?.summary) samenvattingItems.push(aiJaarr.summary);
+  else if (jaarr?._jaar) samenvattingItems.push(`Jaarrekening <em>${jaarr._jaar}</em> aanwezig`);
+ 
+  // ── Inzichten ────────────────────────────────────────────────
   const inzichtItems = [];
-  if(kvk?._isBV && S.form.typeKlant==='bv') inzichtItems.push('KVK bevestigt BV-structuur — consistent met profiel');
-  if(woz?._isTaxatie) inzichtItems.push('Taxatierapport aanwezig — hogere bewijskracht dan WOZ');
-  if(kad?._heeftHypotheek) inzichtItems.push('Bestaande hypotheekinschrijving gevonden — rangorde aandachtspunt');
-  if(S.docs.jaarrekeningen.files.length >= 2) inzichtItems.push(`${S.docs.jaarrekeningen.files.length} jaarrekeningen aanwezig — voldoende voor bancaire inkomenstoets`);
-  else if(S.form.typeKlant==='bv' && S.docs.jaarrekeningen.files.length < 2) inzichtItems.push('Minder dan 2 jaarrekeningen — onvoldoende voor bancaire inkomenstoets');
-  if(inzichtItems.length === 0) inzichtItems.push('Meer documenten nodig voor diepgaande inzichten.');
-
-  // Risico's
+ 
+  // KVK velden
+  if (aiKvk?.fields) {
+    const f = aiKvk.fields;
+    if (f.bedrijfsnaam)    inzichtItems.push(`Bedrijfsnaam: <em>${f.bedrijfsnaam}</em>`);
+    if (f.rechtsvorm)      inzichtItems.push(`Rechtsvorm: <em>${f.rechtsvorm}</em>`);
+    if (f.kvkNummer)       inzichtItems.push(`KVK-nummer: <em>${f.kvkNummer}</em>`);
+    if (f.sbiCode)         inzichtItems.push(`SBI-code: <em>${f.sbiCode}</em>`);
+    if (f.oprichtingsdatum)inzichtItems.push(`Opgericht: <em>${f.oprichtingsdatum}</em>`);
+    if (f.vestigingsadres) inzichtItems.push(`Vestigingsadres: <em>${f.vestigingsadres}</em>`);
+  } else if (kvk?._isBV && S.form.typeKlant === 'bv') {
+    inzichtItems.push('KVK bevestigt BV-structuur — consistent met profiel');
+  }
+ 
+  // Graydon velden
+  if (aiGray?.fields) {
+    const f = aiGray.fields;
+    if (f.kredietscore)    inzichtItems.push(`Kredietscore: <em>${f.kredietscore}</em>`);
+    if (f.risicoklasse)    inzichtItems.push(`Risicoklasse: <em>${f.risicoklasse}</em>`);
+    if (f.betalingsgedrag) inzichtItems.push(`Betalingsgedrag: <em>${f.betalingsgedrag}</em>`);
+    if (f.incassoCount && f.incassoCount !== '0') inzichtItems.push(`Incasso's: <em>${f.incassoCount}</em>`);
+    if (f.aanbevolenKredietlimiet) inzichtItems.push(`Kredietlimiet: <em>${fmtBedrag(f.aanbevolenKredietlimiet) || f.aanbevolenKredietlimiet}</em>`);
+  }
+ 
+  // WOZ velden
+  if (aiWoz?.fields) {
+    const f = aiWoz.fields;
+    if (f.adresObject)     inzichtItems.push(`Object: <em>${f.adresObject}</em>`);
+    const wv = fmtBedrag(f.wozWaarde) || fmtBedrag(f.taxatiewaarde);
+    if (wv)                inzichtItems.push(`${f.documentType === 'taxatie' ? 'Taxatiewaarde' : 'WOZ-waarde'}: <em>${wv}</em>`);
+    if (f.peildatum)       inzichtItems.push(`Peildatum: <em>${f.peildatum}</em>`);
+    if (f.bouwjaar)        inzichtItems.push(`Bouwjaar: <em>${f.bouwjaar}</em>`);
+    if (f.oppervlakte)     inzichtItems.push(`Oppervlakte: <em>${f.oppervlakte}</em>`);
+  } else if (woz?._isTaxatie) {
+    inzichtItems.push('Taxatierapport aanwezig — hogere bewijskracht dan WOZ');
+  }
+ 
+  // Kadaster velden
+  if (aiKad?.fields) {
+    const f = aiKad.fields;
+    if (f.eigenaar)        inzichtItems.push(`Eigenaar: <em>${f.eigenaar}</em>`);
+    if (f.koopsom)         inzichtItems.push(`Koopsom: <em>${fmtBedrag(f.koopsom) || f.koopsom}</em>`);
+    if (f.datumLevering)   inzichtItems.push(`Datum levering: <em>${f.datumLevering}</em>`);
+    if (f.hypotheekInschrijving === 'ja') {
+      const hb = f.hypotheekBedrag ? ` (${fmtBedrag(f.hypotheekBedrag) || f.hypotheekBedrag})` : '';
+      inzichtItems.push(`Hypotheek ingeschreven${hb} — rangorde aandachtspunt`);
+    }
+  } else if (kad?._heeftHypotheek) {
+    inzichtItems.push('Bestaande hypotheekinschrijving gevonden — rangorde aandachtspunt');
+  }
+ 
+  // Jaarrekening velden
+  if (aiJaarr?.fields) {
+    const f = aiJaarr.fields;
+    if (f.bedrijfsnaam)    inzichtItems.push(`Onderneming: <em>${f.bedrijfsnaam}</em>`);
+    if (f.boekjaar)        inzichtItems.push(`Boekjaar: <em>${f.boekjaar}</em>`);
+    if (f.omzet)           inzichtItems.push(`Omzet: <em>${fmtBedrag(f.omzet) || f.omzet}</em>`);
+    if (f.nettowinst)      inzichtItems.push(`Nettowinst: <em>${fmtBedrag(f.nettowinst) || f.nettowinst}</em>`);
+    if (f.ebitda)          inzichtItems.push(`EBITDA: <em>${fmtBedrag(f.ebitda) || f.ebitda}</em>`);
+    if (f.solvabiliteit)   inzichtItems.push(`Solvabiliteit: <em>${f.solvabiliteit}%</em>`);
+  } else if (S.docs.jaarrekeningen.files.length >= 2) {
+    inzichtItems.push(`${S.docs.jaarrekeningen.files.length} jaarrekeningen aanwezig — voldoende voor bancaire inkomenstoets`);
+  } else if (S.form.typeKlant === 'bv' && S.docs.jaarrekeningen.files.length < 2) {
+    inzichtItems.push('Minder dan 2 jaarrekeningen — onvoldoende voor bancaire inkomenstoets');
+  }
+ 
+  if (inzichtItems.length === 0) inzichtItems.push('Meer documenten nodig voor diepgaande inzichten.');
+ 
+  // ── Risico's ─────────────────────────────────────────────────
   const risicoItems = [];
-  if(g?._risicoNiveau==='hoog') risicoItems.push('Graydon verhoogd risico — bancaire route waarschijnlijk niet haalbaar');
-  if(kvk && S.form.typeKlant==='bv' && !kvk._isBV) risicoItems.push('Structuurconflict: BV ingevuld maar KVK toont andere rechtsvorm');
-  if(woz?._definitieveWaarde && parseFloat(S.form.marktwaarde)>0 && Math.abs(parseFloat(S.form.marktwaarde)-woz._definitieveWaarde)/woz._definitieveWaarde*100>15) risicoItems.push(`Waarde-afwijking > 15% — marktwaarde en ${woz._bronLabel} inconsistent`);
-  if(S.form.typeKlant==='bv' && S.docs.jaarrekeningen.files.length===0) risicoItems.push('Jaarrekeningen ontbreken — inkomenstoets BV niet mogelijk');
-  if(risicoItems.length===0) risicoItems.push('Geen documentaire risico\'s gedetecteerd op basis van beschikbare bestanden.');
-
-  // Aandachtspunten
+  [aiKvk, aiGray, aiWoz, aiKad, aiJaarr].forEach(ai => {
+    if (ai?.risks?.length) ai.risks.forEach(r => risicoItems.push(r));
+  });
+  // Fallback lokale risico's
+  if (!aiGray && gray?._risicoNiveau === 'hoog') risicoItems.push('Graydon verhoogd risico — bancaire route waarschijnlijk niet haalbaar');
+  if (!aiKvk && kvk && S.form.typeKlant === 'bv' && !kvk._isBV) risicoItems.push('Structuurconflict: BV ingevuld maar KVK toont andere rechtsvorm');
+  if (!aiWoz && woz?._definitieveWaarde && parseFloat(S.form.marktwaarde) > 0 &&
+      Math.abs(parseFloat(S.form.marktwaarde) - woz._definitieveWaarde) / woz._definitieveWaarde * 100 > 15)
+    risicoItems.push(`Waarde-afwijking > 15% — marktwaarde en ${woz._bronLabel} inconsistent`);
+  if (S.form.typeKlant === 'bv' && S.docs.jaarrekeningen.files.length === 0)
+    risicoItems.push('Jaarrekeningen ontbreken — inkomenstoets BV niet mogelijk');
+  if (risicoItems.length === 0) risicoItems.push("Geen documentaire risico's gedetecteerd op basis van beschikbare bestanden.");
+ 
+  // ── Aandachtspunten ──────────────────────────────────────────
   const aandachtItems = [];
-  if(woz?._peildatum || !woz) aandachtItems.push(woz?._definitieveWaarde ? 'Controleer actualiteit taxatierapport (max 6 maanden oud voor bancaire indiening)' : 'Taxatierapport ontbreekt — vereist voor bancaire route');
-  if(kad?._heeftHypotheek) aandachtItems.push('Verifieer omvang en rang bestaande hypotheek via notaris');
-  if(g?._incassoCount>0) aandachtItems.push(`${g._incassoCount} incasso(s) in kredietrapport — schriftelijke toelichting vereist`);
-  if(aandachtItems.length===0) aandachtItems.push('Geen directe aandachtspunten op basis van huidige documenten.');
-
-  // Vervolgstappen
+  if (!woz?._definitieveWaarde && !aiWoz?.fields?.wozWaarde && !aiWoz?.fields?.taxatiewaarde)
+    aandachtItems.push('Taxatierapport ontbreekt — vereist voor bancaire route');
+  else
+    aandachtItems.push('Controleer actualiteit taxatierapport (max 6 maanden oud voor bancaire indiening)');
+  if ((aiKad?.fields?.hypotheekInschrijving === 'ja') || kad?._heeftHypotheek)
+    aandachtItems.push('Verifieer omvang en rang bestaande hypotheek via notaris');
+  if (aiGray?.fields?.incassoCount && parseInt(aiGray.fields.incassoCount) > 0)
+    aandachtItems.push(`${aiGray.fields.incassoCount} incasso('s) in kredietrapport — schriftelijke toelichting vereist`);
+  else if (!aiGray && gray?._incassoCount > 0)
+    aandachtItems.push(`${gray._incassoCount} incasso(s) in kredietrapport — schriftelijke toelichting vereist`);
+  if (aandachtItems.length === 0) aandachtItems.push('Geen directe aandachtspunten op basis van huidige documenten.');
+ 
+  // ── Vervolgstappen ───────────────────────────────────────────
   const vervolgItems = [];
-  if(!S.docs.woz.files.length) vervolgItems.push('Taxatierapport opvragen (max 6 maanden oud)');
-  if(!S.docs.kadaster.files.length) vervolgItems.push('Kadastraal uittreksel opvragen bij notaris of Kadaster');
-  if(S.form.typeKlant==='bv' && S.docs.jaarrekeningen.files.length<2) vervolgItems.push('Minimaal 2 jaar jaarrekeningen opvragen bij klant');
-  if(!S.docs.graydon.files.length) vervolgItems.push('Kredietrapport opvragen (Graydon/CreditSafe)');
-  if(vervolgItems.length===0) vervolgItems.push('Dossier voldoende compleet — voorbereiding indiening mogelijk starten.');
-
-  const kvkFiles = S.docs.kvk?.files || [];
-const kvkAi = kvkFiles.find(f => f.ai)?.ai || null;
-
-if (kvkAi) {
-  if (kvkAi.summary) {
-    samenvattingItems = [kvkAi.summary, ...samenvattingItems];
-  }
-
-  if (kvkAi.risks && kvkAi.risks.length) {
-  if (typeof risicoItems !== 'undefined') {
-  risicoItems = [...kvkAi.risks, ...risicoItems];
-}
-  }
-
-  if (kvkAi.actions && kvkAi.actions.length) {
-    vervolgItems = [...kvkAi.actions, ...vervolgItems];
-  }
-
-  if (kvkAi.fields) {
-    const kvkFieldLines = [
-      kvkAi.fields.bedrijfsnaam ? `Bedrijfsnaam: ${kvkAi.fields.bedrijfsnaam}` : null,
-      kvkAi.fields.rechtsvorm ? `Rechtsvorm: ${kvkAi.fields.rechtsvorm}` : null,
-      kvkAi.fields.kvkNummer ? `KVK-nummer: ${kvkAi.fields.kvkNummer}` : null,
-      kvkAi.fields.sbiCode ? `SBI-code: ${kvkAi.fields.sbiCode}` : null,
-      kvkAi.fields.oprichtingsdatum ? `Oprichtingsdatum: ${kvkAi.fields.oprichtingsdatum}` : null,
-      kvkAi.fields.vestigingsadres ? `Vestigingsadres: ${kvkAi.fields.vestigingsadres}` : null
-    ].filter(Boolean);
-
-    inzichtItems = [...kvkFieldLines, ...inzichtItems];
-  }
+  [aiKvk, aiGray, aiWoz, aiKad, aiJaarr].forEach(ai => {
+    if (ai?.actions?.length) ai.actions.forEach(a => vervolgItems.push(a));
+  });
+  // Aanvullen met ontbrekende categorieën
+  if (!S.docs.woz.files.length)         vervolgItems.push('Taxatierapport opvragen (max 6 maanden oud)');
+  if (!S.docs.kadaster.files.length)    vervolgItems.push('Kadastraal uittreksel opvragen bij notaris of Kadaster');
+  if (S.form.typeKlant === 'bv' && S.docs.jaarrekeningen.files.length < 2)
+                                         vervolgItems.push('Minimaal 2 jaar jaarrekeningen opvragen bij klant');
+  if (!S.docs.graydon.files.length)     vervolgItems.push('Kredietrapport opvragen (Graydon/CreditSafe)');
+  if (vervolgItems.length === 0)        vervolgItems.push('Dossier voldoende compleet — voorbereiding indiening mogelijk starten.');
+ 
+  // ── Render ───────────────────────────────────────────────────
+  return `
+  <div class="section-head" style="margin-top:16px">
+    <span class="section-num" style="background:var(--pur)">4</span>
+    <span class="section-head-lbl">Documentanalyse</span>
+    <div class="section-head-line"></div>
+    <span class="bdg" style="background:var(--pur-bg);color:var(--pur);border:1px solid var(--pur-bd)">
+      ${filledCats} categorie${filledCats !== 1 ? 'ën' : ''} · ${totalFiles} bestand${totalFiles !== 1 ? 'en' : ''}
+    </span>
+  </div>
+ 
+  <div class="doc-analyse-blok">
+    <div class="doc-analyse-header">
+      <div class="doc-analyse-badge">AI Documentanalyse</div>
+      <div class="doc-analyse-title">Samenvatting geüploade documenten</div>
+    </div>
+ 
+    <div class="doc-analyse-grid">
+      <div class="doc-analyse-section">
+        <div class="doc-analyse-section-lbl lbl-bl">Samenvatting</div>
+        ${samenvattingItems.length > 0
+          ? samenvattingItems.map(i => `<div class="doc-analyse-placeholder">· ${i}</div>`).join('')
+          : `<div class="doc-analyse-placeholder">Nog onvoldoende documenten voor automatische samenvatting. Upload meer bestanden.</div>`}
+      </div>
+      <div class="doc-analyse-section">
+        <div class="doc-analyse-section-lbl lbl-gn">Inzichten</div>
+        ${inzichtItems.map(i => `<div class="doc-analyse-placeholder">→ ${i}</div>`).join('')}
+      </div>
+      <div class="doc-analyse-section">
+        <div class="doc-analyse-section-lbl lbl-rk">Risico's</div>
+        ${risicoItems.map(i => `<div class="doc-analyse-placeholder">⚠ ${i}</div>`).join('')}
+      </div>
+      <div class="doc-analyse-section">
+        <div class="doc-analyse-section-lbl lbl-wn">Aandachtspunten</div>
+        ${aandachtItems.map(i => `<div class="doc-analyse-placeholder">· ${i}</div>`).join('')}
+      </div>
+    </div>
+ 
+    <div class="doc-analyse-full">
+      <div class="doc-analyse-section-lbl lbl-or">Vervolgstappen</div>
+      ${vervolgItems.map((i, idx) =>
+        `<div class="doc-analyse-placeholder"><strong>${idx + 1}.</strong> ${i}</div>`
+      ).join('')}
+    </div>
+  </div>`;
 }
   return `
   <div class="section-head" style="margin-top:16px">
