@@ -36,10 +36,11 @@ Gebruik exact deze structuur:
 }
 Regels:
 - onbekend = leeg laten
-- risks = array van korte NL zinnen over juridische of structuurrisico's
+- risks = array van korte NL zinnen over risico’s (ook bij beperkte informatie)
 - actions = array van korte NL vervolgacties voor de adviseur
 - baseer je alleen op tekst die echt in het document staat
-- geen aannames toevoegen
+- als informatie beperkt is (alleen KVK), benoem dit als risico (bijv. beperkte financiële transparantie)
+- je mag voorzichtige, logische risico-inschattingen maken op basis van ontbrekende informatie
 `,
  
       graydon: `
