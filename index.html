@@ -274,7 +274,7 @@ textarea.modal-ta{width:100%;height:120px;padding:8px 10px;border:1.5px solid va
   </div>
   <div class="hdr-div"></div>
   <div class="hdr-title">Deal Analyzer</div>
-  <div class="hdr-badge">v16</div>
+  <div class="hdr-badge">v17</div>
   <div class="hdr-sp"></div>
   <div id="HDR_K" class="hdr-kl"></div>
   <button class="hdr-btn" onclick="showImportModal()">↓ Importeren</button>
@@ -634,35 +634,45 @@ async function parseDoc(type, file) {
 // ════════════════════════════════════════════════════
 // ⑨ AI DOCUMENT ANALYSE — centraal voor alle types
 // ════════════════════════════════════════════════════
+// Tekstlimieten per type: graydon/jaarrekeningen hebben meer tekst nodig
+const AI_TEXT_LIMITS = {
+  kvk: 20000, graydon: 28000, woz: 18000, kadaster: 18000, jaarrekeningen: 28000
+};
+
 async function runAiAnalysis(type, rawText) {
   if (!rawText || rawText.trim().length < 30) return null;
+
+  const limit = AI_TEXT_LIMITS[type] || 20000;
+  const truncated = rawText.length > limit ? rawText.substring(0, limit) : rawText;
 
   try {
     const response = await fetch('/api/analyze-document', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        docType: type,
-        text: rawText.substring(0, 20000)
-      })
+      body: JSON.stringify({ docType: type, text: truncated })
     });
 
     const data = await response.json();
-    console.log('AI output', type, data);
 
     if (!response.ok) {
-      console.warn(`AI analyse ${type}:`, data.error || response.status);
+      console.warn(`[AI ${type}] HTTP ${response.status}:`, data.error || '');
       return null;
     }
 
-    if (!data || typeof data !== 'object' || !data.summary) {
+    if (!data || typeof data !== 'object') return null;
+
+    // Accepteer output zonder summary zolang er gevulde fields zijn
+    const hasFields = data.fields && Object.values(data.fields).some(v => v && String(v).trim());
+    if (!data.summary && !hasFields) {
+      console.warn(`[AI ${type}] Lege output`);
       return null;
     }
 
+    console.log(`[AI ${type}]`, data);
     return data;
 
   } catch (err) {
-    console.warn(`AI analyse ${type} mislukt:`, err.message);
+    console.warn(`[AI ${type}] mislukt:`, err.message);
     return null;
   }
 }
@@ -1348,30 +1358,41 @@ function renderDocAnalyseBlok() {
     inzichtItems.push('KVK bevestigt BV-structuur — consistent met profiel');
   }
 
-  // Kredietrapport
+  // Kredietrapport — beide veldnamen voor kredietlimiet ondersteunen
   if(aiGray?.fields) {
     const fi = aiGray.fields;
-    if(safe(fi.score))           inzichtItems.push(`Score: <em>${fi.score}</em>`);
-    if(safe(fi.risicoklasse))    inzichtItems.push(`Risicoklasse: <em>${fi.risicoklasse}</em>`);
-    if(safe(fi.betaalgedrag))    inzichtItems.push(`Betaalgedrag: <em>${fi.betaalgedrag}</em>`);
+    if(safe(fi.score))                inzichtItems.push(`Score: <em>${fi.score}</em>`);
+    if(safe(fi.internationaleScore))  inzichtItems.push(`Internationale score: <em>${fi.internationaleScore}</em>`);
+    if(safe(fi.risicoklasse))         inzichtItems.push(`Risicoklasse: <em>${fi.risicoklasse}</em>`);
+    // kredietlimiet: zowel 'kredietlimiet' (nieuw) als 'aanbevolenKredietlimiet' (oud)
+    const gKlimiet = safe(fi.kredietlimiet) || safe(fi.aanbevolenKredietlimiet);
+    if(gKlimiet)                      inzichtItems.push(`Kredietlimiet: <em>${gKlimiet}</em>`);
+    if(safe(fi.probabilityOfDefault)) inzichtItems.push(`Probability of Default: <em>${fi.probabilityOfDefault}</em>`);
+    if(safe(fi.betaalgedrag))         inzichtItems.push(`Betaalgedrag: <em>${fi.betaalgedrag}</em>`);
+    if(safe(fi.bijzonderheden))       inzichtItems.push(`Bijzonderheden: <em>${fi.bijzonderheden}</em>`);
     if(safe(fi.incassoCount) && fi.incassoCount !== '0') inzichtItems.push(`Incasso's: <em>${fi.incassoCount}</em>`);
-  if(safe(fi.kredietlimiet)) inzichtItems.push(`Kredietlimiet: <em>${fi.kredietlimiet}</em>`);
-    if(safe(fi.bijzonderheden))  inzichtItems.push(`Bijzonderheden: <em>${fi.bijzonderheden}</em>`);
-    if(safe(fi.probabilityOfDefault)) inzichtItems.push(`PD: <em>${fi.probabilityOfDefault}</em>`);
-if(safe(fi.internationaleScore)) inzichtItems.push(`Internationale score: <em>${fi.internationaleScore}</em>`);
   } else if(gray?._risicoNiveau) {
     inzichtItems.push(`Graydon risiconiveau: <em>${gray._risicoNiveau}</em>`);
   }
 
   // WOZ / Taxatie
+  // Backend levert: adresObject, wozWaarde, taxatiewaarde, peildatum, bouwjaar, oppervlakte, documentType, taxateur
   if(aiWoz?.fields) {
     const fi = aiWoz.fields;
-    if(safe(fi.adres))           inzichtItems.push(`Object: <em>${fi.adres}</em>`);
-    const wv = fmtBedrag(fi.waarde);
-    if(wv)                       inzichtItems.push(`${fi.documentType==='taxatie'?'Taxatiewaarde':'WOZ-waarde'}: <em>${wv}</em>`);
-    if(safe(fi.waardeDatum))     inzichtItems.push(`Waardepeildatum: <em>${fi.waardeDatum}</em>`);
-    if(safe(fi.taxateur))        inzichtItems.push(`Taxateur: <em>${fi.taxateur}</em>`);
-    if(safe(fi.marktwaardeOnderbouwing)) inzichtItems.push(`Onderbouwing: <em>${fi.marktwaardeOnderbouwing}</em>`);
+    // adres: probeer adresObject en adres (fallback veld)
+    const wozAdres = safe(fi.adresObject) || safe(fi.adres);
+    if(wozAdres)                  inzichtItems.push(`Object: <em>${wozAdres}</em>`);
+    // waarde: taxatiewaarde heeft prioriteit, anders wozWaarde, anders generiek waarde veld
+    const isTax = fi.documentType === 'taxatie';
+    const wozRawWaarde = isTax ? fi.taxatiewaarde : fi.wozWaarde;
+    const wv = fmtBedrag(wozRawWaarde) || fmtBedrag(fi.waarde);
+    if(wv)                        inzichtItems.push(`${isTax ? 'Taxatiewaarde' : 'WOZ-waarde'}: <em>${wv}</em>`);
+    // peildatum: probeer peildatum en waardeDatum
+    const wozDatum = safe(fi.peildatum) || safe(fi.waardeDatum);
+    if(wozDatum)                  inzichtItems.push(`Peildatum: <em>${wozDatum}</em>`);
+    if(safe(fi.bouwjaar))         inzichtItems.push(`Bouwjaar: <em>${fi.bouwjaar}</em>`);
+    if(safe(fi.oppervlakte))      inzichtItems.push(`Oppervlakte: <em>${fi.oppervlakte}</em>`);
+    if(safe(fi.taxateur))         inzichtItems.push(`Taxateur: <em>${fi.taxateur}</em>`);
   } else if(woz?._definitieveWaarde) {
     inzichtItems.push(`${woz._isTaxatie?'Taxatierapport':'WOZ'}: <em>${fE(woz._definitieveWaarde)}</em> — ${woz._isTaxatie?'hogere bewijskracht':'WOZ-beschikking'}`);
   }
@@ -1392,14 +1413,21 @@ if(safe(fi.internationaleScore)) inzichtItems.push(`Internationale score: <em>${
   }
 
   // Jaarrekeningen
+  // Backend kan zowel camelCase (nettoResultaat/eigenVermogen) als lowercase (nettowinst/eigenvermogen) teruggeven
   if(aiJaarr?.fields) {
     const fi = aiJaarr.fields;
     if(safe(fi.bedrijfsnaam))    inzichtItems.push(`Onderneming: <em>${fi.bedrijfsnaam}</em>`);
     if(safe(fi.boekjaar))        inzichtItems.push(`Boekjaar: <em>${fi.boekjaar}</em>`);
     if(safe(fi.omzet))           inzichtItems.push(`Omzet: <em>${fmtBedrag(fi.omzet) || fi.omzet}</em>`);
-    if(safe(fi.nettoResultaat))  inzichtItems.push(`Nettoresultaat: <em>${fmtBedrag(fi.nettoResultaat) || fi.nettoResultaat}</em>`);
+    // nettowinst (backend lowercase) EN nettoResultaat (camelCase) beide ondersteunen
+    const jNettowinst = fi.nettoResultaat || fi.nettowinst;
+    if(safe(jNettowinst))        inzichtItems.push(`Nettoresultaat: <em>${fmtBedrag(jNettowinst) || jNettowinst}</em>`);
     if(safe(fi.ebitda))          inzichtItems.push(`EBITDA: <em>${fmtBedrag(fi.ebitda) || fi.ebitda}</em>`);
-    if(safe(fi.eigenVermogen))   inzichtItems.push(`Eigen vermogen: <em>${fmtBedrag(fi.eigenVermogen) || fi.eigenVermogen}</em>`);
+    // eigenvermogen (backend lowercase) EN eigenVermogen (camelCase) beide ondersteunen
+    const jEv = fi.eigenVermogen || fi.eigenvermogen;
+    if(safe(jEv))                inzichtItems.push(`Eigen vermogen: <em>${fmtBedrag(jEv) || jEv}</em>`);
+    const jBt = fi.balanstotaal || fi.balansTotaal;
+    if(safe(jBt))                inzichtItems.push(`Balanstotaal: <em>${fmtBedrag(jBt) || jBt}</em>`);
     if(safe(fi.solvabiliteit))   inzichtItems.push(`Solvabiliteit: <em>${fi.solvabiliteit}%</em>`);
   } else if(jaarr?._jaar) {
     inzichtItems.push(`Jaarrekening ${jaarr._jaar} aanwezig`);
@@ -1434,11 +1462,18 @@ if(safe(fi.internationaleScore)) inzichtItems.push(`Internationale score: <em>${
 
   // ── Aandachtspunten ──────────────────────────────────────────
   const aandachtItems = [];
-  if(!woz?._definitieveWaarde && !aiWoz?.fields?.waarde)
+  // WOZ/taxatie aanwezig? Check alle mogelijke veldnamen die backend kan leveren
+  const wozAanwezig = woz?._definitieveWaarde
+    || safe(aiWoz?.fields?.wozWaarde) || safe(aiWoz?.fields?.taxatiewaarde) || safe(aiWoz?.fields?.waarde);
+  if(!wozAanwezig)
     aandachtItems.push('Taxatierapport ontbreekt — vereist voor bancaire route');
   else
     aandachtItems.push('Controleer actualiteit taxatierapport (max 6 maanden oud voor bancaire indiening)');
-  if((aiKad?.fields?.hypotheekInschrijving==='ja') || kad?._heeftHypotheek)
+  // Kadaster hypotheek: check beide veldnaamconventies
+  const kadHyp = aiKad?.fields?.hypotheekInschrijving === 'ja'
+    || aiKad?.fields?.hypotheekInschrijving === 'Aanwezig'
+    || kad?._heeftHypotheek;
+  if(kadHyp)
     aandachtItems.push('Verifieer omvang en rang bestaande hypotheek via notaris');
   const incCount = aiGray?.fields?.incassoCount ? parseInt(aiGray.fields.incassoCount) : (gray?._incassoCount || 0);
   if(incCount > 0) aandachtItems.push(`${incCount} incasso('s) gedetecteerd — schriftelijke toelichting vereist`);
@@ -1785,7 +1820,7 @@ TOP ACTIES:
 ${acties.slice(0,5).map((a,i)=>i+1+'. '+a.t).join('\n')}
 
 ─────────────────────────────────────────
-MB Deal Analyzer v16 | Indicatief — geen rechten ontleenbaar</div>
+MB Deal Analyzer v17 | Indicatief — geen rechten ontleenbaar</div>
   </div>
   <div class="btn-row" id="PRINT_BTN_ROW">
     <button class="btn btn-bl" onclick="printReport()">PDF afdrukken</button>
