@@ -104,17 +104,8 @@ body{background:var(--bg);color:var(--tx);font-family:var(--font);font-size:14px
 .print-meta strong{color:var(--tx);font-weight:700;display:block;font-size:12px;margin-bottom:2px}
 
 /* ── HEADER ──────────────────────────────────────── */
-.hdr{
-  background:var(--mb-blue-dd);
-  padding:0 24px;height:58px;
-  display:flex;align-items:center;gap:12px;
-  position:sticky;top:0;z-index:300;
-  box-shadow:0 2px 8px rgba(20,44,71,.3),0 1px 0 rgba(255,255,255,.06)
-}
-.hdr::after{
-  content:'';position:absolute;bottom:0;left:0;right:0;height:2px;
-  background:linear-gradient(90deg,var(--mb-or) 0%,#e8905a 40%,transparent 100%)
-}
+.hdr{background:linear-gradient(135deg,var(--bl-d) 0%,var(--bl) 60%,var(--bl-m) 100%);padding:0 28px;height:54px;display:flex;align-items:center;gap:10px;position:sticky;top:0;z-index:300;box-shadow:0 2px 14px rgba(15,50,76,.25)}
+.hdr::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--or),#f09060,transparent)}
 
 /* Logo */
 .logo-wrap{display:flex;align-items:center;gap:10px;flex-shrink:0;text-decoration:none}
@@ -155,17 +146,17 @@ body{background:var(--bg);color:var(--tx);font-family:var(--font);font-size:14px
 /* ── APP SHELL ───────────────────────────────────── */
 .app-shell{
   display:grid;grid-template-columns:300px 1fr 276px;gap:0;
-  min-height:calc(100vh - 58px);max-width:1680px;margin:0 auto
+  min-height:calc(100vh - 54px);max-width:1680px;margin:0 auto
 }
 .panel-input{
   border-right:1px solid var(--bd);background:var(--wh);
-  height:calc(100vh - 58px);overflow-y:auto;position:sticky;top:58px;
+  height:calc(100vh - 54px);overflow-y:auto;position:sticky;top:54px;
   padding:20px 16px 56px
 }
 .panel-main{padding:22px 24px 56px;min-width:0}
 .panel-aside{
   border-left:1px solid var(--bd);background:var(--wh);
-  height:calc(100vh - 58px);overflow-y:auto;position:sticky;top:58px;
+  height:calc(100vh - 54px);overflow-y:auto;position:sticky;top:54px;
   padding:18px 14px 56px
 }
 
@@ -652,16 +643,17 @@ textarea.modal-ta:focus{border-color:var(--mb-blue);box-shadow:0 0 0 3px rgba(43
 </head>
 <body>
 
-<div class="logo-wrap">
-  <div class="logo-img-wrap">
-    <img src="logo.png">
-  </div>
-</div>
+<div class="hdr">
+  <div class="logo-wrap">
+    <div class="logo-img-wrap">
+      <img src="logo.png">
+    </div>
     <div class="logo-app-name">
       <span class="logo-app-title">Deal Analyzer</span>
       <span class="logo-app-sub">Krediet­analyse</span>
     </div>
   </div>
+  <div class="hdr-div"></div>
   <div class="hdr-sp"></div>
   <div id="HDR_K" class="hdr-kl"></div>
   <div class="hdr-badge">v19</div>
