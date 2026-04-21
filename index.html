@@ -643,7 +643,7 @@ async function runAiAnalysis(type, rawText) {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         docType: type,
-        text: rawText.substring(0, 8000)
+        text: rawText.substring(0, 20000)
       })
     });
 
