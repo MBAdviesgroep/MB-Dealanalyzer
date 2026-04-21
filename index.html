@@ -1184,6 +1184,12 @@ async function handlePdfImport(file) {
         S.form[key] = String(value); S.clientData[key] = String(value);
       }
     });
+    if (!S.form.naamKlant && S.form.adviseur) {
+  S.form.naamKlant = S.form.adviseur;
+  S.clientData.naamKlant = S.form.adviseur;
+  S.form.adviseur = '';
+  delete S.clientData.adviseur;
+}
     statusEl.innerHTML = `<div style="background:var(--gn-bg);border:1.5px solid var(--gn-bd);border-radius:8px;padding:13px 14px;margin-top:11px"><div style="font-family:var(--head);font-size:10px;font-weight:700;color:var(--gn);margin-bottom:6px;text-transform:uppercase">PDF succesvol ingelezen</div><div style="font-size:11px;color:var(--tx2);line-height:1.6">Dealgegevens zijn ingevuld vanuit de PDF.</div></div>`;
     hideImportModal(); fullRender();
   } catch (error) {
