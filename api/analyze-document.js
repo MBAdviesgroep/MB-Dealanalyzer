@@ -81,6 +81,10 @@ Belangrijk:
 - Als limiet is verlaagd of liquide middelen zijn gedaald, benoem dat als aandachtspunt of risico.
 - Als financiële positie sterk lijkt, benoem dat ook.
 - Baseer je samenvatting op de feitelijke kernpunten uit het rapport.
+- Als numerieke gegevens aanwezig zijn (zoals score, kredietlimiet, eigen vermogen, ratios), gebruik deze expliciet in de summary of inzichten.
+- Noem concrete cijfers waar mogelijk (bijv. score 95, kredietlimiet €220.000).
+- Een algemene term zoals "laag risico" is NIET voldoende als er onderliggende data beschikbaar is.
+- Combineer meerdere datapoints in 1 zin (score + limiet + rating).
 
 Voorbeelden van risks:
 - Kredietlimiet is recent verlaagd
