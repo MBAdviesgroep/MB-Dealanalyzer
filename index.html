@@ -1177,6 +1177,7 @@ async function handlePdfImport(file) {
       body: JSON.stringify({ text: parsed.text })
     });
     const data = await response.json();
+    console.log('IMPORT DATA:', data);
     if (!response.ok) throw new Error(data.error || 'Onbekende fout');
     Object.entries(data).forEach(([key, value]) => {
       if (value !== null && value !== undefined && value !== '') {
