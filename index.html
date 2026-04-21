@@ -15,91 +15,68 @@
 
 /* ── Design tokens ───────────────────────────────── */
 :root{
-  /* Brand — direct uit MB Adviesgroep logo */
-  --mb-blue:#2B5F8E;       /* MB blauw */
-  --mb-blue-d:#1e4469;     /* donkerder */
-  --mb-blue-dd:#142e47;    /* header achtergrond */
-  --mb-blue-l:#3d79ac;     /* lichter */
-  --mb-blue-xl:#5a96c9;    /* accent highlight */
-  --mb-blue-bg:#EEF4FA;    /* lichte tint */
-  --mb-blue-bg2:#dde9f5;
-  --mb-blue-bd:#b8d4ec;
+  /* ── Brand — MB Adviesgroep ── */
+  --bl:#2B5F8E;        /* primair blauw */
+  --bl-d:#142e47;      /* donker (header) */
+  --bl-m:#1e4469;      /* medium */
+  --bl-l:#3d79ac;      /* licht */
+  --bl-bg:#EEF4FA;     /* achtergrond tint */
+  --bl-bg2:#dde9f5;
+  --bl-bd:#b8d4ec;
 
-  --mb-or:#D96B3A;          /* MB oranje */
-  --mb-or-d:#bf5a2c;
-  --mb-or-bg:#FDF0EA;
-  --mb-or-bd:#f5c4a5;
+  --or:#D96B3A;         /* oranje accent */
+  --or-d:#bf5a2c;
+  --or-bg:#FDF0EA;
+  --or-bd:#f5c4a5;
 
-  /* Aliassen voor bestaande code */
-  --bl:var(--mb-blue);--bl-d:var(--mb-blue-dd);--bl-m:var(--mb-blue-d);--bl-l:var(--mb-blue-l);
-  --bl-bg:var(--mb-blue-bg);--bl-bg2:var(--mb-blue-bg2);--bl-bd:var(--mb-blue-bd);
-  --or:var(--mb-or);--or-d:var(--mb-or-d);--or-bg:var(--mb-or-bg);--or-bd:var(--mb-or-bd);
-
-  /* Neutralen */
+  /* ── Neutralen ── */
   --wh:#ffffff;
-  --bg:#F5F6F8;           /* koeler dan warm beige */
+  --bg:#F5F6F8;
   --bg2:#ECEEF2;
   --bg3:#E2E5EA;
   --bd:#DDE1E8;
   --bd-l:#ECEEF2;
 
-  /* Tekst */
+  /* ── Tekst ── */
   --tx:#111827;
   --tx2:#374151;
   --tx3:#6B7280;
   --tx4:#9CA3AF;
 
-  /* Semantisch */
+  /* ── Semantisch ── */
   --gn:#166534;--gn-bg:#F0FDF4;--gn-bd:#BBF7D0;--gn-d:#14532D;
   --wn:#92400E;--wn-bg:#FFFBEB;--wn-bd:#FDE68A;
   --rk:#991B1B;--rk-bg:#FEF2F2;--rk-bd:#FECACA;
   --pur:#5B21B6;--pur-bg:#F5F3FF;--pur-bd:#DDD6FE;
 
-  /* Typography — alles Inter */
+  /* ── Typography ── */
   --font:'Inter',system-ui,-apple-system,sans-serif;
   --head:'Inter',system-ui,-apple-system,sans-serif;
-  --mono:'Inter',system-ui,-apple-system,sans-serif; /* mono alleen voor getallen */
+  --mono:'Inter',system-ui,-apple-system,sans-serif;
 
-  /* Shadows */
+  /* ── Shadows ── */
   --sh:0 1px 3px rgba(0,0,0,.06),0 1px 2px rgba(0,0,0,.04);
   --sh-md:0 4px 12px rgba(0,0,0,.08),0 1px 3px rgba(0,0,0,.05);
   --sh-lg:0 8px 24px rgba(0,0,0,.10),0 2px 6px rgba(0,0,0,.06);
 
-  /* Radius */
-  --r:12px;
-  --r-sm:8px;
-  --r-lg:16px;
+  /* ── Radius ── */
+  --r:12px;--r-sm:8px;--r-lg:16px;
 }
 
 html{scroll-behavior:smooth}
 body{background:var(--bg);color:var(--tx);font-family:var(--font);font-size:14px;min-height:100vh;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}
 
-/* ── PRINT ────────────────────────────────────────── */
-@media print{
-  .hdr-btn,.what-if-section,#PRINT_BTN_ROW,.panel-input,.panel-aside,
-  .doc-upload-btn,.doc-file-del{display:none!important}
-  .app-shell{grid-template-columns:1fr!important;max-width:none}
-  .panel-main{padding:0!important}
-  .print-header{display:flex!important}
-  body{font-size:11px;background:#fff;color:#111}
-  .acard{box-shadow:none!important;border:1px solid #dde1e8!important;break-inside:avoid}
-  .deal-snapshot{background:#2B5F8E!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
-  .section-head{margin-top:16px}
-  .lender-card{break-inside:avoid}
-  .doc-analyse-blok{break-inside:avoid}
-  @page{margin:18mm 16mm 16mm}
-}
+/* Print styles are defined in the comprehensive block below */
 
-/* Print header */
+/* Print header — alleen zichtbaar tijdens print */
 .print-header{
-  display:none;align-items:flex-start;justify-content:space-between;
-  padding:0 0 14px;border-bottom:2.5px solid var(--mb-blue);margin-bottom:20px;gap:16px
+  display:none;align-items:center;justify-content:space-between;
+  padding:0 0 14px;border-bottom:2.5px solid var(--bl);margin-bottom:20px;gap:16px
 }
 .print-logo-wrap{display:flex;align-items:center;gap:10px}
-.print-logo-svg{flex-shrink:0}
 .print-logo-text{display:flex;flex-direction:column;gap:1px}
-.print-logo-name{font-size:16px;font-weight:800;color:var(--mb-blue);letter-spacing:-.3px;line-height:1}
-.print-logo-sub{font-size:9px;font-weight:600;color:var(--mb-or);letter-spacing:1.5px;text-transform:uppercase}
+.print-logo-name{font-size:16px;font-weight:800;color:var(--bl);letter-spacing:-.3px;line-height:1}
+.print-logo-sub{font-size:9px;font-weight:600;color:var(--or);letter-spacing:1.5px;text-transform:uppercase}
 .print-meta{text-align:right;font-size:10px;color:var(--tx3);line-height:1.6}
 .print-meta strong{color:var(--tx);font-weight:700;display:block;font-size:12px;margin-bottom:2px}
 
@@ -123,11 +100,6 @@ body{background:var(--bg);color:var(--tx);font-family:var(--font);font-size:14px
 .logo-app-sub{font-size:10px;font-weight:400;color:rgba(255,255,255,.45);letter-spacing:.2px}
 
 .hdr-div{width:1px;height:20px;background:rgba(255,255,255,.12);flex-shrink:0}
-.hdr-badge{
-  background:rgba(255,255,255,.08);color:rgba(255,255,255,.45);
-  border:1px solid rgba(255,255,255,.1);padding:2px 8px;
-  border-radius:20px;font-size:10px;font-weight:500;letter-spacing:.3px
-}
 .hdr-sp{flex:1}
 .hdr-kl{
   font-size:12px;color:rgba(255,255,255,.5);font-weight:500;
@@ -181,10 +153,10 @@ body{background:var(--bg);color:var(--tx);font-family:var(--font);font-size:14px
   -webkit-appearance:none
 }
 .finput:focus,.fselect:focus{
-  border-color:var(--mb-blue);background:var(--wh);
+  border-color:var(--bl);background:var(--wh);
   box-shadow:0 0 0 3px rgba(43,95,142,.1)
 }
-.finput.from-client,.fselect.from-client{background:var(--mb-blue-bg);border-color:var(--mb-blue-bd)}
+.finput.from-client,.fselect.from-client{background:var(--bl-bg);border-color:var(--bl-bd)}
 .finput.err{border-color:var(--rk);background:var(--rk-bg)}
 .fg2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 .ferr{font-size:10px;color:var(--rk);margin-top:3px;font-weight:500}
@@ -197,23 +169,23 @@ body{background:var(--bg);color:var(--tx);font-family:var(--font);font-size:14px
   display:inline-flex;align-items:center;gap:3px;font-size:9px;font-weight:700;
   letter-spacing:.3px;padding:2px 6px;border-radius:20px;text-transform:uppercase
 }
-.src-c{background:var(--mb-blue-bg2);color:var(--mb-blue);border:1px solid var(--mb-blue-bd)}
+.src-c{background:var(--bl-bg2);color:var(--bl);border:1px solid var(--bl-bd)}
 .sl-row{display:flex;align-items:center;gap:8px}
 .sl-lbl{font-size:11px;color:var(--tx3);font-weight:500;min-width:48px}
-.sl-val{font-size:12px;font-weight:700;color:var(--mb-blue);min-width:40px;text-align:right}
+.sl-val{font-size:12px;font-weight:700;color:var(--bl);min-width:40px;text-align:right}
 input[type=range]{
   flex:1;-webkit-appearance:none;height:3px;border-radius:2px;
   background:var(--bd);outline:none;cursor:pointer
 }
 input[type=range]::-webkit-slider-thumb{
   -webkit-appearance:none;width:14px;height:14px;border-radius:50%;
-  background:var(--mb-blue);border:2.5px solid var(--wh);cursor:pointer;
+  background:var(--bl);border:2.5px solid var(--wh);cursor:pointer;
   box-shadow:0 1px 3px rgba(43,95,142,.3)
 }
 
 /* ── DEAL SNAPSHOT ───────────────────────────────── */
 .deal-snapshot{
-  background:linear-gradient(140deg,var(--mb-blue-dd) 0%,var(--mb-blue) 55%,var(--mb-blue-l) 100%);
+  background:linear-gradient(140deg,var(--bl-d) 0%,var(--bl) 55%,var(--bl-l) 100%);
   border-radius:var(--r-lg);padding:20px 22px;margin-bottom:16px;
   position:relative;overflow:hidden;
   box-shadow:0 4px 20px rgba(43,95,142,.25)
@@ -256,7 +228,7 @@ input[type=range]::-webkit-slider-thumb{
 /* ── SECTION HEADS ───────────────────────────────── */
 .section-head{display:flex;align-items:center;gap:10px;margin-bottom:12px;margin-top:4px}
 .section-num{
-  width:24px;height:24px;border-radius:50%;background:var(--mb-blue);color:#fff;
+  width:24px;height:24px;border-radius:50%;background:var(--bl);color:#fff;
   font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0
 }
 .section-head-lbl{
@@ -274,19 +246,19 @@ input[type=range]::-webkit-slider-thumb{
 .acard-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:13px}
 .acard-lbl{
   font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;
-  color:var(--mb-blue);display:flex;align-items:center;gap:6px
+  color:var(--bl);display:flex;align-items:center;gap:6px
 }
-.acard-lbl::before{content:'';width:3px;height:11px;background:var(--mb-or);border-radius:2px;flex-shrink:0}
+.acard-lbl::before{content:'';width:3px;height:11px;background:var(--or);border-radius:2px;flex-shrink:0}
 .mrow{display:grid;gap:8px}
 .mrow.c2{grid-template-columns:1fr 1fr}
 .mrow.c3{grid-template-columns:1fr 1fr 1fr}
 .mrow.c4{grid-template-columns:1fr 1fr 1fr 1fr}
 .metric{background:var(--bg);border-radius:10px;padding:11px 13px;border:1px solid var(--bd-l)}
-.metric.accent{background:var(--mb-blue-bg);border-color:var(--mb-blue-bd)}
+.metric.accent{background:var(--bl-bg);border-color:var(--bl-bd)}
 .m-lbl{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:var(--tx4);margin-bottom:3px}
 .m-val{font-size:17px;font-weight:800;line-height:1;letter-spacing:-.3px}
 .m-sub{font-size:9px;color:var(--tx4);margin-top:3px;font-weight:500}
-.cg{color:var(--gn)}.cw{color:var(--wn)}.cr{color:var(--rk)}.cb{color:var(--mb-blue)}.cgy{color:var(--tx4)}
+.cg{color:var(--gn)}.cw{color:var(--wn)}.cr{color:var(--rk)}.cb{color:var(--bl)}.cgy{color:var(--tx4)}
 
 /* ── BADGES ──────────────────────────────────────── */
 .bdg{
@@ -296,7 +268,7 @@ input[type=range]::-webkit-slider-thumb{
 .bdg-g{background:var(--gn-bg);color:var(--gn);border:1px solid var(--gn-bd)}
 .bdg-w{background:var(--wn-bg);color:var(--wn);border:1px solid var(--wn-bd)}
 .bdg-r{background:var(--rk-bg);color:var(--rk);border:1px solid var(--rk-bd)}
-.bdg-b{background:var(--mb-blue-bg);color:var(--mb-blue);border:1px solid var(--mb-blue-bd)}
+.bdg-b{background:var(--bl-bg);color:var(--bl);border:1px solid var(--bl-bd)}
 
 /* ── LTV BAR ─────────────────────────────────────── */
 .ltv-track{height:6px;background:var(--bd);border-radius:4px;overflow:hidden;margin:8px 0 4px}
@@ -312,14 +284,14 @@ input[type=range]::-webkit-slider-thumb{
 .risk-t{font-size:12px;font-weight:600;color:var(--tx);margin-bottom:2px;line-height:1.4}
 .risk-sub{font-size:10px;color:var(--tx3);font-weight:400}
 .risk-act{font-size:10px;color:var(--tx2);margin-top:3px;font-weight:500}
-.risk-act::before{content:"→ ";font-weight:700;color:var(--mb-or)}
+.risk-act::before{content:"→ ";font-weight:700;color:var(--or)}
 .action-item{
   display:flex;align-items:flex-start;gap:8px;padding:8px 11px;
   border-radius:8px;margin-bottom:5px;font-size:12px;line-height:1.5;font-weight:400
 }
 .action-item.kritisch{background:var(--rk-bg);border-left:3px solid var(--rk)}
-.action-item.hoog{background:var(--or-bg);border-left:3px solid var(--mb-or)}
-.action-item.medium{background:var(--mb-blue-bg);border-left:3px solid var(--mb-blue)}
+.action-item.hoog{background:var(--or-bg);border-left:3px solid var(--or)}
+.action-item.medium{background:var(--bl-bg);border-left:3px solid var(--bl)}
 .action-item.laag{background:var(--gn-bg);border-left:3px solid var(--gn)}
 
 /* ── DOCUMENT UPLOAD ─────────────────────────────── */
@@ -344,8 +316,14 @@ input[type=range]::-webkit-slider-thumb{
 .doc-file-list{display:flex;flex-direction:column;gap:4px;margin-bottom:7px}
 .doc-file-item{
   display:flex;align-items:center;gap:7px;padding:6px 9px;
-  background:var(--bg);border:1px solid var(--bd-l);border-radius:7px;font-size:10px
+  background:var(--bg);border:1px solid var(--bd-l);border-radius:7px;font-size:10px;
+  transition:background .3s,border-color .3s
 }
+.doc-file-item.doc-file-new{
+  background:var(--gn-bg);border-color:var(--gn-bd);
+  animation:fileSlideIn .3s ease-out
+}
+@keyframes fileSlideIn{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:translateY(0)}}
 .doc-file-name{flex:1;color:var(--tx2);font-size:10px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:500}
 .doc-file-date{color:var(--tx4);font-size:9px;flex-shrink:0}
 .doc-file-del{
@@ -356,11 +334,11 @@ input[type=range]::-webkit-slider-thumb{
 .doc-file-del:hover{background:var(--rk);color:var(--wh)}
 .doc-upload-btn{
   display:flex;align-items:center;justify-content:center;gap:6px;padding:8px 12px;
-  background:var(--mb-blue-bg);border:1.5px dashed var(--mb-blue-bd);border-radius:8px;
-  cursor:pointer;font-size:11px;font-weight:600;color:var(--mb-blue);
+  background:var(--bl-bg);border:1.5px dashed var(--bl-bd);border-radius:8px;
+  cursor:pointer;font-size:11px;font-weight:600;color:var(--bl);
   transition:all .15s;position:relative;width:100%
 }
-.doc-upload-btn:hover{background:var(--mb-blue-bg2);border-color:var(--mb-blue)}
+.doc-upload-btn:hover{background:var(--bl-bg2);border-color:var(--bl)}
 .doc-upload-btn input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
 .doc-upload-btn.loading{opacity:.6;pointer-events:none}
 
@@ -374,7 +352,7 @@ input[type=range]::-webkit-slider-thumb{
   font-size:9px;font-weight:700;text-transform:uppercase;
   letter-spacing:.8px;padding:3px 7px;border-radius:20px
 }
-.lender-badge-type.bank{background:var(--mb-blue-bg);color:var(--mb-blue);border:1px solid var(--mb-blue-bd)}
+.lender-badge-type.bank{background:var(--bl-bg);color:var(--bl);border:1px solid var(--bl-bd)}
 .lender-badge-type.non-bank{background:var(--pur-bg);color:var(--pur);border:1px solid var(--pur-bd)}
 .lender-name{font-size:14px;font-weight:700;flex:1;color:var(--tx)}
 .lender-score-wrap{text-align:right;flex-shrink:0}
@@ -394,44 +372,71 @@ input[type=range]::-webkit-slider-thumb{
 .lender-descr{font-size:11px;color:var(--tx3);padding:0 15px 11px;font-style:italic;font-weight:400;line-height:1.5}
 
 /* ── DOCUMENT ANALYSE BLOK ───────────────────────── */
-.doc-analyse-blok{
-  background:var(--wh);border:1px solid var(--pur-bd);
-  border-radius:var(--r);margin-bottom:10px;overflow:hidden;box-shadow:var(--sh)
-}
-.doc-analyse-header{
-  background:linear-gradient(135deg,#F7F4FF 0%,var(--wh) 100%);
-  padding:14px 18px;border-bottom:1px solid var(--pur-bd)
-}
-.doc-analyse-badge{
-  background:var(--pur);color:#fff;font-size:9px;font-weight:700;
-  letter-spacing:.6px;padding:3px 8px;border-radius:20px;
-  text-transform:uppercase;display:inline-block;margin-bottom:6px
-}
-.doc-analyse-title{font-size:14px;font-weight:700;color:var(--pur)}
-.doc-analyse-grid{display:grid;grid-template-columns:1fr 1fr;gap:0;border-top:1px solid var(--bd-l)}
-.doc-analyse-section{padding:14px 18px;border-right:1px solid var(--bd-l)}
-.doc-analyse-section:last-child{border-right:none}
-.doc-analyse-section:nth-child(n+3){border-top:1px solid var(--bd-l)}
-.doc-analyse-section-lbl{
-  font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;
-  color:var(--tx4);margin-bottom:10px;display:flex;align-items:center;gap:6px
-}
-.doc-analyse-section-lbl::before{content:'';width:3px;height:10px;border-radius:2px;flex-shrink:0}
-.lbl-or::before{background:var(--mb-or)}
-.lbl-rk::before{background:var(--rk)}
-.lbl-wn::before{background:var(--wn)}
-.lbl-bl::before{background:var(--mb-blue)}
-.lbl-gn::before{background:var(--gn)}
-.doc-analyse-placeholder{
-  font-size:11.5px;color:var(--tx3);line-height:1.6;padding:3px 0;font-weight:400
-}
-.doc-analyse-placeholder em{font-style:normal;color:var(--tx2);font-weight:600}
-.doc-analyse-full{padding:14px 18px;border-top:1px solid var(--bd-l)}
+/* ── DOCUMENTANALYSE — nieuw design ─────────────────── */
+.da-blok{margin-bottom:10px}
+.da-kpi-row{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:10px}
+.da-kpi{background:var(--wh);border:1px solid var(--bd);border-radius:var(--r);padding:11px 13px}
+.da-kpi-label{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:var(--tx4);margin-bottom:3px}
+.da-kpi-val{font-size:20px;font-weight:700;color:var(--tx);line-height:1.1}
+.da-kpi-val.da-good{color:var(--gn)}
+.da-kpi-val.da-warn{color:var(--wn)}
+.da-kpi-val.da-danger{color:var(--rk)}
+.da-kpi-sub{font-size:10px;color:var(--tx4);margin-top:2px}
+.da-cards-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px}
+.da-card{background:var(--wh);border:1px solid var(--bd);border-radius:var(--r);padding:13px 15px}
+.da-card-head{display:flex;align-items:center;gap:7px;margin-bottom:10px;padding-bottom:9px;border-bottom:1px solid var(--bd-l)}
+.da-card-icon{width:22px;height:22px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:11px;flex-shrink:0;font-style:normal}
+.da-icon-bedrijf{background:var(--bl-bg);color:var(--bl)}
+.da-icon-fin{background:var(--pur-bg);color:var(--pur)}
+.da-icon-vastgoed{background:var(--wn-bg);color:var(--wn)}
+.da-icon-krediet{background:var(--gn-bg);color:var(--gn)}
+.da-card-title{font-size:11px;font-weight:700;color:var(--tx2);text-transform:uppercase;letter-spacing:.5px}
+.da-row{display:flex;justify-content:space-between;align-items:baseline;padding:3.5px 0;border-bottom:1px solid var(--bd-l)}
+.da-row:last-child{border-bottom:none}
+.da-row-key{font-size:11.5px;color:var(--tx3)}
+.da-row-val{font-size:11.5px;font-weight:600;color:var(--tx2);text-align:right;max-width:58%}
+.da-row-val.da-good{color:var(--gn)}
+.da-row-val.da-warn{color:var(--wn)}
+.da-row-val.da-danger{color:var(--rk)}
+.da-risico-blok{background:var(--wh);border:1px solid var(--bd);border-radius:var(--r);padding:13px 15px;margin-bottom:8px}
+.da-risico-head{display:flex;align-items:center;gap:8px;margin-bottom:10px;padding-bottom:9px;border-bottom:1px solid var(--bd-l)}
+.da-risico-head-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--tx2)}
+.da-risico-count{font-size:10px;padding:2px 8px;border-radius:20px;background:var(--rk-bg);color:var(--rk);border:1px solid var(--rk-bd);font-weight:600;margin-left:auto}
+.da-risico-list{display:flex;flex-direction:column;gap:5px}
+.da-risico-item{display:flex;align-items:flex-start;gap:8px;padding:7px 10px;border-radius:7px}
+.da-risico-item.r-high{background:var(--rk-bg);border:1px solid var(--rk-bd)}
+.da-risico-item.r-med{background:var(--wn-bg);border:1px solid var(--wn-bd)}
+.da-risico-item.r-low{background:var(--gn-bg);border:1px solid var(--gn-bd)}
+.da-risico-item.r-info{background:var(--bl-bg);border:1px solid var(--bl-bd)}
+.da-rdot{width:7px;height:7px;border-radius:50%;margin-top:4px;flex-shrink:0}
+.da-rdot.r-high{background:var(--rk)}
+.da-rdot.r-med{background:var(--wn)}
+.da-rdot.r-low{background:var(--gn)}
+.da-rdot.r-info{background:var(--bl)}
+.da-risico-text{font-size:11.5px;color:var(--tx2);line-height:1.4}
+.da-risico-text strong{font-weight:700}
+.da-risico-text span{display:block;font-size:10.5px;color:var(--tx3);margin-top:1px}
+.da-vervolg-blok{background:var(--wh);border:1px solid var(--bd);border-radius:var(--r);padding:13px 15px;margin-bottom:8px}
+.da-vervolg-head{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--tx2);margin-bottom:9px;padding-bottom:9px;border-bottom:1px solid var(--bd-l)}
+.da-vervolg-item{display:flex;align-items:flex-start;gap:8px;padding:5px 0;border-bottom:1px solid var(--bd-l);font-size:11.5px;color:var(--tx2)}
+.da-vervolg-item:last-child{border-bottom:none}
+.da-vervolg-num{font-weight:700;color:var(--bl);min-width:16px;flex-shrink:0}
+.da-note-bar{background:var(--bl-bg);border:1px solid var(--bl-bd);border-radius:7px;padding:9px 13px;font-size:11.5px;color:var(--tx3);display:flex;gap:8px}
+.da-note-bar strong{color:var(--tx2);font-weight:700}
+/* samenvatting blok */
+.da-summary-blok{background:var(--wh);border:1px solid var(--bd);border-radius:var(--r);padding:13px 15px;margin-bottom:8px}
+.da-summary-head{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--tx2);margin-bottom:9px;padding-bottom:9px;border-bottom:1px solid var(--bd-l);display:flex;align-items:center;gap:7px}
+.da-summary-badge{background:var(--pur);color:#fff;font-size:9px;font-weight:700;letter-spacing:.5px;padding:2px 8px;border-radius:20px;text-transform:uppercase}
+.da-summary-item{font-size:11.5px;color:var(--tx3);line-height:1.6;padding:3px 0;border-bottom:1px solid var(--bd-l)}
+.da-summary-item:last-child{border-bottom:none}
+.da-summary-item em{font-style:normal;color:var(--tx2);font-weight:600}
+/* print compat */
+.doc-analyse-blok{margin-bottom:10px}
 
 /* ── VERDICT ─────────────────────────────────────── */
 .verdict-card{border-radius:var(--r);padding:16px 18px;margin-bottom:10px;border-width:1.5px;border-style:solid}
 .verdict-card.good{background:var(--gn-bg);border-color:var(--gn-bd)}
-.verdict-card.blauw{background:var(--mb-blue-bg);border-color:var(--mb-blue-bd)}
+.verdict-card.blauw{background:var(--bl-bg);border-color:var(--bl-bd)}
 .verdict-card.warn{background:var(--wn-bg);border-color:var(--wn-bd)}
 .verdict-card.oranje{background:var(--or-bg);border-color:var(--or-bd)}
 .verdict-card.bad{background:var(--rk-bg);border-color:var(--rk-bd)}
@@ -451,7 +456,7 @@ input[type=range]::-webkit-slider-thumb{
 .cf-lbl{font-size:11px;font-weight:600;margin-bottom:2px}
 .cf-sub{font-size:9.5px;color:var(--tx3)}
 .cf-act{font-size:10px;color:var(--tx2);margin-top:2px;font-weight:500}
-.cf-act::before{content:"→ ";font-weight:700;color:var(--mb-or)}
+.cf-act::before{content:"→ ";font-weight:700;color:var(--or)}
 
 /* ── ASIDE ───────────────────────────────────────── */
 .aside-row{
@@ -461,7 +466,7 @@ input[type=range]::-webkit-slider-thumb{
 .aside-row:last-child{border-bottom:none}
 .aside-k{font-size:10px;color:var(--tx3);font-weight:400}
 .aside-v{font-size:11px;font-weight:700}
-.aside-v.cg{color:var(--gn)}.aside-v.cw{color:var(--wn)}.aside-v.cr{color:var(--rk)}.aside-v.cb{color:var(--mb-blue)}.aside-v.cgy{color:var(--tx4)}
+.aside-v.cg{color:var(--gn)}.aside-v.cw{color:var(--wn)}.aside-v.cr{color:var(--rk)}.aside-v.cb{color:var(--bl)}.aside-v.cgy{color:var(--tx4)}
 .doss-bar{height:5px;background:var(--bd);border-radius:3px;overflow:hidden;margin-bottom:5px}
 .doss-fill{height:100%;border-radius:3px;transition:width .4s}
 .doss-lbl{display:flex;justify-content:space-between;font-size:10px;margin-bottom:8px;font-weight:500}
@@ -470,7 +475,7 @@ input[type=range]::-webkit-slider-thumb{
 .rd-pill-lbl{font-size:10px;color:var(--tx3);font-weight:400}
 .rd-pill-val{font-size:9px;font-weight:700;padding:2px 6px;border-radius:20px;letter-spacing:.2px}
 .rd-ok{background:var(--gn-bg);color:var(--gn)}
-.rd-bl{background:var(--mb-blue-bg);color:var(--mb-blue)}
+.rd-bl{background:var(--bl-bg);color:var(--bl)}
 .rd-warn{background:var(--wn-bg);color:var(--wn)}
 .rd-bad{background:var(--rk-bg);color:var(--rk)}
 
@@ -493,30 +498,30 @@ input[type=range]::-webkit-slider-thumb{
   font-weight:600;border:none;transition:all .15s;letter-spacing:.1px
 }
 .btn-sm{padding:5px 10px;font-size:10px}
-.btn-bl{background:var(--mb-blue);color:#fff;box-shadow:0 1px 3px rgba(43,95,142,.25)}
-.btn-bl:hover{background:var(--mb-blue-d)}
-.btn-or{background:var(--mb-or);color:#fff;box-shadow:0 1px 3px rgba(217,107,58,.25)}
-.btn-or:hover{background:var(--mb-or-d)}
+.btn-bl{background:var(--bl);color:#fff;box-shadow:0 1px 3px rgba(43,95,142,.25)}
+.btn-bl:hover{background:var(--bl-m)}
+.btn-or{background:var(--or);color:#fff;box-shadow:0 1px 3px rgba(217,107,58,.25)}
+.btn-or:hover{background:var(--or-d)}
 .btn-ghost{background:transparent;color:var(--tx3);border:1.5px solid var(--bd)}
 .btn-ghost:hover{background:var(--bg2);color:var(--tx2)}
 .btn-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
 .spn{
   display:inline-block;width:12px;height:12px;border-radius:50%;
-  border:2px solid rgba(43,95,142,.2);border-top-color:var(--mb-blue);
+  border:2px solid rgba(43,95,142,.2);border-top-color:var(--bl);
   animation:spin .7s linear infinite
 }
 @keyframes spin{to{transform:rotate(360deg)}}
 .af-banner{
-  background:var(--mb-blue-bg);border:1px solid var(--mb-blue-bd);
+  background:var(--bl-bg);border:1px solid var(--bl-bd);
   border-radius:10px;padding:10px 12px;margin-bottom:10px;
   display:flex;align-items:center;gap:8px
 }
 .af-tag{
-  background:var(--mb-blue);color:#fff;font-size:8px;font-weight:700;
+  background:var(--bl);color:#fff;font-size:8px;font-weight:700;
   padding:2px 6px;border-radius:10px;letter-spacing:.5px;
   text-transform:uppercase;flex-shrink:0
 }
-.af-txt{font-size:11px;color:var(--mb-blue);flex:1;font-weight:500}
+.af-txt{font-size:11px;color:var(--bl);flex:1;font-weight:500}
 .sum-t{width:100%;border-collapse:collapse;font-size:11px}
 .sum-t td{padding:4px 0;border-bottom:1px solid var(--bd-l)}
 .sum-t td:first-child{color:var(--tx4);width:48%;font-weight:400}
@@ -548,7 +553,7 @@ input[type=range]::-webkit-slider-thumb{
   border-bottom:2px solid transparent;margin-bottom:-1.5px;color:var(--tx4);
   transition:color .12s
 }
-.modal-tab.active{color:var(--mb-blue);border-bottom-color:var(--mb-blue)}
+.modal-tab.active{color:var(--bl);border-bottom-color:var(--bl)}
 .modal-section{display:none}.modal-section.active{display:block}
 .modal-btns{display:flex;gap:8px;justify-content:flex-end;margin-top:16px}
 textarea.modal-ta{
@@ -556,88 +561,262 @@ textarea.modal-ta{
   border-radius:8px;font-family:var(--font);font-size:12px;
   resize:none;outline:none;background:var(--bg);color:var(--tx)
 }
-textarea.modal-ta:focus{border-color:var(--mb-blue);box-shadow:0 0 0 3px rgba(43,95,142,.1)}
+textarea.modal-ta:focus{border-color:var(--bl);box-shadow:0 0 0 3px rgba(43,95,142,.1)}
 .pdf-drop{
   border:2px dashed var(--bd);border-radius:10px;padding:28px;
   text-align:center;cursor:pointer;position:relative;transition:all .15s
 }
-.pdf-drop:hover{border-color:var(--mb-blue);background:var(--mb-blue-bg)}
+.pdf-drop:hover{border-color:var(--bl);background:var(--bl-bg)}
 .pdf-drop input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer}
 .pdf-drop-icon{font-size:28px;margin-bottom:8px}
 .pdf-drop-lbl{font-size:12px;font-weight:600;color:var(--tx2);margin-bottom:4px}
 .pdf-drop-sub{font-size:10px;color:var(--tx4)}
 
-/* ── PRINT-SPECIFIEKE VERBETERINGEN ─────────────── */
+/* ══════════════════════════════════════════════════════
+   PRINT — Professioneel A4 rapport
+   ══════════════════════════════════════════════════════ */
 @media print {
-  /* Volledige reset voor print */
-  body{font-size:11px!important;color:#111!important;background:#fff!important}
 
-  /* Header sectietitels mooier in print */
-  .section-head-lbl{font-size:11px!important;color:#374151!important}
-  .section-num{background:#2B5F8E!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  /* ── Pagina-setup ──────────────────────────────────── */
+  @page { margin:16mm 14mm 14mm; size:A4 portrait }
+  @page :first { margin-top:0 }
 
-  /* Cards: geen schaduw, wel border */
-  .acard{box-shadow:none!important;border:1px solid #dde1e8!important;
-    break-inside:avoid;margin-bottom:8px!important;padding:12px 14px!important}
+  /* ── Base reset ────────────────────────────────────── */
+  *{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}
+  html,body{font-size:10px!important;color:#111827!important;background:#fff!important;font-family:'Inter',system-ui,sans-serif!important}
 
-  /* Snapshot volledig blauw printen */
+  /* ── Layout: verberg alles behalve hoofdpanel ──────── */
+  .hdr,.panel-input,.panel-aside,
+  .what-if-section,#PRINT_BTN_ROW,
+  .hdr-btn,.doc-upload-btn,.doc-file-del,
+  .doc-cat-header,.empty-state{display:none!important}
+  .app-shell{display:block!important;max-width:none!important}
+  .panel-main{padding:0!important;min-width:0!important}
+
+  /* ── Print cover header (per pagina via running element) */
+  .print-header{
+    display:flex!important;
+    align-items:center;justify-content:space-between;
+    padding:10mm 14mm 6mm;
+    background:#1e4469;
+    color:#fff;
+    margin:0 -14mm;
+    margin-top:-16mm;
+    margin-bottom:8mm;
+  }
+  .print-logo-wrap{display:flex!important;align-items:center;gap:10px}
+  .print-logo-svg svg path,.print-logo-svg svg line,.print-logo-svg svg circle{stroke:#fff!important}
+  .print-logo-svg svg text{fill:#fff!important}
+  .print-logo-name{color:#fff!important;font-size:15px!important;font-weight:800!important}
+  .print-logo-sub{color:rgba(255,255,255,.65)!important;font-size:8px!important;letter-spacing:2px}
+  .print-meta{text-align:right;color:rgba(255,255,255,.7)!important;font-size:9px!important;line-height:1.7}
+  .print-meta strong{color:#fff!important;font-size:12px!important;display:block;margin-bottom:1px}
+
+  /* ── Deal Snapshot ─────────────────────────────────── */
   .deal-snapshot{
-    background:#2B5F8E!important;
-    -webkit-print-color-adjust:exact;print-color-adjust:exact;
-    border-radius:10px!important;padding:14px 16px!important;
-    break-inside:avoid;margin-bottom:12px!important
+    background:#1e4469!important;
+    border-radius:8px!important;
+    padding:12px 14px!important;
+    margin-bottom:10px!important;
+    break-inside:avoid;
+    page-break-after:avoid;
   }
+  .snap-header{margin-bottom:8px!important}
+  .snap-title{font-size:9px!important;letter-spacing:1px;color:rgba(255,255,255,.55)!important}
+  .snap-kpis{display:grid!important;grid-template-columns:repeat(5,1fr)!important;gap:6px!important}
   .snap-kpi{
-    background:rgba(255,255,255,0.1)!important;
-    -webkit-print-color-adjust:exact;print-color-adjust:exact;
-    border:1px solid rgba(255,255,255,0.15)!important
+    background:rgba(255,255,255,.1)!important;
+    border:1px solid rgba(255,255,255,.15)!important;
+    border-radius:6px!important;
+    padding:8px 9px!important;
   }
+  .snap-kpi-lbl{font-size:7.5px!important;color:rgba(255,255,255,.5)!important;text-transform:uppercase;letter-spacing:.7px;margin-bottom:2px}
+  .snap-kpi-val{font-size:18px!important;font-weight:700!important;line-height:1}
+  .snap-kpi-val.good{color:#6ee7b7!important}
+  .snap-kpi-val.warn{color:#fcd34d!important}
+  .snap-kpi-val.bad{color:#fca5a5!important}
+  .snap-kpi-val.neutral{color:#fff!important}
+  .snap-kpi-sub{font-size:8px!important;color:rgba(255,255,255,.5)!important;margin-top:2px}
+  .snap-verdict{
+    margin-top:8px!important;
+    padding:8px 10px!important;
+    background:rgba(255,255,255,.08)!important;
+    border-radius:6px!important;
+    font-size:9px!important;
+    color:rgba(255,255,255,.75)!important;
+    border:1px solid rgba(255,255,255,.12)!important;
+  }
+  .snap-gng{
+    font-size:9px!important;font-weight:700!important;letter-spacing:.5px;
+    padding:3px 9px!important;border-radius:20px!important;
+  }
+  .snap-gng.go{background:#065f46!important;color:#6ee7b7!important;border:1px solid #6ee7b7!important}
+  .snap-gng.cond{background:#78350f!important;color:#fcd34d!important;border:1px solid #fcd34d!important}
+  .snap-gng.no{background:#7f1d1d!important;color:#fca5a5!important;border:1px solid #fca5a5!important}
+  .snap-sub-scores{color:rgba(255,255,255,.5)!important;font-size:8.5px!important}
 
-  /* Lender cards compact */
-  .lender-card{break-inside:avoid;margin-bottom:6px!important}
-  .lender-card-body{padding:8px 12px!important}
+  /* ── Sectiekoppen ─────────────────────────────────── */
+  .section-head{
+    display:flex!important;align-items:center;gap:8px;
+    margin-top:12px!important;margin-bottom:7px!important;
+    border-bottom:1.5px solid #dde1e8;padding-bottom:5px;
+    page-break-after:avoid;break-after:avoid;
+  }
+  .section-num{
+    background:#2B5F8E!important;color:#fff!important;
+    font-size:9px!important;font-weight:700!important;
+    width:18px!important;height:18px!important;
+    border-radius:50%!important;
+    display:inline-flex!important;align-items:center;justify-content:center;
+    flex-shrink:0;
+  }
+  .section-head-lbl{font-size:11px!important;font-weight:700!important;color:#111827!important;text-transform:uppercase;letter-spacing:.5px}
+  .section-head-line{display:none!important}
+  .bdg{font-size:8px!important;padding:2px 7px!important;border-radius:20px!important}
 
-  /* Document analyse blok */
-  .doc-analyse-blok{break-inside:avoid}
-  .doc-analyse-section{padding:10px 14px!important}
+  /* ── Analyse-kaarten ──────────────────────────────── */
+  .acard{
+    box-shadow:none!important;
+    border:1px solid #dde1e8!important;
+    border-radius:7px!important;
+    break-inside:avoid;
+    margin-bottom:7px!important;
+    padding:10px 12px!important;
+  }
+  .acard-hd{margin-bottom:8px!important}
+  .acard-lbl{font-size:9px!important;font-weight:700!important;text-transform:uppercase;letter-spacing:.5px;color:#374151!important}
+  .acard-lbl::before{background:#D96B3A!important;width:3px!important;height:9px!important}
 
-  /* Verdict card */
-  .verdict-card{break-inside:avoid}
+  /* LTV balk */
+  .ltv-grid{display:grid!important;grid-template-columns:1fr 1fr!important;gap:8px!important}
+  .ltv-val{font-size:20px!important;font-weight:700!important}
+  .ltv-bar-wrap{margin-top:6px!important}
 
-  /* Tabel netter */
-  .sum-t td{padding:3px 0!important}
+  /* Cashflow grid */
+  .cf-grid{display:grid!important;grid-template-columns:repeat(3,1fr)!important;gap:8px!important}
+  .cf-kpi-val{font-size:16px!important;font-weight:700!important}
 
-  /* Memo font */
-  .memo{font-size:9px!important;padding:8px 10px!important}
+  /* Structuur grid */
+  .struct-grid{display:grid!important;grid-template-columns:repeat(4,1fr)!important;gap:8px!important}
+  .struct-val{font-size:16px!important;font-weight:700!important}
 
-  /* Badges kleur bewaren */
-  .bdg-g,.bdg-r,.bdg-w,.bdg-b,
-  .rd-ok,.rd-bad,.rd-warn,.rd-bl,
-  .snap-gng.go,.snap-gng.no,.snap-gng.cond,
-  .action-item,
-  .risk-item,
-  .cf-hard,.cf-zacht{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  /* Badges kleuren bewaren */
+  .bdg-g{background:#d1fae5!important;color:#065f46!important;border-color:#6ee7b7!important}
+  .bdg-r{background:#fee2e2!important;color:#991b1b!important;border-color:#fca5a5!important}
+  .bdg-w{background:#fffbeb!important;color:#78350f!important;border-color:#fcd34d!important}
+  .bdg-b{background:#dbeafe!important;color:#1e40af!important;border-color:#93c5fd!important}
+  .rd-ok{background:#d1fae5!important;color:#065f46!important}
+  .rd-bad{background:#fee2e2!important;color:#991b1b!important}
+  .rd-warn{background:#fffbeb!important;color:#78350f!important}
+  .rd-bl{background:#dbeafe!important;color:#1e40af!important}
 
-  /* Acard label accent */
-  .acard-lbl::before{background:#D96B3A!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  /* ── Risico's ─────────────────────────────────────── */
+  .risk-item{break-inside:avoid;margin-bottom:4px!important;padding:6px 9px!important;font-size:9.5px!important}
+  .cf-hard{background:#fee2e2!important;border-color:#fca5a5!important}
+  .cf-zacht{background:#fffbeb!important;border-color:#fcd34d!important}
+  .action-item{break-inside:avoid;padding:5px 8px!important;font-size:9.5px!important}
 
-  /* Pagina-marges */
-  .panel-main{padding:0!important}
+  /* ── Verdict ──────────────────────────────────────── */
+  .verdict-card{break-inside:avoid;margin-bottom:6px!important;padding:10px 12px!important}
+  .verdict-card.good{background:#d1fae5!important;border-color:#6ee7b7!important}
+  .verdict-card.blauw{background:#dbeafe!important;border-color:#93c5fd!important}
+  .verdict-card.warn{background:#fffbeb!important;border-color:#fcd34d!important}
+  .verdict-card.oranje{background:#ffedd5!important;border-color:#fdba74!important}
+  .verdict-card.bad{background:#fee2e2!important;border-color:#fca5a5!important}
 
-  /* Verberg wat-als sliders, irrelevante UI */
-  .what-if-section,#PRINT_BTN_ROW,.hdr-btn,
-  .doc-upload-btn,.doc-file-del,.doc-cat-header{display:none!important}
+  /* ── Lender cards ─────────────────────────────────── */
+  .lender-card{break-inside:avoid;margin-bottom:6px!important;border:1px solid #dde1e8!important}
+  .lender-card-header{padding:9px 12px!important}
+  .lender-card-body{padding:8px 12px!important;display:grid!important;grid-template-columns:1fr 1fr!important}
+  .lender-match{font-size:22px!important;font-weight:800!important}
+  .lender-type-badge{font-size:7.5px!important;padding:2px 6px!important}
+  .lender-pros li,.lender-cons li{font-size:9px!important;line-height:1.5}
+  .lender-name{font-size:13px!important;font-weight:700!important}
+  .lender-desc{font-size:9px!important}
+  .lender-footer{padding:6px 12px!important;font-size:8.5px!important}
 
-  /* Verberg sidebar panels */
-  .panel-input,.panel-aside{display:none!important}
-  .app-shell{grid-template-columns:1fr!important}
+  /* ── Documentanalyse nieuw design ────────────────── */
+  .da-kpi-row{display:grid!important;grid-template-columns:repeat(4,1fr)!important;gap:6px!important;margin-bottom:7px!important}
+  .da-kpi{background:#f5f6f8!important;border:1px solid #dde1e8!important;padding:8px 10px!important}
+  .da-kpi-label{font-size:7.5px!important;color:#9ca3af!important}
+  .da-kpi-val{font-size:17px!important;font-weight:700!important}
+  .da-kpi-val.da-good{color:#065f46!important}
+  .da-kpi-val.da-warn{color:#78350f!important}
+  .da-kpi-val.da-danger{color:#991b1b!important}
+  .da-cards-grid{display:grid!important;grid-template-columns:1fr 1fr!important;gap:6px!important;margin-bottom:7px!important}
+  .da-card{border:1px solid #dde1e8!important;padding:9px 11px!important;break-inside:avoid}
+  .da-card-head{margin-bottom:7px!important;padding-bottom:6px!important}
+  .da-card-title{font-size:9px!important;font-weight:700!important;text-transform:uppercase;letter-spacing:.5px;color:#374151!important}
+  .da-row{padding:2.5px 0!important}
+  .da-row-key{font-size:9.5px!important;color:#6b7280!important}
+  .da-row-val{font-size:9.5px!important;font-weight:600!important}
+  .da-row-val.da-good{color:#065f46!important}
+  .da-row-val.da-warn{color:#78350f!important}
+  .da-row-val.da-danger{color:#991b1b!important}
+  .da-risico-blok{border:1px solid #dde1e8!important;padding:9px 11px!important;break-inside:avoid;margin-bottom:6px!important}
+  .da-risico-head{margin-bottom:7px!important;padding-bottom:6px!important}
+  .da-risico-head-title{font-size:9px!important;font-weight:700!important;text-transform:uppercase}
+  .da-risico-count{font-size:8px!important;padding:1px 6px!important}
+  .da-risico-item{padding:5px 8px!important;break-inside:avoid;margin-bottom:3px!important}
+  .da-risico-item.r-high{background:#fee2e2!important;border-color:#fca5a5!important}
+  .da-risico-item.r-med{background:#fffbeb!important;border-color:#fcd34d!important}
+  .da-risico-item.r-low{background:#d1fae5!important;border-color:#6ee7b7!important}
+  .da-risico-item.r-info{background:#dbeafe!important;border-color:#93c5fd!important}
+  .da-rdot.r-high{background:#991b1b!important}
+  .da-rdot.r-med{background:#78350f!important}
+  .da-rdot.r-low{background:#065f46!important}
+  .da-rdot.r-info{background:#1e40af!important}
+  .da-risico-text{font-size:9.5px!important}
+  .da-vervolg-blok{border:1px solid #dde1e8!important;padding:9px 11px!important;break-inside:avoid;margin-bottom:6px!important}
+  .da-vervolg-head{font-size:9px!important;font-weight:700!important;text-transform:uppercase;margin-bottom:6px!important;padding-bottom:5px!important}
+  .da-vervolg-item{font-size:9.5px!important;padding:3px 0!important}
+  .da-note-bar{background:#eff6ff!important;border-color:#93c5fd!important;padding:7px 10px!important;font-size:9px!important}
+  .da-summary-blok{border:1px solid #dde1e8!important;padding:9px 11px!important;margin-bottom:7px!important;break-inside:avoid}
+  .da-summary-head{font-size:9px!important;font-weight:700!important;text-transform:uppercase;margin-bottom:6px!important;padding-bottom:5px!important}
+  .da-summary-badge{background:#5B21B6!important;color:#fff!important;font-size:7.5px!important;padding:2px 7px!important}
+  .da-summary-item{font-size:9.5px!important;padding:2px 0!important}
+  .da-card-icon{display:none!important}
 
-  /* Spacing voor secties */
-  .section-head{margin-top:14px!important;margin-bottom:8px!important}
+  /* ── Dealoverzicht tabel ──────────────────────────── */
+  .sum-t td{padding:3px 0!important;font-size:9.5px!important;border-bottom:1px solid #f3f4f6!important}
+  .checklist-item{font-size:9.5px!important;padding:3px 0!important}
 
-  /* Page breaks voorkomen bij kritische items */
-  h1,h2,h3{page-break-after:avoid}
-  .section-head + .acard{page-break-before:avoid}
+  /* ── Kredietmemo ──────────────────────────────────── */
+  .memo{font-size:8.5px!important;padding:9px 11px!important;background:#f9fafb!important;border:1px solid #dde1e8!important;break-inside:avoid}
+
+  /* ── Pagebreaks ───────────────────────────────────── */
+  .deal-snapshot{page-break-after:avoid}
+  .section-head{page-break-after:avoid;break-after:avoid}
+  .acard{page-break-inside:avoid;break-inside:avoid}
+  .lender-card{page-break-inside:avoid;break-inside:avoid}
+  .verdict-card{page-break-inside:avoid;break-inside:avoid}
+  .da-card{page-break-inside:avoid;break-inside:avoid}
+  .da-risico-blok{page-break-inside:avoid;break-inside:avoid}
+  .da-vervolg-blok{page-break-inside:avoid;break-inside:avoid}
+
+  /* ── Print footer per pagina ──────────────────────── */
+  .print-page-footer{
+    display:block!important;
+    position:running(footer);
+    font-size:8px;color:#9ca3af;
+    text-align:center;
+    border-top:1px solid #dde1e8;
+    padding-top:4px;
+    margin-top:4mm;
+  }
+  @page { @bottom-center { content: element(footer) } }
+
+  /* Inline footer fallback (running niet altijd ondersteund) */
+  body::after{
+    content:'MB Deal Analyzer · Indicatief — geen rechten ontleenbaar';
+    display:block;
+    font-size:7.5px;
+    color:#9ca3af;
+    text-align:center;
+    border-top:1px solid #e5e7eb;
+    padding-top:4px;
+    margin-top:12px;
+  }
 }
 </style>
 </head>
@@ -656,7 +835,6 @@ textarea.modal-ta:focus{border-color:var(--mb-blue);box-shadow:0 0 0 3px rgba(43
   <div class="hdr-div"></div>
   <div class="hdr-sp"></div>
   <div id="HDR_K" class="hdr-kl"></div>
-  <div class="hdr-badge">v19</div>
   <button class="hdr-btn" onclick="showImportModal()">↓ Importeren</button>
   <button class="hdr-btn accent" onclick="printReport()">⎙ Rapport</button>
   <button class="hdr-btn" onclick="resetApp()">↺ Reset</button>
@@ -1034,7 +1212,6 @@ async function parseDoc(type, file) {
       documentKwaliteit: parsed.kwaliteit,
       overallConfidence: oc,
       rawText: parsed.text,
-      extractedText: parsed.text,
       parsedFields: velden,
       parserType: 'regex-v1',
       confidence: oc
@@ -1062,7 +1239,7 @@ async function runAiAnalysis(type, rawText) {
     if (!data || typeof data !== 'object') return null;
     const hasFields = data.fields && Object.values(data.fields).some(v => v && String(v).trim());
     if (!data.summary && !hasFields) { console.warn(`[AI ${type}] Lege output`); return null; }
-    console.log(`[AI ${type}]`, data);
+    // AI data logged in dev only
     return data;
   } catch (err) {
     console.warn(`[AI ${type}] mislukt:`, err.message);
@@ -1084,7 +1261,7 @@ const S = {
   },
   loading: {},
   form: {
-    naamKlant:'', inkomen:'', vermogen:'', aantalPanden:'1',
+    naamKlant:'', inkomen:'', vermogen:'', aantalPanden:'',
     woonland:'nl', typeKlant:'particulier', doelFinanciering:'aankoop',
     aankoopprijs:'', marktwaarde:'', huurPerMaand:'', huurType:'bestaand',
     typeVastgoed:'woning', gewensteLening:'', eigenInbreng:'',
@@ -1143,7 +1320,6 @@ async function handleUpload(type, file) {
     const ai = await runAiAnalysis(type, rawText);
 
     if (ai) {
-      console.log(`[AI ${type}]`, ai);
     }
 
     // Stap 3: fileEntry opslaan
@@ -1152,7 +1328,8 @@ async function handleUpload(type, file) {
       naam: file.name,
       uploadDatum: new Date().toLocaleDateString('nl-NL'),
       parsed,
-      ai
+      ai,
+      _justUploaded: true
     };
 
     if (!dt.multiple) {
@@ -1164,6 +1341,12 @@ async function handleUpload(type, file) {
     S.autoFill = buildAutoFill();
     S.loading[type + '_loading'] = false;
     fullRender();
+
+    // Na 3s de justUploaded flag wissen en zacht herrenderen
+    setTimeout(() => {
+      const fe = S.docs[type].files.find(f => f.id === fileEntry.id);
+      if(fe) { fe._justUploaded = false; fullRender(); }
+    }, 3000);
 
   } catch (e) {
     console.error('Upload fout:', e);
@@ -1232,7 +1415,7 @@ function checkConflicts(form) {
 // ⑮ METRICS
 // ════════════════════════════════════════════════════
 function calcMetrics(form) {
-  const a=parseFloat(form.aankoopprijs)||0,mv=parseFloat(form.marktwaarde)||0,l=parseFloat(form.gewensteLening)||0,inb=parseFloat(form.eigenInbreng)||0,h=parseFloat(form.huurPerMaand)||0,r=parseFloat(form.rente)||0.05,lo=parseInt(form.looptijd)||20,ann=form.metAflossing==='ja';
+  const a=parseFloat(form.aankoopprijs)||0,mv=parseFloat(form.marktwaarde)||0,l=parseFloat(form.gewensteLening)||0,inb=parseFloat(form.eigenInbreng)||0,h=parseFloat(form.huurPerMaand)||0,r=normalizeRente(form.rente),lo=parseInt(form.looptijd)||20,ann=form.metAflossing==='ja';
   const ref=mv>0?Math.min(a,mv):a;
   const ltv=ref>0?(l/ref)*100:null,ltvA=a>0?(l/a)*100:null,ltvM=mv>0?(l/mv)*100:null;
   const mlIO=l>0?(l*r)/12:0,mlAnn=l>0&&r>0?l*(r/12)/(1-Math.pow(1+r/12,-(lo*12))):0,ml=ann?mlAnn:mlIO;
@@ -1268,8 +1451,20 @@ function calculateScore(form, m, dossier) {
   if(form.huurType==='bestaand'&&parseFloat(form.huurPerMaand)>0)B+=.5;else if(form.huurType==='prognose')B-=0.4;
   if(form.doelFinanciering==='herfinanciering')B+=.25;if(form.typeKlant==='bv')B+=.25;
   if(p===0&&m.ltv>75)B-=.5;
-  // Inkomen als extra zekerheid (naast huur)
-  if(parseFloat(form.inkomen)>0 && parseFloat(form.inkomen)>60000) B+=.3;
+  // Inkomen als terugbetalingscapaciteit — zwaarder bij geen huur
+  const ink = parseFloat(form.inkomen)||0;
+  const heeftHuur = parseFloat(form.huurPerMaand)>0;
+  if(ink>0) {
+    if(!heeftHuur) {
+      // Geen huur: inkomen is de enige bron — weegt zwaarder
+      if(ink>=150000)B+=1.2; else if(ink>=100000)B+=0.9; else if(ink>=70000)B+=0.6; else if(ink>=40000)B+=0.2; else B-=0.5;
+    } else {
+      // Huur aanwezig: inkomen als extra zekerheid
+      if(ink>=150000)B+=0.6; else if(ink>=100000)B+=0.4; else if(ink>=60000)B+=0.2;
+    }
+  } else if(!heeftHuur) {
+    B-=1.0; // Geen inkomen én geen huur is al afgestraft in A, extra malus hier
+  }
   B=Math.max(-4,Math.min(3,B));
 
   // ── C: Dossier & documentaire onderbouwing ──────────────────────
@@ -1534,16 +1729,144 @@ function validate() {
   const e = {};
   const a=parseFloat(S.form.aankoopprijs),l=parseFloat(S.form.gewensteLening);
   if(!S.form.naamKlant?.trim()) e.naamKlant='Naam is verplicht';
-  if(!S.form.aankoopprijs) e.aankoopprijs='Aankoopprijs verplicht';
-  if(!S.form.gewensteLening) e.gewensteLening='Leningsbedrag verplicht';
-  if(!S.form.eigenInbreng) e.eigenInbreng='Eigen inbreng verplicht';
+  if(!S.form.aankoopprijs || isNaN(parseFloat(S.form.aankoopprijs)) || parseFloat(S.form.aankoopprijs) <= 0) e.aankoopprijs='Aankoopprijs verplicht';
+  if(!S.form.gewensteLening || isNaN(parseFloat(S.form.gewensteLening)) || parseFloat(S.form.gewensteLening) <= 0) e.gewensteLening='Leningsbedrag verplicht';
+  if(!S.form.eigenInbreng || isNaN(parseFloat(S.form.eigenInbreng)) || parseFloat(S.form.eigenInbreng) < 0) e.eigenInbreng='Eigen inbreng verplicht';
   if(l>0&&a>0&&l>a*1.1) e.gewensteLening='Hoger dan aankoopprijs';
   return e;
 }
 
+// Normaliseer rente: accepteer zowel 5 als 0.05
+function normalizeRente(v) {
+  const n = parseFloat(v);
+  if(isNaN(n)) return 0.05;
+  return n > 1 ? n / 100 : n;
+}
+
 // ════════════════════════════════════════════════════
-// ㉔ STATE UPDATES
+// WHAT-IF SYNC — updatet linkerpaneel live mee
 // ════════════════════════════════════════════════════
+
+// Sla originele waarden op zodra what-if voor het eerst wordt gebruikt
+const WHATIF_KEYS = ['rente','gewensteLening','eigenInbreng','huurPerMaand'];
+let _whatifSnapshot = null;
+
+function snapWhatIf() {
+  if(!_whatifSnapshot) {
+    _whatifSnapshot = {};
+    WHATIF_KEYS.forEach(k => { _whatifSnapshot[k] = S.form[k]; });
+  }
+}
+
+function resetWhatIf() {
+  if(!_whatifSnapshot) { showToast('Geen wijzigingen om terug te zetten.', 'info'); return; }
+  WHATIF_KEYS.forEach(k => { S.form[k] = _whatifSnapshot[k]; });
+  _whatifSnapshot = null;
+  fullRender();
+  showToast('What-if teruggezet naar originele waarden', 'ok');
+}
+function syncWhatIf(key, value, labelEl) {
+  // Sla originele waarden op bij eerste what-if actie
+  snapWhatIf();
+
+  // 1. State bijwerken
+  S.form[key] = value;
+
+  // 2. Label in what-if sectie bijwerken
+  if(labelEl) {
+    const n = parseFloat(value);
+    if(key === 'rente') labelEl.textContent = (n * 100).toFixed(1) + '%';
+    else labelEl.textContent = '€' + Math.round(n).toLocaleString('nl-NL');
+  }
+
+  // 3. Bijbehorend inputveld in linkerpaneel syncen (zonder re-render)
+  const inp = document.getElementById('fi_' + key);
+  if(inp) {
+    inp.value = value;
+    inp.classList.add('from-client');
+  }
+
+  // 4. Rente: ook de slider in het linkerpaneel syncen
+  if(key === 'rente') {
+    const leftSlider = document.querySelector('#PANEL_INPUT input[type=range][min="0.03"]');
+    if(leftSlider) {
+      leftSlider.value = value;
+      const slVal = leftSlider.nextElementSibling;
+      if(slVal) slVal.textContent = (parseFloat(value) * 100).toFixed(1) + '%';
+    }
+  }
+
+  // 5. Analyse herberekenen (debounced)
+  scheduleAnalysisUpdate();
+}
+
+
+const LS_KEY = 'mb_deal_analyzer_state';
+
+function saveToLocalStorage() {
+  try {
+    // Sla form + docs op (zonder rawText om ruimte te sparen)
+    const toSave = {
+      form: S.form,
+      docs: {}
+    };
+    Object.entries(S.docs).forEach(([k,v]) => {
+      toSave.docs[k] = {
+        multiple: v.multiple,
+        files: v.files.map(f => ({
+          id: f.id,
+          naam: f.naam,
+          uploadDatum: f.uploadDatum,
+          ai: f.ai,
+          parsed: f.parsed ? {
+            ...f.parsed,
+            _meta: f.parsed._meta ? {
+              ...f.parsed._meta,
+              rawText: undefined,
+              extractedText: undefined
+            } : undefined
+          } : undefined
+        }))
+      };
+    });
+    localStorage.setItem(LS_KEY, JSON.stringify(toSave));
+  } catch(e) { /* quota overschreden of private mode */ }
+}
+
+function loadFromLocalStorage() {
+  try {
+    const raw = localStorage.getItem(LS_KEY);
+    if(!raw) return false;
+    const saved = JSON.parse(raw);
+    if(saved.form) Object.assign(S.form, saved.form);
+    if(saved.docs) {
+      Object.entries(saved.docs).forEach(([k,v]) => {
+        if(S.docs[k]) S.docs[k].files = v.files || [];
+      });
+    }
+    return true;
+  } catch(e) { return false; }
+}
+
+function showToast(msg, type='ok') {
+  let el = document.getElementById('TOAST');
+  if(!el) {
+    el = document.createElement('div');
+    el.id = 'TOAST';
+    el.style.cssText = 'position:fixed;bottom:24px;right:24px;z-index:9999;font-family:var(--font);font-size:12px;font-weight:600;padding:10px 16px;border-radius:9px;box-shadow:0 4px 16px rgba(0,0,0,.15);transition:opacity .3s;pointer-events:none';
+    document.body.appendChild(el);
+  }
+  const styles = {
+    ok: 'background:var(--gn-bg);color:var(--gn);border:1px solid var(--gn-bd)',
+    warn: 'background:var(--wn-bg);color:var(--wn);border:1px solid var(--wn-bd)',
+    info: 'background:var(--bl-bg);color:var(--bl);border:1px solid var(--bl-bd)'
+  };
+  el.style.cssText += ';' + (styles[type]||styles.ok);
+  el.textContent = msg;
+  el.style.opacity = '1';
+  clearTimeout(el._t);
+  el._t = setTimeout(() => { el.style.opacity='0'; }, 2800);
+}
 let _renderDebounce = null;
 
 function scheduleAnalysisUpdate() {
@@ -1551,20 +1874,28 @@ function scheduleAnalysisUpdate() {
   _renderDebounce = setTimeout(() => updateAnalysisPanels(), 120);
 }
 
-function updateAnalysisPanels() {
+// Centrale berekeningsfunctie — voorkomt duplicatie tussen fullRender en updateAnalysisPanels
+function calcAll() {
   S.errors = validate();
-  const m=calcMetrics(S.form), conf=checkConflicts(S.form);
-  const doss=calcDossierQuality(conf,S.form);
-  const risks=detectRisks(S.form,m,conf);
-  const sc=calculateScore(S.form,m,doss);
-  const readiness=detectReadiness(S.form,m,conf,sc);
-  const acties=generateAdvice(S.form,m,risks,sc,doss,readiness);
-  const lenders=matchLenders(S.form,m,sc,doss);
-  const concl=genConclusie(sc,conf,doss,readiness);
+  const m        = calcMetrics(S.form);
+  const conf     = checkConflicts(S.form);
+  const doss     = calcDossierQuality(conf, S.form);
+  const risks    = detectRisks(S.form, m, conf);
+  const sc       = calculateScore(S.form, m, doss);
+  const readiness= detectReadiness(S.form, m, conf, sc);
+  const acties   = generateAdvice(S.form, m, risks, sc, doss, readiness);
+  const lenders  = matchLenders(S.form, m, sc, doss);
+  const concl    = genConclusie(sc, conf, doss, readiness);
+  return { m, conf, doss, risks, sc, readiness, acties, lenders, concl };
+}
+
+function updateAnalysisPanels() {
+  const r = calcAll();
   document.getElementById('HDR_K').textContent = S.form.naamKlant||'';
-  document.getElementById('PANEL_MAIN').innerHTML = renderMain(m,sc,risks,conf,doss,readiness,acties,lenders,concl);
-  renderAside(m,sc,doss,readiness);
+  document.getElementById('PANEL_MAIN').innerHTML = renderMain(r.m, r.sc, r.risks, r.conf, r.doss, r.readiness, r.acties, r.lenders, r.concl);
+  renderAside(r.m, r.sc, r.doss, r.readiness);
   updateFieldErrors();
+  saveToLocalStorage();
 }
 
 function updateFieldErrors() {
@@ -1573,29 +1904,26 @@ function updateFieldErrors() {
 }
 
 function fullRender() {
-  S.errors = validate();
-  const m=calcMetrics(S.form), conf=checkConflicts(S.form);
-  const doss=calcDossierQuality(conf,S.form);
-  const risks=detectRisks(S.form,m,conf);
-  const sc=calculateScore(S.form,m,doss);
-  const readiness=detectReadiness(S.form,m,conf,sc);
-  const acties=generateAdvice(S.form,m,risks,sc,doss,readiness);
-  const lenders=matchLenders(S.form,m,sc,doss);
-  const concl=genConclusie(sc,conf,doss,readiness);
+  _whatifSnapshot = null; // snapshot wissen bij handmatige formulierwijziging
+  const r = calcAll();
   document.getElementById('HDR_K').textContent = S.form.naamKlant||'';
   document.getElementById('PANEL_INPUT').innerHTML = renderInput();
-  document.getElementById('PANEL_MAIN').innerHTML = renderMain(m,sc,risks,conf,doss,readiness,acties,lenders,concl);
-  renderAside(m,sc,doss,readiness);
+  document.getElementById('PANEL_MAIN').innerHTML = renderMain(r.m, r.sc, r.risks, r.conf, r.doss, r.readiness, r.acties, r.lenders, r.concl);
+  renderAside(r.m, r.sc, r.doss, r.readiness);
+  saveToLocalStorage();
 }
 
 function resetApp() {
+  if(!confirm('Weet je zeker dat je alles wilt wissen? Dit kan niet ongedaan worden gemaakt.')) return;
   Object.assign(S, {
     errors:{}, autoFill:{}, clientData:{}, activeImportTab:'json',
     docs:{kvk:{multiple:false,files:[]},graydon:{multiple:false,files:[]},woz:{multiple:true,files:[]},kadaster:{multiple:true,files:[]},jaarrekeningen:{multiple:true,files:[]}},
     loading:{},
-    form:{naamKlant:'',inkomen:'',vermogen:'',aantalPanden:'1',woonland:'nl',typeKlant:'particulier',doelFinanciering:'aankoop',aankoopprijs:'',marktwaarde:'',huurPerMaand:'',huurType:'bestaand',typeVastgoed:'woning',gewensteLening:'',eigenInbreng:'',rente:'0.05',looptijd:'20',metAflossing:'nee',dossiernr:'',adviseur:'',notitie:''}
+    form:{naamKlant:'',inkomen:'',vermogen:'',aantalPanden:'',woonland:'nl',typeKlant:'particulier',doelFinanciering:'aankoop',aankoopprijs:'',marktwaarde:'',huurPerMaand:'',huurType:'bestaand',typeVastgoed:'woning',gewensteLening:'',eigenInbreng:'',rente:'0.05',looptijd:'20',metAflossing:'nee',dossiernr:'',adviseur:'',notitie:''}
   });
+  try { localStorage.removeItem(LS_KEY); } catch(e) {}
   fullRender();
+  showToast('Formulier gewist', 'info');
 }
 
 // ════════════════════════════════════════════════════
@@ -1635,7 +1963,6 @@ async function handlePdfImport(file) {
       body: JSON.stringify({ text: parsed.text })
     });
     const data = await response.json();
-    console.log('IMPORT DATA:', data);
     if (!response.ok) throw new Error(data.error || 'Onbekende fout');
     Object.entries(data).forEach(([key, value]) => {
       if (value !== null && value !== undefined && value !== '') {
@@ -1660,43 +1987,44 @@ async function handlePdfImport(file) {
 // ㉖ PRINT
 // ════════════════════════════════════════════════════
 function printReport() {
+  // Guard: voorkom lege print
+  if(!S.form.naamKlant?.trim() || !parseFloat(S.form.gewensteLening)) {
+    showToast('Vul eerst naam en leningsbedrag in voor het rapport.', 'warn');
+    return;
+  }
   const datum=new Date().toLocaleDateString('nl-NL',{day:'2-digit',month:'long',year:'numeric'});
+  const tijd=new Date().toLocaleTimeString('nl-NL',{hour:'2-digit',minute:'2-digit'});
   const ref=`MBA-${Date.now().toString().slice(-6)}`;
+  const klant=f('naamKlant')||'—';
+  const adviseur=f('adviseur')||'';
+  const dossier=f('dossiernr')||ref;
+
   const ph=document.getElementById('PRINT_HEADER');
   ph.style.display='flex';
   ph.innerHTML=`
     <div class="print-logo-wrap">
-      <div class="print-logo-svg"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 110 56" style="height:42px;width:auto" role="img" aria-label="MB Adviesgroep">
-  <title>MB Adviesgroep</title>
-  <g transform="translate(5,2)" stroke="#3D3D3D" stroke-linecap="round" stroke-linejoin="round" fill="none">
-    <path d="M3,21 Q16,3 29,21" stroke-width="1.9"/>
-    <circle cx="16" cy="3.5" r="1.7" fill="#3D3D3D" stroke="none"/>
-    <line x1="16" y1="5.2" x2="16" y2="8" stroke-width="1.4"/>
-    <path d="M7,21 Q16,9 25,21" stroke-width="1.6"/>
-    <line x1="16" y1="9" x2="16" y2="21" stroke-width="1.3"/>
-    <line x1="7" y1="16" x2="25" y2="16" stroke-width="1.3"/>
-    <line x1="7" y1="21" x2="13.5" y2="11" stroke-width="1.1"/>
-    <line x1="25" y1="21" x2="18.5" y2="11" stroke-width="1.1"/>
-    <line x1="4" y1="21" x2="4" y2="29" stroke-width="1.9"/>
-    <line x1="28" y1="21" x2="28" y2="29" stroke-width="1.9"/>
-    <line x1="0.5" y1="24" x2="7.5" y2="24" stroke-width="1.7"/>
-    <line x1="24.5" y1="24" x2="31.5" y2="24" stroke-width="1.7"/>
-    <circle cx="0" cy="24" r="1.4" fill="#3D3D3D" stroke="none"/>
-    <circle cx="32" cy="24" r="1.4" fill="#3D3D3D" stroke="none"/>
-    <line x1="-1" y1="29" x2="33" y2="29" stroke-width="1.9"/>
-    <line x1="-3" y1="31.5" x2="35" y2="31.5" stroke-width="1.5"/>
-  </g>
-  <text x="44" y="30" font-family="Inter,system-ui,sans-serif" font-size="25" font-weight="800" fill="#2B5F8E" letter-spacing="-0.3">MB</text>
-  <text x="3" y="50" font-family="Inter,system-ui,sans-serif" font-size="9" font-weight="700" fill="#D0632E" letter-spacing="1.6">ADVIESGROEP</text>
-</svg></div>
+      <img src="logo.png" style="height:36px;width:auto;filter:brightness(0) invert(1)" onerror="this.style.display='none'">
+      <div class="print-logo-text" style="margin-left:10px">
+        <div class="print-logo-name">MB Adviesgroep</div>
+        <div class="print-logo-sub">Deal Analyzer — Intern Kredietmemo</div>
+      </div>
     </div>
     <div class="print-meta">
-      <strong>${f('naamKlant')||'—'}</strong>
-      Deal Analyzer — Intern Kredietmemo<br>
-      ${datum} · Ref: ${ref}${f('adviseur')?' · '+f('adviseur'):''}${f('dossiernr')?' · '+f('dossiernr'):''}
+      <strong>${klant}</strong>
+      ${datum} · ${tijd}${adviseur?' · '+adviseur:''}<br>
+      Ref: ${dossier}
     </div>`;
+
+  // Voeg pagina-scheiding hints toe voor betere layout
+  document.querySelectorAll('.section-head').forEach((el,i)=>{
+    if(i>0) el.style.pageBreakBefore='auto';
+  });
+
   window.print();
-  setTimeout(()=>{ph.style.display='none';},600);
+  setTimeout(()=>{
+    ph.style.display='none';
+    document.querySelectorAll('.section-head').forEach(el=>el.style.pageBreakBefore='');
+  },800);
 }
 
 function doCopy(id,btnId){
@@ -1710,15 +2038,23 @@ function doCopy(id,btnId){
 function f(k){return S.form[k]||'';}
 function fv(k){return parseFloat(S.form[k])||0;}
 
+// Velden die alleen positieve getallen accepteren
+const POSITIVE_FIELDS = new Set(['aankoopprijs','marktwaarde','gewensteLening','eigenInbreng','huurPerMaand','inkomen','vermogen','aantalPanden']);
+
 function inp(key,type='text',ph=''){
   const v=(S.form[key]||'').replace(/"/g,'&quot;');
   const fc=S.clientData[key]!==undefined?' from-client':'';
   const ec=S.errors[key]?' err':'';
-  return `<input type="${type}" id="fi_${key}" class="finput${fc}${ec}" value="${v}" placeholder="${ph}" oninput="S.form['${key}']=this.value;scheduleAnalysisUpdate()" onchange="S.form['${key}']=this.value;scheduleAnalysisUpdate()">`;
+  const minAttr = (type==='number' && POSITIVE_FIELDS.has(key)) ? ' min="0"' : '';
+  const sanitize = (type==='number' && POSITIVE_FIELDS.has(key))
+    ? `if(parseFloat(this.value)<0)this.value=0;`
+    : '';
+  return `<input type="${type}" id="fi_${key}" class="finput${fc}${ec}" value="${v}" placeholder="${ph}"${minAttr} oninput="${sanitize}S.form['${key}']=this.value;scheduleAnalysisUpdate()" onchange="${sanitize}S.form['${key}']=this.value;scheduleAnalysisUpdate()">`;
 }
 function sel(key,opts){
   const v=S.form[key]||'';const fc=S.clientData[key]!==undefined?' from-client':'';
-  return `<select id="fi_${key}" class="fselect${fc}" onchange="S.form['${key}']=this.value;fullRender()">${opts.map(([val,lbl])=>`<option value="${val}"${v===val?' selected':''}>${lbl}</option>`).join('')}</select>`;
+  const extra = key==='metAflossing' ? `onchange="S.form['${key}']=this.value;const lw=document.getElementById('LOOPTIJD_WRAP');if(lw)lw.style.cssText=this.value==='ja'?'':'opacity:.45;pointer-events:none';fullRender()"` : `onchange="S.form['${key}']=this.value;fullRender()"`;
+  return `<select id="fi_${key}" class="fselect${fc}" ${extra}>${opts.map(([val,lbl])=>`<option value="${val}"${v===val?' selected':''}>${lbl}</option>`).join('')}</select>`;
 }
 function fg(label,input,err=''){return `<div class="fgrp">${label?`<label>${label}</label>`:''}${input}${err?`<div class="ferr">${err}</div>`:''}</div>`;}
 function fg2(a,b){return `<div class="fg2">${a}${b}</div>`;}
@@ -1769,6 +2105,8 @@ function renderDocCategory(key) {
   const isRequired = dt.requiredFor.length > 0;
   const statusCls = hasFiles ? 'ok' : isRequired ? 'miss' : 'opt';
   const statusLbl = hasFiles ? (dt.multiple?`${files.length} bestand${files.length>1?'en':''}`:'✓ Aanwezig') : (isRequired?'Vereist':'Optioneel');
+  // Toon recent-uploaded indicator (binnen 3 seconden)
+  const recentUpload = files.some(f => f._justUploaded);
 
   return `
   <div class="doc-category" id="DOC_CAT_${key}">
@@ -1781,8 +2119,8 @@ function renderDocCategory(key) {
     <div class="doc-cat-body">
       ${files.length>0?`<div class="doc-file-list">
         ${files.map(fEntry=>`
-          <div class="doc-file-item">
-            <span style="font-size:10px;flex-shrink:0">${dt.icon}</span>
+          <div class="doc-file-item${fEntry._justUploaded?' doc-file-new':''}">
+            <span style="font-size:10px;flex-shrink:0">${fEntry._justUploaded?'✅':dt.icon}</span>
             <span class="doc-file-name" title="${fEntry.naam}">${fEntry.naam}</span>
             <span class="doc-file-date">${fEntry.uploadDatum}</span>
             ${fEntry.parsed?._meta?.documentKwaliteit?`<span style="font-size:7.5px;font-weight:700;padding:1.5px 4px;border-radius:8px;${fEntry.parsed._meta.documentKwaliteit==='goed'?'background:var(--gn-bg);color:var(--gn)':fEntry.parsed._meta.documentKwaliteit==='matig'?'background:var(--wn-bg);color:var(--wn)':'background:var(--rk-bg);color:var(--rk)'}">${fEntry.parsed._meta.documentKwaliteit==='goed'?'OK':fEntry.parsed._meta.documentKwaliteit==='matig'?'Deels':'Slecht'}</span>`:''}
@@ -1968,10 +2306,91 @@ function renderDocAnalyseBlok() {
   if(incCount > 0) aandachtItems.push(`${incCount} incasso('s) gedetecteerd — schriftelijke toelichting vereist`);
   if(aandachtItems.length === 0) aandachtItems.push('Geen directe aandachtspunten op basis van huidige documenten.');
 
-  // ── Vervolgstappen ───────────────────────────────────────────
+  // ── Bepaal welke KPI-kaarten we tonen (alleen als data beschikbaar) ──────
+  const grayFields = aiGray?.fields || {};
+  const jaarrFields = aiJaarr?.fields || {};
+  const wozFields = aiWoz?.fields || {};
+
+  const kpiScore = safe(grayFields.score);
+  const kpiScoreInt = kpiScore ? parseInt(kpiScore) : null;
+  const kpiKlasse = safe(grayFields.risicoklasse) || safe(grayFields.internationaleScore);
+  const kpiLimiet = fmtBedrag(grayFields.kredietlimiet || grayFields.aanbevolenKredietlimiet);
+  const kpiPD = safe(grayFields.probabilityOfDefault);
+  const kpiSolv = safe(jaarrFields.solvabiliteit);
+  const kpiBijz = safe(grayFields.bijzonderheden);
+
+  const hasKpis = kpiScore || kpiLimiet || kpiPD || kpiSolv;
+
+  // KPI kleurklasse helper
+  function scoreKlasse(n) { return n>=80?'da-good':n>=60?'da-warn':'da-danger'; }
+  function pdKlasse(s) { const n=parseFloat(s); return n<1?'da-good':n<5?'da-warn':'da-danger'; }
+  function solvKlasse(s) { const n=parseFloat(s); return n>=25?'da-good':n>=15?'da-warn':'da-danger'; }
+
+  // ── Bouw data-kaarten ────────────────────────────────────────────────────
+  const bedrijfRows = [];
+  const kvkFields = aiKvk?.fields || {};
+  if(safe(kvkFields.bedrijfsnaam))     bedrijfRows.push(['Naam', kvkFields.bedrijfsnaam]);
+  if(safe(kvkFields.rechtsvorm))       bedrijfRows.push(['Rechtsvorm', kvkFields.rechtsvorm]);
+  if(safe(kvkFields.kvkNummer))        bedrijfRows.push(['KVK', kvkFields.kvkNummer]);
+  if(safe(kvkFields.sbiCode))          bedrijfRows.push(['SBI-code', kvkFields.sbiCode]);
+  if(safe(kvkFields.oprichtingsdatum)) bedrijfRows.push(['Opgericht', kvkFields.oprichtingsdatum]);
+  if(safe(kvkFields.vestigingsadres))  bedrijfRows.push(['Vestiging', kvkFields.vestigingsadres]);
+
+  const kredietRows = [];
+  if(kpiScore)                         kredietRows.push(['Score', kpiScore, kpiScoreInt?scoreKlasse(kpiScoreInt):null]);
+  if(safe(grayFields.internationaleScore)) kredietRows.push(['Int. score', grayFields.internationaleScore]);
+  if(safe(grayFields.risicoklasse))    kredietRows.push(['Risicoklasse', grayFields.risicoklasse]);
+  if(kpiLimiet)                        kredietRows.push(['Kredietlimiet', kpiLimiet]);
+  if(kpiPD)                            kredietRows.push(['Prob. of default', kpiPD, pdKlasse(kpiPD)]);
+  if(safe(grayFields.betaalgedrag))    kredietRows.push(['Betaalgedrag', grayFields.betaalgedrag]);
+
+  const vastgoedRows = [];
+  const wozAdres = safe(wozFields.adresObject) || safe(wozFields.adres);
+  if(wozAdres)                         vastgoedRows.push(['Object', wozAdres]);
+  const isTax = wozFields.documentType==='taxatie';
+  const wv = fmtBedrag(isTax ? wozFields.taxatiewaarde : wozFields.wozWaarde) || fmtBedrag(wozFields.waarde);
+  if(wv)                               vastgoedRows.push([isTax?'Taxatiewaarde':'WOZ-waarde', wv]);
+  const wdatum = safe(wozFields.peildatum) || safe(wozFields.waardeDatum);
+  if(wdatum)                           vastgoedRows.push(['Peildatum', wdatum]);
+  if(safe(wozFields.bouwjaar))         vastgoedRows.push(['Bouwjaar', wozFields.bouwjaar]);
+  if(safe(wozFields.oppervlakte))      vastgoedRows.push(['Oppervlakte', wozFields.oppervlakte]);
+  if(safe(wozFields.taxateur))         vastgoedRows.push(['Taxateur', wozFields.taxateur]);
+  // Kadaster aanvulling
+  const kadFields = aiKad?.fields || {};
+  if(safe(kadFields.eigenaar))         vastgoedRows.push(['Eigenaar', kadFields.eigenaar]);
+  if(safe(kadFields.leveringsdatum))   vastgoedRows.push(['Datum levering', kadFields.leveringsdatum]);
+
+  const finRows = [];
+  if(safe(jaarrFields.bedrijfsnaam))   finRows.push(['Onderneming', jaarrFields.bedrijfsnaam]);
+  if(safe(jaarrFields.boekjaar))       finRows.push(['Boekjaar', jaarrFields.boekjaar]);
+  if(safe(jaarrFields.omzet))          finRows.push(['Omzet', fmtBedrag(jaarrFields.omzet)||jaarrFields.omzet]);
+  const jNetto = jaarrFields.nettoResultaat||jaarrFields.nettowinst;
+  if(safe(jNetto))                     finRows.push(['Nettoresultaat', fmtBedrag(jNetto)||jNetto]);
+  if(safe(jaarrFields.ebitda))         finRows.push(['EBITDA', fmtBedrag(jaarrFields.ebitda)||jaarrFields.ebitda]);
+  const jEv = jaarrFields.eigenVermogen||jaarrFields.eigenvermogen;
+  if(safe(jEv))                        finRows.push(['Eigen vermogen', fmtBedrag(jEv)||jEv]);
+  const jBt = jaarrFields.balanstotaal||jaarrFields.balansTotaal;
+  if(safe(jBt))                        finRows.push(['Balanstotaal', fmtBedrag(jBt)||jBt]);
+  if(kpiSolv)                          finRows.push(['Solvabiliteit', kpiSolv+'%', solvKlasse(kpiSolv)]);
+
+  function renderDataCard(icon, iconClass, title, rows) {
+    if(rows.length===0) return '';
+    return `<div class="da-card">
+      <div class="da-card-head">
+        <em class="da-card-icon ${iconClass}">${icon}</em>
+        <span class="da-card-title">${title}</span>
+      </div>
+      ${rows.map(([k,v,cls])=>`<div class="da-row">
+        <span class="da-row-key">${k}</span>
+        <span class="da-row-val${cls?' '+cls:''}">${v}</span>
+      </div>`).join('')}
+    </div>`;
+  }
+
+  // ── Vervolgstappen ───────────────────────────────────────────────────────
   const vervolgItems = [];
   const seenActions = new Set();
-  aiSources.forEach(ai => {
+  [aiKvk, aiGray, aiWoz, aiKad, aiJaarr].forEach(ai => {
     if(Array.isArray(ai?.actions)) {
       ai.actions.forEach(a => {
         const clean = String(a).trim();
@@ -1985,6 +2404,18 @@ function renderDocAnalyseBlok() {
   if(!S.docs.graydon.files.length)      vervolgItems.push('Kredietrapport opvragen (Graydon/CreditSafe)');
   if(vervolgItems.length === 0)         vervolgItems.push('Dossier voldoende compleet — voorbereiding indiening kan starten.');
 
+  // ── Risico prioritering ──────────────────────────────────────────────────
+  function risicoLevel(tekst) {
+    const t = tekst.toLowerCase();
+    if(t.includes('ontbreken')||t.includes('niet mogelijk')||t.includes('verhoogd')||t.includes('negatief')||t.includes('incasso')||t.includes('afwijking')) return 'r-high';
+    if(t.includes('verlaagd')||t.includes('gedaald')||t.includes('rangorde')||t.includes('inconsistent')||t.includes('kwetsbaar')) return 'r-med';
+    if(t.includes('controleer')||t.includes('geen')) return 'r-info';
+    return 'r-low';
+  }
+
+  const allRisicos = [...risicoItems.filter(r=>!r.startsWith('Geen documentaire')), ...aandachtItems.filter(a=>!a.startsWith('Geen directe'))];
+  const geenRisicos = allRisicos.length === 0;
+
   return `
   <div class="section-head" style="margin-top:16px">
     <span class="section-num" style="background:var(--pur)">4</span>
@@ -1995,35 +2426,86 @@ function renderDocAnalyseBlok() {
     </span>
   </div>
 
-  <div class="doc-analyse-blok">
-    <div class="doc-analyse-header">
-      <div class="doc-analyse-badge">AI Documentanalyse</div>
-      <div class="doc-analyse-title">Samenvatting geüploade documenten</div>
+  <div class="da-blok">
+
+    ${samenvattingItems.length>0?`
+    <div class="da-summary-blok">
+      <div class="da-summary-head">
+        <span class="da-summary-badge">AI Documentanalyse</span>
+        Samenvatting geüploade documenten
+      </div>
+      ${samenvattingItems.map(i=>`<div class="da-summary-item">· ${i}</div>`).join('')}
+    </div>`:''}
+
+    ${hasKpis?`
+    <div class="da-kpi-row">
+      ${kpiScore?`<div class="da-kpi">
+        <div class="da-kpi-label">Creditscore</div>
+        <div class="da-kpi-val ${kpiScoreInt?scoreKlasse(kpiScoreInt):''}">${kpiScore}</div>
+        ${kpiKlasse?`<div class="da-kpi-sub">${kpiKlasse}</div>`:''}
+      </div>`:''}
+      ${kpiLimiet?`<div class="da-kpi">
+        <div class="da-kpi-label">Kredietlimiet</div>
+        <div class="da-kpi-val ${kpiBijz&&kpiBijz.toLowerCase().includes('verlaagd')?'da-warn':''}">${kpiLimiet}</div>
+        ${kpiBijz?`<div class="da-kpi-sub" style="max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${kpiBijz}">${kpiBijz.length>40?kpiBijz.substring(0,38)+'…':kpiBijz}</div>`:''}
+      </div>`:''}
+      ${kpiPD?`<div class="da-kpi">
+        <div class="da-kpi-label">Prob. of default</div>
+        <div class="da-kpi-val ${pdKlasse(kpiPD)}">${kpiPD}</div>
+      </div>`:''}
+      ${kpiSolv?`<div class="da-kpi">
+        <div class="da-kpi-label">Solvabiliteit</div>
+        <div class="da-kpi-val ${solvKlasse(kpiSolv)}">${kpiSolv}%</div>
+      </div>`:''}
+    </div>`:''}
+
+    <div class="da-cards-grid">
+      ${renderDataCard('🏢','da-icon-bedrijf','Bedrijf',bedrijfRows)}
+      ${renderDataCard('✓','da-icon-krediet','Kredietprofiel',kredietRows)}
+      ${renderDataCard('🏠','da-icon-vastgoed','Vastgoed',vastgoedRows)}
+      ${renderDataCard('📊','da-icon-fin','Financiën',finRows)}
     </div>
-    <div class="doc-analyse-grid">
-      <div class="doc-analyse-section">
-        <div class="doc-analyse-section-lbl lbl-bl">Samenvatting</div>
-        ${samenvattingItems.length>0
-          ? samenvattingItems.map(i=>`<div class="doc-analyse-placeholder">· ${i}</div>`).join('')
-          : `<div class="doc-analyse-placeholder">Nog onvoldoende documenten voor automatische samenvatting.</div>`}
+
+    ${!geenRisicos?`
+    <div class="da-risico-blok">
+      <div class="da-risico-head">
+        <span class="da-risico-head-title">Risico's &amp; aandachtspunten</span>
+        <span class="da-risico-count">${allRisicos.length} punt${allRisicos.length!==1?'en':''}</span>
       </div>
-      <div class="doc-analyse-section">
-        <div class="doc-analyse-section-lbl lbl-gn">Inzichten</div>
-        ${inzichtItems.map(i=>`<div class="doc-analyse-placeholder">→ ${i}</div>`).join('')}
+      <div class="da-risico-list">
+        ${allRisicos.map(r=>{
+          const lvl = risicoLevel(r);
+          const parts = r.split(' — ');
+          return `<div class="da-risico-item ${lvl}">
+            <div class="da-rdot ${lvl}"></div>
+            <div class="da-risico-text">
+              <strong>${parts[0]}</strong>
+              ${parts[1]?`<span>${parts[1]}</span>`:''}
+            </div>
+          </div>`;
+        }).join('')}
       </div>
-      <div class="doc-analyse-section">
-        <div class="doc-analyse-section-lbl lbl-rk">Risico's</div>
-        ${risicoItems.map(i=>`<div class="doc-analyse-placeholder">⚠ ${i}</div>`).join('')}
-      </div>
-      <div class="doc-analyse-section">
-        <div class="doc-analyse-section-lbl lbl-wn">Aandachtspunten</div>
-        ${aandachtItems.map(i=>`<div class="doc-analyse-placeholder">· ${i}</div>`).join('')}
-      </div>
-    </div>
-    <div class="doc-analyse-full">
-      <div class="doc-analyse-section-lbl lbl-or">Vervolgstappen</div>
-      ${vervolgItems.map((i,idx)=>`<div class="doc-analyse-placeholder"><strong>${idx+1}.</strong> ${i}</div>`).join('')}
-    </div>
+    </div>`:`
+    <div class="da-note-bar">
+      <span>✓</span>
+      <span><strong>Geen risico's gedetecteerd</strong> op basis van de huidige documenten.</span>
+    </div>`}
+
+    ${aandachtItems.some(a=>a.includes('taxatie')||a.includes('Taxatie'))?`
+    <div class="da-note-bar">
+      <span>📋</span>
+      <span><strong>Let op:</strong> ${aandachtItems.find(a=>a.includes('taxatie')||a.includes('Taxatie'))}</span>
+    </div>`:''}
+
+    ${vervolgItems.length>0?`
+    <div class="da-vervolg-blok">
+      <div class="da-vervolg-head">Vervolgstappen</div>
+      ${vervolgItems.map((i,idx)=>`<div class="da-vervolg-item">
+        <span class="da-vervolg-num">${idx+1}.</span>
+        <span>${i}</span>
+      </div>`).join('')}
+    </div>`:''}
+
   </div>`;
 }
 
@@ -2041,29 +2523,39 @@ function renderInput() {
     ${hasAF?`<div class="af-banner"><span class="af-tag">Auto</span><span class="af-txt">${Object.keys(S.autoFill).length} veld(en) uitgelezen.</span><button class="btn btn-bl btn-sm" onclick="doAutoFill()">Overnemen</button></div>`:''}
 
     <div class="sec-lbl"><span>Klant</span></div>
-    ${fg2(fg('Naam klant *',inp('naamKlant','text','Jan de Vries'),S.errors.naamKlant||''),fg('Type',sel('typeKlant',[['particulier','Particulier'],['bv','BV / Holding']])))}
-    ${fg2(fg('Inkomen €/jr',inp('inkomen','number','120000')),fg('Vermogen €',inp('vermogen','number','250000')))}
-    ${fg2(fg('Woonland',sel('woonland',[['nl','Nederland'],['eu','EU'],['buiten-eu','Buiten EU']])),fg('Panden',inp('aantalPanden','number','1')))}
+    ${fg2(fg('Naam klant *',inp('naamKlant','text',''),S.errors.naamKlant||''),fg('Type',sel('typeKlant',[['particulier','Particulier'],['bv','BV / Holding']])))}
+    ${fg2(fg('Inkomen €/jr',inp('inkomen','number','')),fg('Vermogen €',inp('vermogen','number','')))}
+    ${fg2(fg('Woonland',sel('woonland',[['nl','Nederland'],['eu','EU'],['buiten-eu','Buiten EU']])),fg('Panden',inp('aantalPanden','number','')))}
     ${fg('Doel',sel('doelFinanciering',[['aankoop','Aankoop'],['herfinanciering','Herfinanciering'],['overwaarde','Overwaarde opname']]))}
 
     <div class="sec-lbl"><span>Vastgoed</span></div>
-    ${fg2(fg('Aankoopprijs € *',inp('aankoopprijs','number','450000'),S.errors.aankoopprijs||''),fg('Marktwaarde €',inp('marktwaarde','number','480000')))}
-    ${fg2(fg('Type',sel('typeVastgoed',[['woning','Woning (verhuur)'],['bedrijfspand','Bedrijfspand'],['horeca','Horeca'],['recreatie','Recreatie'],['mixed','Mixed-use'],['overig','Overig']])),fg('Huur',sel('huurType',[['bestaand','Contract'],['prognose','Prognose']])))}
-    ${fg('Huur/mnd €',inp('huurPerMaand','number','1800'))}
+    ${fg2(fg('Aankoopprijs € *',inp('aankoopprijs','number',''),S.errors.aankoopprijs||''),fg('Marktwaarde €',inp('marktwaarde','number','')))}
+    ${fg2(fg('Type',sel('typeVastgoed',[['woning','Woning (verhuur)'],['bedrijfspand','Bedrijfspand'],['horeca','Horeca'],['recreatie','Recreatie'],['mixed','Mixed-use'],['overig','Overig']])),fg('Huurtype',sel('huurType',[['bestaand','Contract'],['prognose','Prognose']])))}
+    <div class="fgrp">
+      <label>Huurinkomsten €/mnd <span style="font-weight:400;color:var(--tx4);text-transform:none;letter-spacing:0;font-size:9px">opbrengst van huurder</span></label>
+      ${inp('huurPerMaand','number','')}
+    </div>
 
     <div class="sec-lbl"><span>Structuur</span></div>
-    ${fg2(fg('Lening € *',inp('gewensteLening','number','350000'),S.errors.gewensteLening||''),fg('Inbreng € *',inp('eigenInbreng','number','100000'),S.errors.eigenInbreng||''))}
+    ${fg2(fg('Lening € *',inp('gewensteLening','number',''),S.errors.gewensteLening||''),fg('Inbreng € *',inp('eigenInbreng','number',''),S.errors.eigenInbreng||''))}
     <div class="fgrp">
       <label>Rente</label>
       <div class="sl-row">
-        <input type="range" min="0.03" max="0.09" step="0.005" value="${f('rente')}" oninput="S.form.rente=this.value;this.nextElementSibling.textContent=(parseFloat(this.value)*100).toFixed(1)+'%';scheduleAnalysisUpdate()">
+        <input type="range" min="0.03" max="0.15" step="0.005" value="${f('rente')}" oninput="S.form.rente=this.value;this.nextElementSibling.textContent=(parseFloat(this.value)*100).toFixed(1)+'%';scheduleAnalysisUpdate()">
         <span class="sl-val">${(parseFloat(f('rente')||.05)*100).toFixed(1)}%</span>
       </div>
     </div>
     ${fg('Structuur',sel('metAflossing',[['nee','Interest only (IO)'],['ja','Annuïtair']]))}
+    <div class="fgrp" id="LOOPTIJD_WRAP" style="${f('metAflossing')==='ja'?'':'opacity:.45;pointer-events:none'}">
+      <label>Looptijd</label>
+      <div class="sl-row">
+        <input type="range" min="5" max="30" step="1" value="${f('looptijd')||20}" oninput="S.form.looptijd=this.value;this.nextElementSibling.textContent=this.value+' jr';scheduleAnalysisUpdate()">
+        <span class="sl-val">${f('looptijd')||20} jr</span>
+      </div>
+    </div>
 
     <div class="sec-lbl"><span>Intern</span></div>
-    ${fg2(fg('Dossiernr.',inp('dossiernr','text','MBA-001')),fg('Adviseur',inp('adviseur','text','')))}
+    ${fg2(fg('Dossiernr.',inp('dossiernr','text','')),fg('Adviseur',inp('adviseur','text','')))}
     <div class="fgrp">
       <label>Notitie</label>
       <textarea id="fi_notitie" style="width:100%;padding:7px 9px;background:var(--bg);border:1.5px solid var(--bd);border-radius:7px;font-family:var(--mono);font-size:11px;resize:none;min-height:60px;outline:none;color:var(--tx)" oninput="S.form.notitie=this.value" placeholder="Context, bijzonderheden…">${f('notitie')}</textarea>
@@ -2167,10 +2659,10 @@ function renderMain(m, sc, risks, conf, doss, readiness, acties, lenders, concl)
     <div class="acard-hd"><span class="acard-lbl">Cashflow & Draagkracht</span></div>
     <div class="mrow c3">
       <div class="metric"><div class="m-lbl">DSCR (${afl})</div><div class="m-val ${dscrC(m.dscr)==='good'?'cg':dscrC(m.dscr)==='bad'?'cr':'cw'}">${m.dscr?m.dscr.toFixed(2):'N/B'}</div><div class="m-sub">${m.dscr?m.dscr>=1.25?'✓ Voldoende':m.dscr>=1?'Onder norm':'Kritisch':'Geen huur'}</div></div>
-      <div class="metric"><div class="m-lbl">Huur/mnd</div><div class="m-val">${m.h?fE(m.h):'—'}</div><div class="m-sub">${f('huurType')==='bestaand'?'Contract':'Prognose'}</div></div>
+      <div class="metric"><div class="m-lbl">Huurinkomen/mnd</div><div class="m-val">${m.h?fE(m.h):'—'}</div><div class="m-sub">${f('huurType')==='bestaand'?'Contract':'Prognose'}</div></div>
       <div class="metric"><div class="m-lbl">Cashflow</div><div class="m-val ${!m.h||!m.ml?'cgy':m.cf>0?'cg':'cr'}">${m.h&&m.ml?fE(m.cf):'—'}</div><div class="m-sub">Na lasten</div></div>
     </div>
-    ${m.bh125?`<div style="margin-top:8px;padding:7px 9px;background:var(--bg);border-radius:6px;font-size:10.5px;color:var(--tx3)">Min. huur DSCR 1.25: <strong style="color:var(--tx);font-family:var(--mono)">${fE(m.bh125)}/mnd</strong>${m.h&&m.h<m.bh125?` — tekort ${fE(m.bh125-m.h)}/mnd`:' ✓'}</div>`:''}
+    ${m.bh125?`<div style="margin-top:8px;padding:7px 9px;background:var(--bg);border-radius:6px;font-size:10.5px;color:var(--tx3)">Min. huurinkomen DSCR 1.25: <strong style="color:var(--tx);font-family:var(--mono)">${fE(m.bh125)}/mnd</strong>${m.h&&m.h<m.bh125?` — tekort ${fE(m.bh125-m.h)}/mnd`:' ✓'}</div>`:''}
   </div>
 
   <div class="acard">
@@ -2207,16 +2699,20 @@ function renderMain(m, sc, risks, conf, doss, readiness, acties, lenders, concl)
   </div>
 
   <div class="acard what-if-section">
-    <div class="acard-hd"><span class="acard-lbl">What-if</span><span style="font-size:9px;color:var(--tx4)">Live herberekening</span></div>
+    <div class="acard-hd">
+      <span class="acard-lbl">What-if</span>
+      <span style="font-size:9px;color:var(--tx4)">Live herberekening</span>
+      <button class="btn btn-ghost btn-sm" style="margin-left:auto;font-size:10px" onclick="resetWhatIf()" title="Zet sliders terug naar de originele waarden">↺ Terugzetten</button>
+    </div>
     ${[
-      ['rente','Rente','0.03','0.09','0.005',v=>(parseFloat(v)*100).toFixed(1)+'%'],
+      ['rente','Rente','0.03','0.15','0.005',v=>(parseFloat(v)*100).toFixed(1)+'%'],
       ['gewensteLening','Lening','50000','2000000','10000',v=>'€'+Math.round(v).toLocaleString()],
       ['eigenInbreng','Inbreng','0','1000000','5000',v=>'€'+Math.round(v).toLocaleString()],
-      ['huurPerMaand','Huur/mnd','0','10000','50',v=>'€'+Math.round(v).toLocaleString()]
+      ['huurPerMaand','Huurinkomen','0','10000','50',v=>'€'+Math.round(v).toLocaleString()]
     ].map(([k,l,mn,mx,st,fmt])=>`
       <div class="sl-row" style="margin-bottom:7px">
         <span class="sl-lbl">${l}</span>
-        <input type="range" min="${mn}" max="${mx}" step="${st}" value="${f(k)||'0'}" oninput="S.form['${k}']=this.value;scheduleAnalysisUpdate()">
+        <input type="range" min="${mn}" max="${mx}" step="${st}" value="${f(k)||'0'}" oninput="syncWhatIf('${k}',this.value,this.nextElementSibling)">
         <span class="sl-val">${fmt(f(k)||'0')}</span>
       </div>`).join('')}
     <div class="whatif-result">
@@ -2317,7 +2813,7 @@ PAND
 Type              : ${f('typeVastgoed')}  ·  Doel: ${f('doelFinanciering')||'aankoop'}
 Aankoopprijs      : ${fE(m.a)}
 Marktwaarde       : ${fE(m.mv)||'—'}
-Huurinkomsten     : ${m.h?fE(m.h)+'/mnd':'Geen'}
+Huurinkomsten      : ${m.h?fE(m.h)+'/mnd':'Geen'}
 
 FINANCIERING
 Gewenste lening   : ${fE(m.l)}
@@ -2339,7 +2835,7 @@ TOP ACTIES:
 ${acties.slice(0,5).map((a,i)=>i+1+'. '+a.t).join('\n')}
 
 ─────────────────────────────────────────
-MB Deal Analyzer v19 | Indicatief — geen rechten ontleenbaar</div>
+MB Deal Analyzer v20 | Indicatief — geen rechten ontleenbaar</div>
   </div>
   <div class="btn-row" id="PRINT_BTN_ROW">
     <button class="btn btn-bl" onclick="printReport()">PDF afdrukken</button>
@@ -2428,10 +2924,27 @@ function renderAside(m, sc, doss, readiness) {
   `;
 }
 
+
 // ════════════════════════════════════════════════════
-// INIT
+// INIT — herstel vanuit localStorage indien beschikbaar
 // ════════════════════════════════════════════════════
-fullRender();
+(function init() {
+  const restored = loadFromLocalStorage();
+  fullRender();
+  if(restored && S.form.naamKlant) {
+    // Kleine vertraging zodat de UI eerst rendert
+    setTimeout(() => showToast('Vorige sessie hersteld — ' + S.form.naamKlant, 'info'), 400);
+  }
+  // Autosave indicator in header subtitel
+  const sub = document.querySelector('.logo-app-sub');
+  if(sub) {
+    setInterval(() => {
+      sub.textContent = 'Opgeslagen ' + new Date().toLocaleTimeString('nl-NL',{hour:'2-digit',minute:'2-digit'});
+      setTimeout(() => { if(sub) sub.textContent = 'Kredietanalyse'; }, 2000);
+    }, 30000);
+  }
+})();
+
 </script>
 </body>
 </html>
