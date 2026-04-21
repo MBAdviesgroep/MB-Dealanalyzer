@@ -1350,12 +1350,14 @@ function renderDocAnalyseBlok() {
   // Kredietrapport
   if(aiGray?.fields) {
     const fi = aiGray.fields;
-    if(safe(fi.score))           inzichtItems.push(`Kredietscore: <em>${fi.score}</em>`);
+    if(safe(fi.score))           inzichtItems.push(`Score: <em>${fi.score}</em>`);
     if(safe(fi.risicoklasse))    inzichtItems.push(`Risicoklasse: <em>${fi.risicoklasse}</em>`);
     if(safe(fi.betaalgedrag))    inzichtItems.push(`Betaalgedrag: <em>${fi.betaalgedrag}</em>`);
     if(safe(fi.incassoCount) && fi.incassoCount !== '0') inzichtItems.push(`Incasso's: <em>${fi.incassoCount}</em>`);
-    if(safe(fi.aanbevolenKredietlimiet)) inzichtItems.push(`Kredietlimiet: <em>${fmtBedrag(fi.aanbevolenKredietlimiet) || fi.aanbevolenKredietlimiet}</em>`);
+  if(safe(fi.kredietlimiet)) inzichtItems.push(`Kredietlimiet: <em>${fi.kredietlimiet}</em>`);
     if(safe(fi.bijzonderheden))  inzichtItems.push(`Bijzonderheden: <em>${fi.bijzonderheden}</em>`);
+    if(safe(fi.probabilityOfDefault)) inzichtItems.push(`PD: <em>${fi.probabilityOfDefault}</em>`);
+if(safe(fi.internationaleScore)) inzichtItems.push(`Internationale score: <em>${fi.internationaleScore}</em>`);
   } else if(gray?._risicoNiveau) {
     inzichtItems.push(`Graydon risiconiveau: <em>${gray._risicoNiveau}</em>`);
   }
