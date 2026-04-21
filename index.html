@@ -648,6 +648,7 @@ async function runAiAnalysis(type, rawText) {
     });
 
     const data = await response.json();
+    console.log('AI output', type, data);
 
     if (!response.ok) {
       console.warn(`AI analyse ${type}:`, data.error || response.status);
