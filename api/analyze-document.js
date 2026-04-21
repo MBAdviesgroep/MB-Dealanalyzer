@@ -43,30 +43,52 @@ Regels:
 - je mag voorzichtige, logische risico-inschattingen maken op basis van ontbrekende informatie
 `,
  
-      graydon: `
-Je analyseert een kredietrapport (Graydon, CreditSafe of vergelijkbaar).
-Geef ALLEEN geldige JSON terug. Geen uitleg, geen markdown, geen tekst erbuiten.
+graydon: `
+Je analyseert een kredietrapport voor kredietbeoordeling.
+
+Geef ALLEEN geldige JSON terug.
+Geen uitleg, geen markdown, geen tekst erbuiten.
+
 Gebruik exact deze structuur:
 {
   "summary": "",
   "fields": {
-    "bedrijfsnaam": "",
-    "kredietscore": "",
+    "score": "",
     "risicoklasse": "",
-    "betalingsgedrag": "",
-    "incassoCount": "",
+    "betaalgedrag": "",
     "faillissementen": "",
-    "aanbevolenKredietlimiet": ""
+    "bijzonderheden": ""
   },
   "risks": [],
   "actions": []
 }
+
 Regels:
-- risicoklasse alleen: "laag", "gemiddeld" of "hoog"
-- incassoCount = aantal incasso's als getal string, bv "2", of leeg
-- risks = array van korte NL zinnen over krediet- en betalingsrisico's
-- actions = array van korte NL vervolgacties voor de adviseur
-- baseer je alleen op tekst die echt in het document staat
+- summary = korte zakelijke samenvatting in 1 of 2 zinnen
+- fields alleen invullen als het expliciet in het document staat
+- onbekende velden leeg laten
+- risks = array van korte NL zinnen met concrete kredietrisico’s
+- actions = array van korte NL zinnen met concrete vervolgstappen
+
+Belangrijk:
+- benoem negatieve signalen duidelijk als risico
+- als score/rating zwak is, benoem dat expliciet
+- als betaalachterstanden, incasso's, faillissementen of negatieve registraties aanwezig zijn, benoem die expliciet
+- als informatie beperkt is, benoem beperkte transparantie als risico
+- als het rapport juist sterk oogt, mag je ook benoemen dat risico’s beperkt lijken, maar blijf zakelijk
+
+Voorbeelden van risks:
+- Verhoogd kredietrisico op basis van lage score of zwakke rating
+- Negatieve betaalhistorie of achterstanden aanwezig
+- Faillissementsverleden of insolventiesignalen vereisen nadere beoordeling
+- Beperkte transparantie in beschikbare kredietinformatie
+
+Voorbeelden van actions:
+- Recente jaarrekeningen opvragen
+- Openstaande schulden en verplichtingen verifiëren
+- Betaalgedrag nader beoordelen
+- Financieringsvoorstel aanpassen op verhoogd risico
+- Extra zekerheden of lagere leverage overwegen
 `,
  
       woz: `
