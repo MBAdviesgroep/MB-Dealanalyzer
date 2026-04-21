@@ -4,6 +4,14 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Deal Analyzer — MB Adviesgroep</title>
+<!-- PDF.js voor correcte tekstextractie uit PDF-bestanden -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script>
+  // Stel workerSrc in zodra het script geladen is
+  if (typeof pdfjsLib !== 'undefined') {
+    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+  }
+</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
@@ -525,14 +533,75 @@ function mkField(w,c,b){return{waarde:w??null,confidence:Math.round(c*100)/100,b
 // ════════════════════════════════════════════════════
 // ⑦ FILE READERS
 // ════════════════════════════════════════════════════
+// ── PDF tekstextractie via PDF.js (echte tekst, niet ruwe bytes) ──
+// Fallback naar legacy byte-scan als PDF.js niet beschikbaar is
 async function readPdfText(file) {
+  // Probeer PDF.js — geeft veel betere tekstkwaliteit voor alle PDF-types
+  // inclusief gecomprimeerde streams en Unicode-encoded tekst (Graydon, CreditSafe etc.)
+  if (typeof pdfjsLib !== 'undefined') {
+    try {
+      return await readPdfWithPdfJs(file);
+    } catch(e) {
+      console.warn('[PDF.js] mislukt, val terug op byte-scan:', e.message);
+    }
+  }
+  // Legacy fallback: ruwe byte-scan (werkt alleen voor simpele PDFs)
+  return await readPdfLegacy(file);
+}
+
+async function readPdfWithPdfJs(file) {
+  const arrayBuffer = await file.arrayBuffer();
+  const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+  const totalPages = pdf.numPages;
+  const pageTexts = [];
+
+  // Lees alle pagina's (max 80 om geheugen te beheersen)
+  const maxPages = Math.min(totalPages, 80);
+  for (let i = 1; i <= maxPages; i++) {
+    const page = await pdf.getPage(i);
+    const tc = await page.getTextContent();
+    // Combineer items met spatie, detecteer regelwissels op y-positie
+    let lastY = null;
+    const parts = [];
+    for (const item of tc.items) {
+      if (!item.str) continue;
+      const y = item.transform ? item.transform[5] : null;
+      // Nieuwe regel als y-positie significant verandert
+      if (lastY !== null && y !== null && Math.abs(y - lastY) > 3) {
+        parts.push('\n');
+      }
+      parts.push(item.str);
+      lastY = y;
+    }
+    pageTexts.push(parts.join(' ').replace(/  +/g, ' '));
+  }
+
+  const text = pageTexts.join('\n\n');
+  const words = text.match(/[a-zA-ZÀ-ÿ]{3,}/g) || [];
+  return {
+    text,
+    wordCount: words.length,
+    kwaliteit: words.length > 200 ? 'goed' : words.length > 50 ? 'matig' : 'slecht'
+  };
+}
+
+async function readPdfLegacy(file) {
   return new Promise(resolve => {
     const r = new FileReader();
     r.onload = e => {
-      const buf = new Uint8Array(e.target.result); let text = '';
-      for(let i=0;i<Math.min(buf.length,400000);i++){const c=buf[i];if(c>=32&&c<127)text+=String.fromCharCode(c);else if(c===10||c===13)text+=' ';}
-      const words = text.match(/[a-zA-Z]{3,}/g)||[];
-      resolve({text,wordCount:words.length,kwaliteit:words.length>200?'goed':words.length>50?'matig':'slecht'});
+      const buf = new Uint8Array(e.target.result);
+      let text = '';
+      for(let i = 0; i < Math.min(buf.length, 400000); i++) {
+        const c = buf[i];
+        if(c >= 32 && c < 127) text += String.fromCharCode(c);
+        else if(c === 10 || c === 13) text += ' ';
+      }
+      const words = text.match(/[a-zA-Z]{3,}/g) || [];
+      resolve({
+        text,
+        wordCount: words.length,
+        kwaliteit: words.length > 200 ? 'goed' : words.length > 50 ? 'matig' : 'slecht'
+      });
     };
     r.readAsArrayBuffer(file);
   });
@@ -634,7 +703,7 @@ async function parseDoc(type, file) {
 // ════════════════════════════════════════════════════
 // ⑨ AI DOCUMENT ANALYSE — centraal voor alle types
 // ════════════════════════════════════════════════════
-// Tekstlimieten per type: graydon/jaarrekeningen hebben meer tekst nodig
+// Tekstlimieten per type — graydon/jaarrekeningen bevatten meer spreide data
 const AI_TEXT_LIMITS = {
   kvk: 20000, graydon: 28000, woz: 18000, kadaster: 18000, jaarrekeningen: 28000
 };
@@ -1358,13 +1427,12 @@ function renderDocAnalyseBlok() {
     inzichtItems.push('KVK bevestigt BV-structuur — consistent met profiel');
   }
 
-  // Kredietrapport — beide veldnamen voor kredietlimiet ondersteunen
+  // Kredietrapport — alle veldnamen inclusief backwards compat
   if(aiGray?.fields) {
     const fi = aiGray.fields;
     if(safe(fi.score))                inzichtItems.push(`Score: <em>${fi.score}</em>`);
     if(safe(fi.internationaleScore))  inzichtItems.push(`Internationale score: <em>${fi.internationaleScore}</em>`);
     if(safe(fi.risicoklasse))         inzichtItems.push(`Risicoklasse: <em>${fi.risicoklasse}</em>`);
-    // kredietlimiet: zowel 'kredietlimiet' (nieuw) als 'aanbevolenKredietlimiet' (oud)
     const gKlimiet = safe(fi.kredietlimiet) || safe(fi.aanbevolenKredietlimiet);
     if(gKlimiet)                      inzichtItems.push(`Kredietlimiet: <em>${gKlimiet}</em>`);
     if(safe(fi.probabilityOfDefault)) inzichtItems.push(`Probability of Default: <em>${fi.probabilityOfDefault}</em>`);
@@ -1375,19 +1443,14 @@ function renderDocAnalyseBlok() {
     inzichtItems.push(`Graydon risiconiveau: <em>${gray._risicoNiveau}</em>`);
   }
 
-  // WOZ / Taxatie
-  // Backend levert: adresObject, wozWaarde, taxatiewaarde, peildatum, bouwjaar, oppervlakte, documentType, taxateur
+  // WOZ / Taxatie — backend levert adresObject/wozWaarde/taxatiewaarde/peildatum
   if(aiWoz?.fields) {
     const fi = aiWoz.fields;
-    // adres: probeer adresObject en adres (fallback veld)
     const wozAdres = safe(fi.adresObject) || safe(fi.adres);
     if(wozAdres)                  inzichtItems.push(`Object: <em>${wozAdres}</em>`);
-    // waarde: taxatiewaarde heeft prioriteit, anders wozWaarde, anders generiek waarde veld
     const isTax = fi.documentType === 'taxatie';
-    const wozRawWaarde = isTax ? fi.taxatiewaarde : fi.wozWaarde;
-    const wv = fmtBedrag(wozRawWaarde) || fmtBedrag(fi.waarde);
+    const wv = fmtBedrag(isTax ? fi.taxatiewaarde : fi.wozWaarde) || fmtBedrag(fi.waarde);
     if(wv)                        inzichtItems.push(`${isTax ? 'Taxatiewaarde' : 'WOZ-waarde'}: <em>${wv}</em>`);
-    // peildatum: probeer peildatum en waardeDatum
     const wozDatum = safe(fi.peildatum) || safe(fi.waardeDatum);
     if(wozDatum)                  inzichtItems.push(`Peildatum: <em>${wozDatum}</em>`);
     if(safe(fi.bouwjaar))         inzichtItems.push(`Bouwjaar: <em>${fi.bouwjaar}</em>`);
@@ -1412,18 +1475,15 @@ function renderDocAnalyseBlok() {
     inzichtItems.push('Bestaande hypotheekinschrijving — rangorde aandachtspunt');
   }
 
-  // Jaarrekeningen
-  // Backend kan zowel camelCase (nettoResultaat/eigenVermogen) als lowercase (nettowinst/eigenvermogen) teruggeven
+  // Jaarrekeningen — beide veldnaamconventies (lowercase + camelCase)
   if(aiJaarr?.fields) {
     const fi = aiJaarr.fields;
     if(safe(fi.bedrijfsnaam))    inzichtItems.push(`Onderneming: <em>${fi.bedrijfsnaam}</em>`);
     if(safe(fi.boekjaar))        inzichtItems.push(`Boekjaar: <em>${fi.boekjaar}</em>`);
     if(safe(fi.omzet))           inzichtItems.push(`Omzet: <em>${fmtBedrag(fi.omzet) || fi.omzet}</em>`);
-    // nettowinst (backend lowercase) EN nettoResultaat (camelCase) beide ondersteunen
     const jNettowinst = fi.nettoResultaat || fi.nettowinst;
     if(safe(jNettowinst))        inzichtItems.push(`Nettoresultaat: <em>${fmtBedrag(jNettowinst) || jNettowinst}</em>`);
     if(safe(fi.ebitda))          inzichtItems.push(`EBITDA: <em>${fmtBedrag(fi.ebitda) || fi.ebitda}</em>`);
-    // eigenvermogen (backend lowercase) EN eigenVermogen (camelCase) beide ondersteunen
     const jEv = fi.eigenVermogen || fi.eigenvermogen;
     if(safe(jEv))                inzichtItems.push(`Eigen vermogen: <em>${fmtBedrag(jEv) || jEv}</em>`);
     const jBt = fi.balanstotaal || fi.balansTotaal;
@@ -1462,14 +1522,12 @@ function renderDocAnalyseBlok() {
 
   // ── Aandachtspunten ──────────────────────────────────────────
   const aandachtItems = [];
-  // WOZ/taxatie aanwezig? Check alle mogelijke veldnamen die backend kan leveren
   const wozAanwezig = woz?._definitieveWaarde
     || safe(aiWoz?.fields?.wozWaarde) || safe(aiWoz?.fields?.taxatiewaarde) || safe(aiWoz?.fields?.waarde);
   if(!wozAanwezig)
     aandachtItems.push('Taxatierapport ontbreekt — vereist voor bancaire route');
   else
     aandachtItems.push('Controleer actualiteit taxatierapport (max 6 maanden oud voor bancaire indiening)');
-  // Kadaster hypotheek: check beide veldnaamconventies
   const kadHyp = aiKad?.fields?.hypotheekInschrijving === 'ja'
     || aiKad?.fields?.hypotheekInschrijving === 'Aanwezig'
     || kad?._heeftHypotheek;
