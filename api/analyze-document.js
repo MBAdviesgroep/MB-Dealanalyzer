@@ -44,12 +44,13 @@ Regels:
 `,
  
 graydon: `
-Je analyseert een Graydon / Creditsafe kredietrapport voor kredietbeoordeling.
+Je analyseert een Graydon / Creditsafe kredietrapport.
 
 Geef ALLEEN geldige JSON terug.
 Geen uitleg, geen markdown, geen tekst erbuiten.
 
 Gebruik exact deze structuur:
+
 {
   "summary": "",
   "fields": {
@@ -67,36 +68,32 @@ Gebruik exact deze structuur:
 }
 
 Regels:
-- Gebruik alleen informatie die expliciet in het document staat.
-- Onbekende velden leeg laten.
-- summary = 1 of 2 zakelijke zinnen met de belangrijkste kredietduiding.
-- risks = concrete kredietrisico’s of aandachtspunten.
-- actions = concrete vervolgstappen voor adviseur / kredietbeoordeling.
+- Gebruik alleen data die letterlijk in het document staat
+- Onbekende velden leeg laten
+- Gebruik cijfers als die er zijn (heel belangrijk)
 
-Belangrijk:
-- Als score, kredietlimiet, probability of default of internationale score aanwezig zijn, MOETEN die worden gebruikt.
-- Als het rapport sterk oogt, benoem dat ook gewoon.
-- Noem niet "geen bruikbare kredietinformatie" als score, limiet, rating of ratio's aanwezig zijn.
-- Benoem positieve én negatieve signalen.
-- Als limiet is verlaagd of liquide middelen zijn gedaald, benoem dat als aandachtspunt of risico.
-- Als financiële positie sterk lijkt, benoem dat ook.
-- Baseer je samenvatting op de feitelijke kernpunten uit het rapport.
-- Als numerieke gegevens aanwezig zijn (zoals score, kredietlimiet, eigen vermogen, ratios), gebruik deze expliciet in de summary of inzichten.
-- Noem concrete cijfers waar mogelijk (bijv. score 95, kredietlimiet €220.000).
-- Een algemene term zoals "laag risico" is NIET voldoende als er onderliggende data beschikbaar is.
-- Combineer meerdere datapoints in 1 zin (score + limiet + rating).
+BELANGRIJK:
+- Als een score aanwezig is (bijv. 95), vul die in bij "score"
+- Als kredietlimiet aanwezig is, vul die in bij "kredietlimiet"
+- Als probability of default aanwezig is, vul die in
+- Als internationale score (A/B/C) aanwezig is, vul die in
+- Gebruik NIET alleen "laag risico" als er cijfers beschikbaar zijn
 
-Voorbeelden van risks:
-- Kredietlimiet is recent verlaagd
-- Liquide middelen zijn gedaald
-- Nadere toetsing nodig ondanks sterke score
-- Beperkte operationele informatie beschikbaar
+Voorbeeld:
+- score = 95
+- kredietlimiet = €220.000
+- probabilityOfDefault = 0.03%
+- internationaleScore = A
 
-Voorbeelden van actions:
-- Trend in limietwijzigingen beoordelen
-- Jaarrekeningen vergelijken met kredietrapport
-- Cashpositie nader toetsen
-- Financieringsvoorstel afstemmen op actuele kredietlimiet
+summary:
+- Combineer belangrijkste info in 1 zin
+- Bijvoorbeeld: "Sterk kredietprofiel met score 95 en kredietlimiet €220.000"
+
+risks:
+- Benoem concrete risico’s (bijv. daling liquide middelen, limiet verlaagd)
+
+actions:
+- Benoem concrete vervolgstappen voor adviseur
 `,
  
       woz: `
