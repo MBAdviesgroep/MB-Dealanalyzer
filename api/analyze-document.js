@@ -44,7 +44,7 @@ Regels:
 `,
  
 graydon: `
-Je analyseert een kredietrapport voor kredietbeoordeling.
+Je analyseert een Graydon / Creditsafe kredietrapport voor kredietbeoordeling.
 
 Geef ALLEEN geldige JSON terug.
 Geen uitleg, geen markdown, geen tekst erbuiten.
@@ -55,6 +55,9 @@ Gebruik exact deze structuur:
   "fields": {
     "score": "",
     "risicoklasse": "",
+    "kredietlimiet": "",
+    "probabilityOfDefault": "",
+    "internationaleScore": "",
     "betaalgedrag": "",
     "faillissementen": "",
     "bijzonderheden": ""
@@ -64,31 +67,32 @@ Gebruik exact deze structuur:
 }
 
 Regels:
-- summary = korte zakelijke samenvatting in 1 of 2 zinnen
-- fields alleen invullen als het expliciet in het document staat
-- onbekende velden leeg laten
-- risks = array van korte NL zinnen met concrete kredietrisico’s
-- actions = array van korte NL zinnen met concrete vervolgstappen
+- Gebruik alleen informatie die expliciet in het document staat.
+- Onbekende velden leeg laten.
+- summary = 1 of 2 zakelijke zinnen met de belangrijkste kredietduiding.
+- risks = concrete kredietrisico’s of aandachtspunten.
+- actions = concrete vervolgstappen voor adviseur / kredietbeoordeling.
 
 Belangrijk:
-- benoem negatieve signalen duidelijk als risico
-- als score/rating zwak is, benoem dat expliciet
-- als betaalachterstanden, incasso's, faillissementen of negatieve registraties aanwezig zijn, benoem die expliciet
-- als informatie beperkt is, benoem beperkte transparantie als risico
-- als het rapport juist sterk oogt, mag je ook benoemen dat risico’s beperkt lijken, maar blijf zakelijk
+- Als score, kredietlimiet, probability of default of internationale score aanwezig zijn, MOETEN die worden gebruikt.
+- Als het rapport sterk oogt, benoem dat ook gewoon.
+- Noem niet "geen bruikbare kredietinformatie" als score, limiet, rating of ratio's aanwezig zijn.
+- Benoem positieve én negatieve signalen.
+- Als limiet is verlaagd of liquide middelen zijn gedaald, benoem dat als aandachtspunt of risico.
+- Als financiële positie sterk lijkt, benoem dat ook.
+- Baseer je samenvatting op de feitelijke kernpunten uit het rapport.
 
 Voorbeelden van risks:
-- Verhoogd kredietrisico op basis van lage score of zwakke rating
-- Negatieve betaalhistorie of achterstanden aanwezig
-- Faillissementsverleden of insolventiesignalen vereisen nadere beoordeling
-- Beperkte transparantie in beschikbare kredietinformatie
+- Kredietlimiet is recent verlaagd
+- Liquide middelen zijn gedaald
+- Nadere toetsing nodig ondanks sterke score
+- Beperkte operationele informatie beschikbaar
 
 Voorbeelden van actions:
-- Recente jaarrekeningen opvragen
-- Openstaande schulden en verplichtingen verifiëren
-- Betaalgedrag nader beoordelen
-- Financieringsvoorstel aanpassen op verhoogd risico
-- Extra zekerheden of lagere leverage overwegen
+- Trend in limietwijzigingen beoordelen
+- Jaarrekeningen vergelijken met kredietrapport
+- Cashpositie nader toetsen
+- Financieringsvoorstel afstemmen op actuele kredietlimiet
 `,
  
       woz: `
