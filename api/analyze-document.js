@@ -50,7 +50,6 @@ Geef ALLEEN geldige JSON terug.
 Geen uitleg, geen markdown, geen tekst erbuiten.
 
 Gebruik exact deze structuur:
-
 {
   "summary": "",
   "fields": {
@@ -67,33 +66,51 @@ Gebruik exact deze structuur:
   "actions": []
 }
 
+Belangrijk:
+Lees het document letterlijk uit en haal concrete waarden op als ze aanwezig zijn.
+
+Zoek expliciet naar deze velden:
+- score: vaak een getal zoals 95
+- risicoklasse: bijvoorbeeld A, B, C of "laag risico"
+- kredietlimiet: bijvoorbeeld € 220.000
+- probabilityOfDefault: bijvoorbeeld 0.03%
+- internationaleScore: bijvoorbeeld A
+- betaalgedrag: alleen invullen als expliciet genoemd
+- faillissementen: alleen invullen als expliciet genoemd
+- bijzonderheden: korte opsomming van opvallende punten zoals limietverlaging, daling liquide middelen, recente wijzigingen
+
 Regels:
-- Gebruik alleen data die letterlijk in het document staat
-- Onbekende velden leeg laten
-- Gebruik cijfers als die er zijn (heel belangrijk)
+- Vul een veld in zodra het letterlijk of duidelijk in het document staat
+- Laat onbekende velden leeg
+- Gebruik cijfers exact zoals in het rapport
+- Geef NIET alleen een algemene conclusie als er concrete data aanwezig is
+- Als score, kredietlimiet, internationale score of PD aanwezig zijn, MOETEN die in fields terechtkomen
+- summary moet de belangrijkste conclusie in 1 zin geven met concrete cijfers
+- risks moeten concrete aandachtspunten bevatten
+- actions moeten concrete vervolgstappen bevatten
 
-BELANGRIJK:
-- Als een score aanwezig is (bijv. 95), vul die in bij "score"
-- Als kredietlimiet aanwezig is, vul die in bij "kredietlimiet"
-- Als probability of default aanwezig is, vul die in
-- Als internationale score (A/B/C) aanwezig is, vul die in
-- Gebruik NIET alleen "laag risico" als er cijfers beschikbaar zijn
-
-Voorbeeld:
-- score = 95
-- kredietlimiet = €220.000
-- probabilityOfDefault = 0.03%
-- internationaleScore = A
-
-summary:
-- Combineer belangrijkste info in 1 zin
-- Bijvoorbeeld: "Sterk kredietprofiel met score 95 en kredietlimiet €220.000"
-
-risks:
-- Benoem concrete risico’s (bijv. daling liquide middelen, limiet verlaagd)
-
-actions:
-- Benoem concrete vervolgstappen voor adviseur
+Voorbeeld van goede output:
+{
+  "summary": "Sterk kredietprofiel met score 95, internationale score A en kredietlimiet van € 220.000.",
+  "fields": {
+    "score": "95",
+    "risicoklasse": "A",
+    "kredietlimiet": "€ 220.000",
+    "probabilityOfDefault": "0.03%",
+    "internationaleScore": "A",
+    "betaalgedrag": "",
+    "faillissementen": "",
+    "bijzonderheden": "Kredietlimiet recent verlaagd; liquide middelen gedaald"
+  },
+  "risks": [
+    "Kredietlimiet is recent verlaagd",
+    "Liquide middelen zijn gedaald"
+  ],
+  "actions": [
+    "Vergelijk kredietrapport met jaarrekeningen",
+    "Beoordeel ontwikkeling van limiet en liquiditeit"
+  ]
+}
 `,
  
       woz: `
