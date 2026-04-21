@@ -66,35 +66,52 @@ Gebruik exact deze structuur:
   "actions": []
 }
 
-Belangrijk:
-Lees het document letterlijk uit en haal concrete waarden op als ze aanwezig zijn.
+Zoek expliciet naar deze labels of varianten daarvan:
+- Risico Score
+- Score van vandaag
+- Internationale Score
+- Kredietlimiet
+- Probability of Default
+- Status
+- Score omschrijving
+- Limiet gewijzigd
+- liquide middelen gedaald
+- jaarrekening gegevens
+- Group / groepsstructuur
 
-Zoek expliciet naar deze velden:
-- score: vaak een getal zoals 95
-- risicoklasse: bijvoorbeeld A, B, C of "laag risico"
-- kredietlimiet: bijvoorbeeld € 220.000
-- probabilityOfDefault: bijvoorbeeld 0.03%
-- internationaleScore: bijvoorbeeld A
-- betaalgedrag: alleen invullen als expliciet genoemd
-- faillissementen: alleen invullen als expliciet genoemd
-- bijzonderheden: korte opsomming van opvallende punten zoals limietverlaging, daling liquide middelen, recente wijzigingen
+Belangrijke regels:
+- Als score aanwezig is, zet die in "score"
+- Als internationale score A/B/C aanwezig is, zet die in "internationaleScore"
+- Als kredietlimiet aanwezig is, zet die in "kredietlimiet"
+- Als probability of default aanwezig is, zet die in "probabilityOfDefault"
+- Gebruik concrete cijfers exact zoals ze in het document staan
+- Laat velden alleen leeg als ze echt niet in de tekst staan
+- Geef niet alleen "laag risico" terug als er ook concrete cijfers in het document staan
+- "risicoklasse" mag bijvoorbeeld zijn: laag risico, zeer laag risico, A, B etc.
+- "bijzonderheden" gebruik je voor opvallende punten zoals limietverlaging, daling liquide middelen of recente wijzigingen
 
-Regels:
-- Vul een veld in zodra het letterlijk of duidelijk in het document staat
-- Laat onbekende velden leeg
-- Gebruik cijfers exact zoals in het rapport
-- Geef NIET alleen een algemene conclusie als er concrete data aanwezig is
-- Als score, kredietlimiet, internationale score of PD aanwezig zijn, MOETEN die in fields terechtkomen
-- summary moet de belangrijkste conclusie in 1 zin geven met concrete cijfers
-- risks moeten concrete aandachtspunten bevatten
-- actions moeten concrete vervolgstappen bevatten
+summary:
+- 1 zakelijke zin
+- noem daarin bij voorkeur score + internationale score + kredietlimiet als die beschikbaar zijn
+
+risks:
+- concrete aandachtspunten, bijvoorbeeld:
+  - kredietlimiet recent verlaagd
+  - liquide middelen gedaald
+  - nadere toetsing liquiditeit gewenst
+
+actions:
+- concrete vervolgstappen, bijvoorbeeld:
+  - vergelijk kredietrapport met jaarrekeningen
+  - beoordeel trend in kredietlimiet
+  - toets liquiditeitsontwikkeling nader
 
 Voorbeeld van goede output:
 {
   "summary": "Sterk kredietprofiel met score 95, internationale score A en kredietlimiet van € 220.000.",
   "fields": {
     "score": "95",
-    "risicoklasse": "A",
+    "risicoklasse": "laag risico",
     "kredietlimiet": "€ 220.000",
     "probabilityOfDefault": "0.03%",
     "internationaleScore": "A",
@@ -108,7 +125,7 @@ Voorbeeld van goede output:
   ],
   "actions": [
     "Vergelijk kredietrapport met jaarrekeningen",
-    "Beoordeel ontwikkeling van limiet en liquiditeit"
+    "Beoordeel trend in kredietlimiet en liquiditeit"
   ]
 }
 `,
