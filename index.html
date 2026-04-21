@@ -934,11 +934,16 @@ Gewenste output:
   "summary": "één zin samenvatting van het kredietprofiel",
   "fields": {
     "score": "",
+    "internationaleScore": "",
     "risicoklasse": "",
+    "kredietlimiet": "",
+    "aanbevolenKredietlimiet": "",
+    "probabilityOfDefault": "",
     "betaalgedrag": "",
     "faillissementen": "",
     "incassoCount": "",
-    "aanbevolenKredietlimiet": "",
+    "solvabiliteit": "",
+    "eigenVermogenPercentage": "",
     "bijzonderheden": ""
   },
   "risks": ["risico als string", "..."],
@@ -1002,13 +1007,121 @@ Gewenste output:
 
 // ════════════════════════════════════════════════════
 // ③ CONFIG — LENDERS
+// Bronnen: openbare voorwaarden, marktkennis per april 2026
 // ════════════════════════════════════════════════════
 const LENDERS = [
-  { id:'rnhb', naam:'RNHB', type:'non-bank', beschrijving:'Specialist bijzonder vastgoed, buitenlandse klanten en nichesegmenten.', minLTV:0, maxLTV:85, minDSCR:0.9, minLening:150000, maxLening:5000000, klantTypes:['particulier','bv'], woonlanden:['nl','eu','buiten-eu'], vastgoedTypes:['woning','bedrijfspand','horeca','recreatie','mixed','overig'], trackrecordVereist:false, doelen:['aankoop','herfinanciering','overwaarde'], buitenland:true, horeca:true, recreatie:true },
-  { id:'nibc', naam:'NIBC', type:'non-bank', beschrijving:'Mid-market vastgoed, flexibel bij hogere LTV voor woningverhuur.', minLTV:0, maxLTV:82, minDSCR:1.0, minLening:200000, maxLening:10000000, klantTypes:['particulier','bv'], woonlanden:['nl','eu'], vastgoedTypes:['woning','bedrijfspand','horeca','mixed','overig'], trackrecordVereist:false, doelen:['aankoop','herfinanciering'], buitenland:false, horeca:true, recreatie:false },
-  { id:'llb', naam:'LLB Nederland', type:'non-bank', beschrijving:'Internationale klanten, verhuurde woningen en stabiel buy-to-let.', minLTV:0, maxLTV:80, minDSCR:1.0, minLening:200000, maxLening:5000000, klantTypes:['particulier','bv'], woonlanden:['nl','eu','buiten-eu'], vastgoedTypes:['woning','mixed','overig'], trackrecordVereist:false, doelen:['aankoop','herfinanciering'], buitenland:true, horeca:false, recreatie:false },
-  { id:'ing', naam:'ING Zakelijk', type:'bank', beschrijving:'Bancaire financiering voor woningvastgoed met lage LTV en stabiel profiel.', minLTV:0, maxLTV:75, minDSCR:1.25, minLening:100000, maxLening:5000000, klantTypes:['particulier','bv'], woonlanden:['nl'], vastgoedTypes:['woning','bedrijfspand','mixed'], trackrecordVereist:false, doelen:['aankoop','herfinanciering'], buitenland:false, horeca:false, recreatie:false },
-  { id:'abn', naam:'ABN AMRO Zakelijk', type:'bank', beschrijving:'Woningvastgoed met trackrecord. Lage LTV, stabiel inkomen of huurprofiel.', minLTV:0, maxLTV:75, minDSCR:1.25, minLening:150000, maxLening:7500000, klantTypes:['particulier','bv'], woonlanden:['nl'], vastgoedTypes:['woning','bedrijfspand'], trackrecordVereist:true, doelen:['aankoop','herfinanciering'], buitenland:false, horeca:false, recreatie:false }
+  // ── NON-BANK ─────────────────────────────────────
+  {
+    id:'rnhb', naam:'RNHB', type:'non-bank',
+    beschrijving:'Specialist in bijzonder vastgoed: horeca, recreatie, nichesegmenten en buitenlandse klanten. Hoge flexibiliteit, hogere rente.',
+    maxLTV:85, minDSCR:0.9, minLening:150000, maxLening:5000000,
+    renteIndicatief:'6,5–9,5%',
+    klantTypes:['particulier','bv'], woonlanden:['nl','eu','buiten-eu'],
+    vastgoedTypes:['woning','bedrijfspand','horeca','recreatie','mixed','overig'],
+    trackrecordVereist:false, doelen:['aankoop','herfinanciering','overwaarde'],
+    buitenland:true, horeca:true, recreatie:true,
+    specialisme:'Niche & bijzonder vastgoed'
+  },
+  {
+    id:'nibc', naam:'NIBC', type:'non-bank',
+    beschrijving:'Mid-market buy-to-let specialist. Actief voor woningen en bedrijfspanden met stabiele huurstroom. Hogere LTV mogelijk bij sterk profiel.',
+    maxLTV:82, minDSCR:1.0, minLening:200000, maxLening:10000000,
+    renteIndicatief:'5,5–7,5%',
+    klantTypes:['particulier','bv'], woonlanden:['nl','eu'],
+    vastgoedTypes:['woning','bedrijfspand','horeca','mixed','overig'],
+    trackrecordVereist:false, doelen:['aankoop','herfinanciering'],
+    buitenland:false, horeca:true, recreatie:false,
+    specialisme:'Buy-to-let & mid-market'
+  },
+  {
+    id:'mogelijk', naam:'Mogelijk.nl', type:'non-bank',
+    beschrijving:'Verhuur hypotheek platform voor particulieren. Eenvoudig proces, snel beslissen, gericht op woningverhuur in NL.',
+    maxLTV:80, minDSCR:1.1, minLening:75000, maxLening:2000000,
+    renteIndicatief:'5,8–8,0%',
+    klantTypes:['particulier'], woonlanden:['nl'],
+    vastgoedTypes:['woning','mixed'],
+    trackrecordVereist:false, doelen:['aankoop','herfinanciering'],
+    buitenland:false, horeca:false, recreatie:false,
+    specialisme:'Woningverhuur particulier'
+  },
+  {
+    id:'llb', naam:'LLB Nederland', type:'non-bank',
+    beschrijving:'Sterk voor internationale klanten en NL-expats. Verhuurde woningen en stabiel buy-to-let profiel.',
+    maxLTV:80, minDSCR:1.0, minLening:200000, maxLening:5000000,
+    renteIndicatief:'6,0–8,5%',
+    klantTypes:['particulier','bv'], woonlanden:['nl','eu','buiten-eu'],
+    vastgoedTypes:['woning','mixed','overig'],
+    trackrecordVereist:false, doelen:['aankoop','herfinanciering'],
+    buitenland:true, horeca:false, recreatie:false,
+    specialisme:'Internationale klanten'
+  },
+  {
+    id:'dynamic', naam:'Dynamic Credit', type:'non-bank',
+    beschrijving:'Institutionele verhuurhypotheek voor professionele beleggers met trackrecord. Scherpe rente bij meerdere panden.',
+    maxLTV:78, minDSCR:1.15, minLening:250000, maxLening:15000000,
+    renteIndicatief:'5,2–6,8%',
+    klantTypes:['particulier','bv'], woonlanden:['nl'],
+    vastgoedTypes:['woning','bedrijfspand','mixed'],
+    trackrecordVereist:true, doelen:['aankoop','herfinanciering'],
+    buitenland:false, horeca:false, recreatie:false,
+    specialisme:'Professionele beleggers'
+  },
+  // ── BANK ─────────────────────────────────────────
+  {
+    id:'ing', naam:'ING Zakelijk', type:'bank',
+    beschrijving:'Bancaire financiering voor zakelijk vastgoed met stabiel profiel. Lage LTV-norm, streng dossierbeleid.',
+    maxLTV:75, minDSCR:1.25, minLening:100000, maxLening:5000000,
+    renteIndicatief:'4,8–6,2%',
+    klantTypes:['particulier','bv'], woonlanden:['nl'],
+    vastgoedTypes:['woning','bedrijfspand','mixed'],
+    trackrecordVereist:false, doelen:['aankoop','herfinanciering'],
+    buitenland:false, horeca:false, recreatie:false,
+    specialisme:'Zakelijk vastgoed bank'
+  },
+  {
+    id:'abn', naam:'ABN AMRO Zakelijk', type:'bank',
+    beschrijving:'Woningvastgoed met trackrecord. Vereist aantoonbare verhuurervaring en stabiel inkomensprofiel.',
+    maxLTV:75, minDSCR:1.25, minLening:150000, maxLening:7500000,
+    renteIndicatief:'4,7–6,0%',
+    klantTypes:['particulier','bv'], woonlanden:['nl'],
+    vastgoedTypes:['woning','bedrijfspand'],
+    trackrecordVereist:true, doelen:['aankoop','herfinanciering'],
+    buitenland:false, horeca:false, recreatie:false,
+    specialisme:'Woningvastgoed met trackrecord'
+  },
+  {
+    id:'rabo', naam:'Rabobank Zakelijk', type:'bank',
+    beschrijving:'Agrarisch vastgoed en zakelijk onroerend goed. Sterke voorkeur voor bestaande relaties en NL-gebaseerde ondernemers.',
+    maxLTV:70, minDSCR:1.3, minLening:150000, maxLening:10000000,
+    renteIndicatief:'4,6–5,9%',
+    klantTypes:['particulier','bv'], woonlanden:['nl'],
+    vastgoedTypes:['woning','bedrijfspand','mixed'],
+    trackrecordVereist:true, doelen:['aankoop','herfinanciering'],
+    buitenland:false, horeca:false, recreatie:false,
+    specialisme:'Zakelijk & agrarisch vastgoed'
+  },
+  {
+    id:'volksbank', naam:'de Volksbank (ASN/SNS)', type:'bank',
+    beschrijving:'Duurzaam vastgoed profiel. Actief voor energiezuinige woningverhuur. Strengere LTV maar competitieve rente bij goed profiel.',
+    maxLTV:72, minDSCR:1.25, minLening:100000, maxLening:3000000,
+    renteIndicatief:'4,9–6,1%',
+    klantTypes:['particulier'], woonlanden:['nl'],
+    vastgoedTypes:['woning'],
+    trackrecordVereist:false, doelen:['aankoop','herfinanciering'],
+    buitenland:false, horeca:false, recreatie:false,
+    specialisme:'Duurzame woningverhuur'
+  },
+  {
+    id:'bunq', naam:'bunq (zakelijk)', type:'bank',
+    beschrijving:'Digitale bank met snelle besluitvorming. Geschikt voor particulieren met eenvoudig woningverhuurprofiel en laag risico.',
+    maxLTV:70, minDSCR:1.2, minLening:50000, maxLening:1500000,
+    renteIndicatief:'5,2–6,8%',
+    klantTypes:['particulier'], woonlanden:['nl'],
+    vastgoedTypes:['woning'],
+    trackrecordVereist:false, doelen:['aankoop','herfinanciering'],
+    buitenland:false, horeca:false, recreatie:false,
+    specialisme:'Digitaal & snel'
+  }
 ];
 
 // ════════════════════════════════════════════════════
@@ -1074,7 +1187,20 @@ const RX_KAD_KS=[/(?:koopsom|koopprijs|verkoopsom)[\s:]+€?\s*([\d.,]+)/i];
 const RX_KAD_LDAT=[/(?:datum\s+levering|leveringsdatum|gepasseerd\s+op)[\s:]+(\d{1,2}[-\/]\d{1,2}[-\/]\d{2,4})/i];
 const RX_EUROS=/€\s*([\d.,]+)/g;
 
-function parseBedrag(s){if(!s)return null;let t=s.trim().replace(/\s/g,"");if(/^\d{1,3}(\.\d{3})+$/.test(t)||/^\d{1,3}(\.\d{3})+,\d{2}$/.test(t)){t=t.replace(/\./g,"").replace(",",".");}else{t=t.replace(/,/g,"");}const n=parseFloat(t);return isNaN(n)||n<1000||n>50000000?null:Math.round(n);}
+function parseBedrag(s){
+  if(!s)return null;
+  let t=s.trim().replace(/\s/g,'').replace(/[€$£]/g,'');
+  // NL: punt+komma aanwezig → punt=duizend, komma=decimaal
+  if(/\d\.\d{3},/.test(t)||/\d\.\d{3}$/.test(t)){
+    t=t.replace(/\./g,'').replace(',','.');
+  } else if(/,\d{2}$/.test(t)){
+    t=t.replace(/\./g,'').replace(',','.');
+  } else {
+    t=t.replace(/,/g,'');
+  }
+  const n=parseFloat(t);
+  return isNaN(n)||n<100||n>50000000?null:Math.round(n);
+}
 function norRv(s){if(!s)return null;const m=s.toLowerCase();if(m.includes("besloten")||m==="bv"||m==="b.v.")return"BV";if(m.includes("naamloze")||m==="nv"||m==="n.v.")return"NV";if(m.includes("vof")||m.includes("vennootschap onder firma"))return"VOF";if(m.includes("eenmanszaak"))return"Eenmanszaak";if(m.includes("maatschap"))return"Maatschap";return s.trim();}
 function telKw(t,kws){const l=t.toLowerCase();return kws.reduce((a,k)=>a+(l.match(new RegExp(k.replace(/[.*+?^${}()|[\]\\]/g,"\\$&"),"gi"))||[]).length,0);}
 function matchFirst(t,pats){for(const p of pats){const m=t.match(p);if(m)return m[1]||m[0];}return null;}
@@ -1650,60 +1776,121 @@ function generateAdvice(form, m, risks, sc, doss, readiness) {
 
 // ════════════════════════════════════════════════════
 // ㉑ LENDER MATCH ENGINE
+// Logica: harde blokkers eerst, dan positieve indicatoren
 // ════════════════════════════════════════════════════
 function matchLenders(form, m, sc, doss) {
-  const p=parseInt(form.aantalPanden)||0;
-  const g=getFirstParsed('graydon'), woz=getFirstParsed('woz');
+  const p = parseInt(form.aantalPanden) || 0;
+  const g = getFirstParsed('graydon');
+  const gAi = S.docs.graydon?.files[0]?.ai;
+  const gScore = gAi?.fields?.score ? parseFloat(gAi.fields.score) : null;
+  const gRisico = (gScore !== null && !isNaN(gScore)) ? (gScore >= 70 ? 'laag' : gScore >= 50 ? 'gemiddeld' : 'hoog') : g?._risicoNiveau;
+
   return LENDERS.map(l => {
-    let score = 60;
-    const plus = [], min = [], beperking = [];
+    const plus = [], min = [], blokkers = [];
+    let score = 50; // neutrale basis
+
+    // ── 1. HARDE BLOKKERS — disqualificeren direct ──────────────
+    const hardBlok = [];
+    if(!l.woonlanden.includes(form.woonland))
+      hardBlok.push(`Woonland (${form.woonland === 'buiten-eu' ? 'buiten EU' : 'EU'}) buiten beleid`);
+    if(!l.vastgoedTypes.includes(form.typeVastgoed))
+      hardBlok.push(`${form.typeVastgoed} niet in beleid`);
+    if(!l.klantTypes.includes(form.typeKlant))
+      hardBlok.push(`${form.typeKlant === 'bv' ? 'BV' : 'Particulier'} niet in beleid`);
+    if(!l.doelen.includes(form.doelFinanciering))
+      hardBlok.push(`${form.doelFinanciering} niet geaccepteerd`);
+    if(m.ltv !== null && m.ltv > l.maxLTV)
+      hardBlok.push(`LTV ${fP(m.ltv)} overschrijdt max ${l.maxLTV}%`);
+    if(m.l > 0 && m.l > l.maxLening)
+      hardBlok.push(`Bedrag ${fE(m.l)} boven max ${fE(l.maxLening)}`);
+
+    if(hardBlok.length > 0) {
+      return {...l, score:0, kl:'bad', matchType:'niet', plus:[], min:hardBlok, blokkers:hardBlok, blokkeerd:true};
+    }
+
+    // ── 2. ZACHTE MINPUNTEN ─────────────────────────────────────
+    if(m.dscr !== null && m.dscr < l.minDSCR) {
+      const tekort = (l.minDSCR - m.dscr).toFixed(2);
+      score -= 35;
+      min.push(`DSCR ${m.dscr.toFixed(2)} onder minimum ${l.minDSCR} (tekort ${tekort})`);
+    } else if(m.dscr === null) {
+      score -= 15;
+      min.push('DSCR niet bepaald — geen huurinkomsten ingevoerd');
+    }
+    if(m.l > 0 && m.l < l.minLening) {
+      score -= 25;
+      min.push(`Leningsbedrag ${fE(m.l)} onder minimum ${fE(l.minLening)}`);
+    }
+    if(l.trackrecordVereist && p === 0) {
+      score -= 20;
+      min.push('Trackrecord vereist — geen panden in portefeuille');
+    }
+    if(gRisico === 'hoog') {
+      score -= (l.type === 'bank' ? 30 : 15);
+      min.push(l.type === 'bank' ? 'Hoog kredietrisico — bancaire route vrijwel uitgesloten' : 'Hoog kredietrisico — toelichting vereist');
+    } else if(gRisico === 'gemiddeld' && l.type === 'bank') {
+      score -= 10;
+      min.push('Gemiddeld kredietprofiel — bancaire drempel');
+    }
+
+    // ── 3. PLUSPUNTEN ───────────────────────────────────────────
+    // LTV ruimte
     if(m.ltv !== null) {
-      if(m.ltv > l.maxLTV) { const overshoot = m.ltv - l.maxLTV; score -= Math.min(45, overshoot * 5); min.push(`LTV ${fP(m.ltv)} overschrijdt max ${l.maxLTV}%`); }
-      else if(m.ltv <= l.maxLTV * 0.85) { score += 15; plus.push(`LTV ruim binnen norm (${fP(m.ltv)} ≤ ${l.maxLTV}%)`); }
-      else { score += 5; plus.push(`LTV binnen norm (${fP(m.ltv)} ≤ ${l.maxLTV}%)`); }
-    } else { score -= 5; min.push('LTV onbekend'); }
-    if(m.dscr !== null) {
-      if(m.dscr < l.minDSCR) { score -= 28; min.push(`DSCR ${m.dscr.toFixed(2)} onder minimum ${l.minDSCR}`); }
-      else if(m.dscr >= 1.5) { score += 15; plus.push(`Sterke cashflow DSCR ${m.dscr.toFixed(2)}`); }
-      else if(m.dscr >= 1.25) { score += 8; plus.push(`DSCR voldoende (${m.dscr.toFixed(2)})`); }
-      else { score += 2; plus.push(`DSCR net voldoende (${m.dscr.toFixed(2)})`); }
-    } else { score -= 12; min.push('DSCR niet bepaald (geen huur)'); }
-    if(!l.woonlanden.includes(form.woonland)) { score -= 50; beperking.push('Woonland buiten beleid'); }
-    else if(form.woonland === 'nl') { score += 5; plus.push('NL-ingezetene — standaard'); }
-    else if(l.buitenland) { score += 3; plus.push('Actief voor buitenlandse klanten'); }
-    if(!l.vastgoedTypes.includes(form.typeVastgoed)) { score -= 40; beperking.push(`${form.typeVastgoed} buiten beleid`); }
-    else if(['horeca','recreatie'].includes(form.typeVastgoed)) {
-      if(l[form.typeVastgoed]) { score += 5; plus.push(`${form.typeVastgoed} binnen beleid`); }
-      else { score -= 40; beperking.push(`${form.typeVastgoed} niet toegestaan`); }
+      const marge = l.maxLTV - m.ltv;
+      if(marge >= 20) { score += 20; plus.push(`LTV ${fP(m.ltv)} — ruim binnen norm (max ${l.maxLTV}%)`); }
+      else if(marge >= 10) { score += 12; plus.push(`LTV ${fP(m.ltv)} — binnen norm (max ${l.maxLTV}%)`); }
+      else { score += 4; plus.push(`LTV ${fP(m.ltv)} — krap binnen norm`); }
     }
-    if(m.l > 0) {
-      if(m.l < l.minLening) { score -= 20; min.push(`Bedrag onder min ${fE(l.minLening)}`); }
-      else if(m.l > l.maxLening) { score -= 20; beperking.push(`Bedrag boven max ${fE(l.maxLening)}`); }
-      else { score += 5; plus.push('Lening binnen ticket-range'); }
+
+    // DSCR kwaliteit
+    if(m.dscr !== null && m.dscr >= l.minDSCR) {
+      if(m.dscr >= 1.5) { score += 18; plus.push(`Sterke cashflow — DSCR ${m.dscr.toFixed(2)}`); }
+      else if(m.dscr >= 1.25) { score += 10; plus.push(`DSCR ${m.dscr.toFixed(2)} voldoet aan norm`); }
+      else { score += 4; plus.push(`DSCR ${m.dscr.toFixed(2)} — net voldoende`); }
     }
-    if(!l.klantTypes.includes(form.typeKlant)) { score -= 25; beperking.push('Klanttype niet in beleid'); }
-    if(!l.doelen.includes(form.doelFinanciering)) { score -= 15; min.push('Financieringsdoel buiten beleid'); }
-    else { plus.push(`${form.doelFinanciering} geaccepteerd`); }
-    if(l.trackrecordVereist && p === 0) { score -= 20; beperking.push('Trackrecord vereist — ontbreekt'); }
+
+    // Woonland
+    if(form.woonland === 'nl') { score += 8; plus.push('NL-ingezetene — standaard profiel'); }
+    else if(l.buitenland) { score += 4; plus.push('Actief voor internationale klanten'); }
+
+    // Vastgoed niche bonus
+    if(['horeca','recreatie'].includes(form.typeVastgoed) && l[form.typeVastgoed]) {
+      score += 8; plus.push(`${form.typeVastgoed.charAt(0).toUpperCase()+form.typeVastgoed.slice(1)} binnen specialisme`);
+    }
+
+    // Trackrecord
+    if(p >= 5) { score += 12; plus.push(`${p} panden — sterk trackrecord`); }
     else if(p >= 3) { score += 8; plus.push(`${p} panden — goed trackrecord`); }
     else if(p >= 1) { score += 3; plus.push('Aanwezig trackrecord'); }
-    if(g?._risicoNiveau === 'hoog') {
-      if(l.type === 'bank') { score -= 30; min.push('Graydon hoog risico: bancaire route niet realistisch'); }
-      else { score -= 10; min.push('Graydon hoog risico: toelichting vereist'); }
-    } else if(g?._risicoNiveau === 'laag') { score += 8; plus.push('Goed kredietprofiel (Graydon)'); }
-    else if(!g) { score -= 5; }
-    if(doss) {
-      if(doss.score >= 75 && l.type === 'bank') { score += 8; plus.push('Sterk dossier voor bancaire route'); }
-      else if(doss.score >= 75) { score += 5; plus.push('Sterk dossier'); }
-      else if(doss.score < 30 && l.type === 'bank') { score -= 12; min.push('Dossier te mager voor bank'); }
-      else if(doss.score < 30) { score -= 5; min.push('Matig dossier'); }
+
+    // Kredietprofiel
+    if(gRisico === 'laag') { score += 12; plus.push('Sterk kredietprofiel'); }
+
+    // Dossier
+    if(doss?.score >= 70 && l.type === 'bank') { score += 8; plus.push('Sterk dossier — klaar voor bancaire beoordeling'); }
+    else if(doss?.score >= 70) { score += 5; plus.push('Volledig dossier'); }
+    else if((doss?.score || 0) < 30 && l.type === 'bank') { score -= 10; min.push('Dossier nog onvoldoende voor bancaire route'); }
+
+    // Lening in sweet spot (niet alleen boven minimum)
+    if(m.l >= l.minLening && m.l <= l.maxLening) {
+      const pct = (m.l - l.minLening) / (l.maxLening - l.minLening);
+      if(pct >= 0.05 && pct <= 0.5) { score += 5; plus.push('Leningsbedrag in kernmarkt van deze financier'); }
     }
-    if(woz?._definitieveWaarde && l.type === 'bank') { score += 5; plus.push('Waarde gedocumenteerd — sterk onderdeel'); }
+
     score = Math.max(0, Math.min(100, Math.round(score)));
-    const matchType = score >= 72 ? 'sterk' : score >= 48 ? 'redelijk' : 'zwak';
-    const kl = score >= 72 ? 'good' : score >= 48 ? 'warn' : 'bad';
-    return {...l, score, kl, matchType, plus: plus.slice(0,3), min: min.slice(0,3), beperking: beperking.slice(0,2)};
-  }).sort((a,b) => b.score - a.score);
+    const matchType = score >= 70 ? 'sterk' : score >= 45 ? 'redelijk' : 'zwak';
+    const kl = score >= 70 ? 'good' : score >= 45 ? 'warn' : 'bad';
+
+    return {
+      ...l, score, kl, matchType, blokkeerd: false,
+      plus: plus.slice(0, 3),
+      min: min.slice(0, 3),
+      blokkers: []
+    };
+  })
+  .sort((a, b) => b.score - a.score)
+  // Toon max 5: alle niet-geblokkeerde boven 30%, plus eventueel een "alternatief" geblokkeerde
+  .filter((l, i) => (!l.blokkeerd && l.score >= 30) || i < 2);
 }
 
 // ════════════════════════════════════════════════════
@@ -2149,8 +2336,27 @@ function renderDocAnalyseBlok() {
     return S.docs[type]?.files.find(fe => fe.ai)?.ai || null;
   }
   function fmtBedrag(v) {
-    const n = parseFloat(String(v || '').replace(/[^0-9.]/g, ''));
-    return (!v || isNaN(n)) ? null : '€' + Math.round(n).toLocaleString('nl-NL');
+    if(!v) return null;
+    let s = String(v).trim();
+    // NL-notatie: punt als duizendscheider, komma als decimaal (bijv. "220.000" of "€ 220.000,00")
+    // Verwijder valutasymbolen en spaties
+    s = s.replace(/[€$£\s]/g, '');
+    // Als er punten én komma's zijn: punt = duizend, komma = decimaal
+    if(s.includes('.') && s.includes(',')) {
+      s = s.replace(/\./g, '').replace(',', '.');
+    } else if(s.includes('.')) {
+      // Alleen punt: kijk of het een duizendscheider is (bijv. 220.000) of decimaal (220.50)
+      const parts = s.split('.');
+      if(parts[parts.length-1].length === 3) {
+        // Laatste deel heeft 3 cijfers → duizendscheider
+        s = s.replace(/\./g, '');
+      }
+      // Anders gewoon laten (echte decimaal)
+    } else if(s.includes(',')) {
+      s = s.replace(',', '.');
+    }
+    const n = parseFloat(s);
+    return isNaN(n) ? null : '€' + Math.round(n).toLocaleString('nl-NL');
   }
   function safe(v) { return v && String(v).trim() ? String(v).trim() : null; }
 
@@ -2316,7 +2522,8 @@ function renderDocAnalyseBlok() {
   const kpiKlasse = safe(grayFields.risicoklasse) || safe(grayFields.internationaleScore);
   const kpiLimiet = fmtBedrag(grayFields.kredietlimiet || grayFields.aanbevolenKredietlimiet);
   const kpiPD = safe(grayFields.probabilityOfDefault);
-  const kpiSolv = safe(jaarrFields.solvabiliteit);
+  // Solvabiliteit: eerst uit jaarrekeningen, dan uit Graydon-rapport
+  const kpiSolv = safe(jaarrFields.solvabiliteit) || safe(grayFields.solvabiliteit);
   const kpiBijz = safe(grayFields.bijzonderheden);
 
   const hasKpis = kpiScore || kpiLimiet || kpiPD || kpiSolv;
@@ -2387,22 +2594,62 @@ function renderDocAnalyseBlok() {
     </div>`;
   }
 
-  // ── Vervolgstappen ───────────────────────────────────────────────────────
+  // ── Vervolgstappen — dealspecifiek, max 6, op prioriteit ────────────────
+  // Gebaseerd op: ontbrekende documenten, gedetecteerde conflicten, risico's
+  // NIET op generieke AI-actions (te veel, te algemeen)
   const vervolgItems = [];
-  const seenActions = new Set();
-  [aiKvk, aiGray, aiWoz, aiKad, aiJaarr].forEach(ai => {
-    if(Array.isArray(ai?.actions)) {
-      ai.actions.forEach(a => {
-        const clean = String(a).trim();
-        if(clean && !seenActions.has(clean)) { seenActions.add(clean); vervolgItems.push(clean); }
-      });
+
+  // 1. Harde conflicten eerst — deze blokkeren indiening
+  if(aiKvk?.fields && S.form.typeKlant === 'particulier') {
+    const rv = aiKvk.fields.rechtsvorm || '';
+    if(/bv|vennootschap/i.test(rv)) vervolgItems.push('Verifieer via welke entiteit gefinancierd wordt — KVK toont BV');
+  }
+  const wozAiW = aiWoz?.fields?.taxatiewaarde || aiWoz?.fields?.wozWaarde;
+  const wozNum = wozAiW ? parseBedrag(wozAiW) : null;
+  const mvNum = parseFloat(S.form.marktwaarde) || 0;
+  if(wozNum && mvNum && Math.abs(mvNum - wozNum) / wozNum > 0.15) {
+    vervolgItems.push(`Corrigeer marktwaarde — taxatie (${fmtBedrag(String(wozNum))}) wijkt >15% af van ingevoerde waarde`);
+  }
+
+  // 2. Ontbrekende kritische documenten
+  if(!S.docs.woz.files.length)
+    vervolgItems.push('Taxatierapport opvragen — vereist voor bancaire route (max 6 maanden oud)');
+  if(!S.docs.kadaster.files.length)
+    vervolgItems.push('Kadastraal uittreksel opvragen bij notaris of Kadaster');
+  if(!S.docs.graydon.files.length)
+    vervolgItems.push('Kredietrapport opvragen (Graydon of CreditSafe)');
+  if(S.form.typeKlant === 'bv' && S.docs.kvk.files.length === 0)
+    vervolgItems.push('KVK-uittreksel opvragen (max 3 maanden oud) — vereist bij BV');
+  if(S.form.typeKlant === 'bv' && S.docs.jaarrekeningen.files.length < 2)
+    vervolgItems.push('Minimaal 2 jaar jaarrekeningen opvragen — vereist voor inkomenstoets BV');
+
+  // 3. Specifieke documentbevindingen
+  if(kadHyp)
+    vervolgItems.push('Bestaande hypotheekinschrijving — verifieer omvang en rang via notaris');
+  if(incCount > 0)
+    vervolgItems.push(`${incCount} incasso(s) gedetecteerd — schriftelijke toelichting voor financier voorbereiden`);
+  const taxDatum = safe(aiWoz?.fields?.peildatum) || safe(aiWoz?.fields?.waardeDatum);
+  if(taxDatum) {
+    // Controleer of taxatie ouder dan 6 maanden is
+    const parts = taxDatum.split(/[-\/]/);
+    if(parts.length >= 3) {
+      const taxDate = new Date(parts[2].length===4 ? `${parts[2]}-${parts[1].padStart(2,'0')}-${parts[0].padStart(2,'0')}` : taxDatum);
+      const sixMonthsAgo = new Date(); sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6);
+      if(!isNaN(taxDate) && taxDate < sixMonthsAgo)
+        vervolgItems.push(`Taxatierapport van ${taxDatum} is ouder dan 6 maanden — actualisatie vereist voor bancaire indiening`);
     }
-  });
-  if(!S.docs.woz.files.length)          vervolgItems.push('Taxatierapport opvragen (max 6 maanden oud)');
-  if(!S.docs.kadaster.files.length)     vervolgItems.push('Kadastraal uittreksel opvragen bij notaris of Kadaster');
-  if(S.form.typeKlant==='bv' && S.docs.jaarrekeningen.files.length<2) vervolgItems.push('Minimaal 2 jaar jaarrekeningen opvragen bij klant');
-  if(!S.docs.graydon.files.length)      vervolgItems.push('Kredietrapport opvragen (Graydon/CreditSafe)');
-  if(vervolgItems.length === 0)         vervolgItems.push('Dossier voldoende compleet — voorbereiding indiening kan starten.');
+  }
+  if(safe(aiGray?.fields?.bijzonderheden)?.toLowerCase().includes('verlaagd'))
+    vervolgItems.push('Toelichting voorbereiden op verlaagd kredietlimiet voor financier');
+
+  // Dedupliceer en beperk tot max 6
+  const seen = new Set();
+  const vervolgFinal = vervolgItems.filter(v => {
+    if(seen.has(v)) return false;
+    seen.add(v); return true;
+  }).slice(0, 6);
+
+  const vervolgTonen = vervolgFinal.length > 0 ? vervolgFinal : ['Dossier voldoende compleet — voorbereiding indiening kan starten.'];
 
   // ── Risico prioritering ──────────────────────────────────────────────────
   function risicoLevel(tekst) {
@@ -2444,18 +2691,20 @@ function renderDocAnalyseBlok() {
         <div class="da-kpi-val ${kpiScoreInt?scoreKlasse(kpiScoreInt):''}">${kpiScore}</div>
         ${kpiKlasse?`<div class="da-kpi-sub">${kpiKlasse}</div>`:''}
       </div>`:''}
-      ${kpiLimiet?`<div class="da-kpi">
-        <div class="da-kpi-label">Kredietlimiet</div>
-        <div class="da-kpi-val ${kpiBijz&&kpiBijz.toLowerCase().includes('verlaagd')?'da-warn':''}">${kpiLimiet}</div>
-        ${kpiBijz?`<div class="da-kpi-sub" style="max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${kpiBijz}">${kpiBijz.length>40?kpiBijz.substring(0,38)+'…':kpiBijz}</div>`:''}
-      </div>`:''}
       ${kpiPD?`<div class="da-kpi">
         <div class="da-kpi-label">Prob. of default</div>
         <div class="da-kpi-val ${pdKlasse(kpiPD)}">${kpiPD}</div>
+        <div class="da-kpi-sub">Kans op falen (12 mnd)</div>
       </div>`:''}
       ${kpiSolv?`<div class="da-kpi">
         <div class="da-kpi-label">Solvabiliteit</div>
         <div class="da-kpi-val ${solvKlasse(kpiSolv)}">${kpiSolv}%</div>
+        <div class="da-kpi-sub">Eigen verm. / totale activa</div>
+      </div>`:''}
+      ${kpiLimiet?`<div class="da-kpi">
+        <div class="da-kpi-label">Handelskredietlimiet</div>
+        <div class="da-kpi-val ${kpiBijz&&kpiBijz.toLowerCase().includes('verlaagd')?'da-warn':''}" style="font-size:15px">${kpiLimiet}</div>
+        <div class="da-kpi-sub" style="color:var(--tx4);font-style:italic">Handelskrediet — niet vastgoed</div>
       </div>`:''}
     </div>`:''}
 
@@ -2497,10 +2746,10 @@ function renderDocAnalyseBlok() {
       <span><strong>Let op:</strong> ${aandachtItems.find(a=>a.includes('taxatie')||a.includes('Taxatie'))}</span>
     </div>`:''}
 
-    ${vervolgItems.length>0?`
+    ${vervolgTonen.length>0?`
     <div class="da-vervolg-blok">
       <div class="da-vervolg-head">Vervolgstappen</div>
-      ${vervolgItems.map((i,idx)=>`<div class="da-vervolg-item">
+      ${vervolgTonen.map((i,idx)=>`<div class="da-vervolg-item">
         <span class="da-vervolg-num">${idx+1}.</span>
         <span>${i}</span>
       </div>`).join('')}
@@ -2588,7 +2837,7 @@ function renderMain(m, sc, risks, conf, doss, readiness, acties, lenders, concl)
 
   if(!hasDeal) return `<div class="empty-state"><div class="es-icon">📋</div><div style="font-family:var(--head);font-size:13px;font-weight:600;margin-bottom:5px;color:var(--tx3)">Vul dealgegevens in</div><div style="color:var(--tx4)">Voer aankoopprijs en gewenste lening in om de analyse te starten.</div></div>`;
 
-  const topLenders = lenders.filter(l=>l.score>=30).slice(0,4);
+  const topLenders = lenders.slice(0, 8); // alle lenders, render-logica splitst zelf op geblokkeerd/niet
 
   return `
   <div id="PRINT_HEADER" class="print-header" style="display:none"></div>
@@ -2726,33 +2975,84 @@ function renderMain(m, sc, risks, conf, doss, readiness, acties, lenders, concl)
 
   <div class="section-head" style="margin-top:16px">
     <span class="section-num">5</span><span class="section-head-lbl">Financieringsmogelijkheden</span><div class="section-head-line"></div>
+    ${topLenders.filter(l=>!l.blokkeerd).length>0?`<span class="bdg" style="background:var(--bl-bg);color:var(--bl);border:1px solid var(--bl-bd)">${topLenders.filter(l=>!l.blokkeerd).length} in aanmerking</span>`:''}
   </div>
 
-  ${topLenders.length===0
-    ?`<div class="acard"><div style="font-size:11.5px;color:var(--tx4);font-style:italic">Geen geldverstrekkers voldoen aan huidige parameters.</div></div>`
-    :topLenders.map(l=>{
-      const clr=l.score>=72?'var(--gn)':l.score>=48?'var(--wn)':'var(--rk)';
-      return `<div class="lender-card">
+  ${topLenders.filter(l=>!l.blokkeerd).length===0
+    ?`<div class="acard"><div style="text-align:center;padding:16px;color:var(--rk);font-size:12px;font-weight:600">Geen financiers voldoen aan de huidige parameters.<br><span style="font-size:11px;color:var(--tx4);font-weight:400">Pas LTV, lening of huurinkomsten aan om opties te openen.</span></div></div>`
+    :topLenders.filter(l=>!l.blokkeerd).map((l, idx)=>{
+      const clr = l.score>=70?'var(--gn)':l.score>=45?'var(--wn)':'var(--rk)';
+      const isTop = idx===0;
+      // Bouw een dealspecifieke motivatie
+      const dealMotivatie = [];
+      if(m.ltv!==null) dealMotivatie.push(`LTV ${fP(m.ltv)} van max ${l.maxLTV}%`);
+      if(m.dscr!==null) dealMotivatie.push(`DSCR ${m.dscr.toFixed(2)} (min ${l.minDSCR})`);
+      if(m.l>0) dealMotivatie.push(`${fE(m.l)} past in ticket ${fE(l.minLening)}–${fE(l.maxLening)}`);
+      return `<div class="lender-card" style="${isTop?'border-color:var(--bl);border-width:1.5px':''}">
         <div class="lender-card-header">
-          <span class="lender-badge-type ${l.type}">${l.type==='bank'?'Bank':'Non-bank'}</span>
-          <span class="lender-name">${l.naam}</span>
-          <div class="lender-score-wrap">
-            <div class="lender-score" style="color:${clr}">${l.score}<span style="font-size:10px;color:var(--tx4)">%</span></div>
-            <div class="lender-score-lbl" style="color:${clr}">match</div>
-            <div class="lender-bar-outer"><div class="lender-bar-fill" style="width:${l.score}%;background:${clr}"></div></div>
+          <div style="flex:1;min-width:0">
+            <div style="display:flex;align-items:center;gap:7px;margin-bottom:3px">
+              <span class="lender-badge-type ${l.type}">${l.type==='bank'?'Bank':'Non-bank'}</span>
+              <span class="lender-name">${l.naam}</span>
+              ${isTop?`<span style="font-size:9px;font-weight:700;padding:2px 7px;border-radius:20px;background:var(--bl-bg);color:var(--bl);border:1px solid var(--bl-bd)">Beste match</span>`:''}
+            </div>
+            <div style="font-size:10px;color:var(--tx4)">${l.specialisme}</div>
+          </div>
+          <div style="text-align:right;flex-shrink:0">
+            <div style="font-size:24px;font-weight:800;line-height:1;color:${clr}">${l.score}<span style="font-size:11px;color:var(--tx4);font-weight:400">%</span></div>
+            <div style="font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:${clr}">${l.matchType==='sterk'?'Sterke match':l.matchType==='redelijk'?'Redelijke match':'Zwakke match'}</div>
           </div>
         </div>
-        <div class="lender-descr">${l.beschrijving}</div>
-        <div class="lender-card-body">
-          <div><div class="lender-col-lbl">Pluspunten</div>${l.plus.map(p=>`<div class="lender-point plus">${p}</div>`).join('')}</div>
-          <div><div class="lender-col-lbl">Aandachtspunten</div>${l.min.map(p=>`<div class="lender-point min">${p}</div>`).join('')}${l.beperking.map(p=>`<div class="lender-point min">${p}</div>`).join('')}</div>
+
+        <div style="padding:8px 14px;background:var(--bg);border-bottom:1px solid var(--bd-l);font-size:10.5px;color:var(--tx3);font-style:italic">${l.beschrijving}</div>
+
+        ${l.renteIndicatief?`<div style="padding:7px 14px;border-bottom:1px solid var(--bd-l);display:flex;align-items:center;gap:8px">
+          <span style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--tx4)">Indicatieve rente</span>
+          <span style="font-size:13px;font-weight:700;color:var(--tx2)">${l.renteIndicatief}</span>
+          <span style="font-size:9px;color:var(--tx4);margin-left:auto;font-style:italic">marktindicatie — geen offerte</span>
+        </div>`:''}
+
+        <div style="padding:10px 14px;display:grid;grid-template-columns:1fr 1fr;gap:12px">
+          <div>
+            <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--gn);margin-bottom:5px">Waarom deze deal past</div>
+            ${l.plus.map(p=>`<div style="display:flex;gap:5px;font-size:11px;color:var(--tx2);padding:2px 0"><span style="color:var(--gn);flex-shrink:0">✓</span>${p}</div>`).join('')}
+          </div>
+          <div>
+            <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--wn);margin-bottom:5px">Aandachtspunten</div>
+            ${l.min.length>0
+              ? l.min.map(p=>`<div style="display:flex;gap:5px;font-size:11px;color:var(--tx2);padding:2px 0"><span style="color:var(--wn);flex-shrink:0">−</span>${p}</div>`).join('')
+              : `<div style="font-size:11px;color:var(--tx4);font-style:italic">Geen bezwaren voor deze deal</div>`
+            }
+          </div>
         </div>
-        <div style="padding:6px 13px 10px;display:flex;gap:6px;align-items:center">
-          <span class="lender-match-type ${l.matchType}">${l.matchType==='sterk'?'Sterke match':l.matchType==='redelijk'?'Redelijke match':'Zwakke match'}</span>
-          <span style="font-size:9px;color:var(--tx4);font-family:var(--mono)">LTV max ${l.maxLTV}% · DSCR min ${l.minDSCR} · ${fE(l.minLening)}–${fE(l.maxLening)}</span>
+
+        <div style="padding:6px 14px 10px;border-top:1px solid var(--bd-l);display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+          ${dealMotivatie.map(d=>`<span style="font-size:9px;background:var(--bg2);color:var(--tx3);padding:2px 7px;border-radius:20px">${d}</span>`).join('')}
         </div>
       </div>`;
     }).join('')}
+
+  ${topLenders.filter(l=>l.blokkeerd).length>0?`
+  <div style="margin-top:8px">
+    <details>
+      <summary style="font-size:10.5px;color:var(--tx4);cursor:pointer;padding:6px 2px;user-select:none">
+        ${topLenders.filter(l=>l.blokkeerd).length} financier(s) buiten criteria — toon details
+      </summary>
+      <div style="margin-top:6px;display:flex;flex-direction:column;gap:6px">
+      ${topLenders.filter(l=>l.blokkeerd).map(l=>`
+        <div style="background:var(--bg);border:1px solid var(--bd);border-radius:var(--r-sm);padding:10px 14px;display:flex;align-items:flex-start;gap:12px">
+          <div style="flex:1">
+            <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px">
+              <span class="lender-badge-type ${l.type}">${l.type==='bank'?'Bank':'Non-bank'}</span>
+              <span style="font-size:12px;font-weight:600;color:var(--tx3)">${l.naam}</span>
+            </div>
+            <div style="font-size:10.5px;color:var(--rk)">${l.min.slice(0,2).join(' · ')}</div>
+          </div>
+          <span style="font-size:9px;font-weight:700;padding:2px 8px;border-radius:20px;background:var(--rk-bg);color:var(--rk);border:1px solid var(--rk-bd);flex-shrink:0">Buiten criteria</span>
+        </div>`).join('')}
+      </div>
+    </details>
+  </div>`:''}
 
   <div class="section-head" style="margin-top:16px">
     <span class="section-num">6</span><span class="section-head-lbl">Intern Oordeel</span><div class="section-head-line"></div>
