@@ -818,6 +818,141 @@ textarea.modal-ta:focus{border-color:var(--bl);box-shadow:0 0 0 3px rgba(43,95,1
     margin-top:12px;
   }
 }
+@media print {
+  body.pdf-mode .hdr,
+  body.pdf-mode .app-shell {
+    display: none !important;
+  }
+
+  body.pdf-mode #PDF_REPORT {
+    display: block !important;
+    position: static !important;
+    width: 100% !important;
+    overflow: visible !important;
+  }
+}
+.memo-page {
+  width: 210mm;
+  min-height: 297mm;
+  background: white;
+  margin: 0 auto;
+  padding: 18mm 16mm;
+  box-sizing: border-box;
+  font-family: 'Inter', sans-serif;
+  color: #1f2937;
+}
+
+.memo-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  background: linear-gradient(90deg, #1f4e79, #2b5f8e);
+  color: white;
+  padding: 14px 18px;
+  border-radius: 10px;
+  margin-bottom: 22px;
+}
+
+.memo-brand {
+  font-size: 22px;
+  font-weight: 800;
+  line-height: 1.1;
+}
+
+.memo-sub {
+  font-size: 12px;
+  opacity: 0.9;
+  margin-top: 4px;
+}
+
+.memo-header-right {
+  font-size: 12px;
+  line-height: 1.6;
+  text-align: right;
+}
+
+.memo-title {
+  font-size: 30px;
+  font-weight: 800;
+  color: #1f4e79;
+  margin: 0 0 10px 0;
+}
+
+.memo-intro {
+  font-size: 14px;
+  line-height: 1.6;
+  margin-bottom: 20px;
+}
+
+.memo-section-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: #1f4e79;
+  margin-bottom: 10px;
+}
+
+.memo-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 22px;
+}
+
+.memo-table td {
+  border: 1px solid #d9e1ea;
+  padding: 10px 12px;
+  font-size: 13px;
+}
+
+.memo-table td:nth-child(1),
+.memo-table td:nth-child(3) {
+  background: #f3f6f9;
+  font-weight: 700;
+  width: 22%;
+}
+
+.memo-kpi-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+}
+
+.memo-kpi {
+  border: 2px solid #d9e1ea;
+  border-radius: 12px;
+  padding: 14px 16px;
+}
+
+.memo-kpi-label {
+  font-size: 11px;
+  font-weight: 700;
+  color: #6b7280;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+
+.memo-kpi-value {
+  font-size: 28px;
+  font-weight: 800;
+  color: #166534;
+  line-height: 1;
+}
+@media print {
+  .btn,
+  #TOAST {
+    display: none !important;
+  }
+
+  body.pdf-mode::after {
+    display: none !important;
+    content: none !important;
+  }
+
+  .memo-page {
+    min-height: auto !important;
+    height: auto !important;
+    page-break-after: auto !important;
+  }
+}
 </style>
 </head>
 <body>
@@ -871,6 +1006,8 @@ textarea.modal-ta:focus{border-color:var(--bl);box-shadow:0 0 0 3px rgba(43,95,1
   <div class="panel-main" id="PANEL_MAIN"></div>
   <div class="panel-aside" id="PANEL_ASIDE"></div>
 </div>
+
+<div id="PDF_REPORT" style="display:none;background:#fff;position:fixed;top:0;left:0;right:0;bottom:0;z-index:9999;overflow-y:auto;"></div>
 
 <script>
 'use strict';
@@ -1010,117 +1147,242 @@ Gewenste output:
 // Bronnen: openbare voorwaarden, marktkennis per april 2026
 // ════════════════════════════════════════════════════
 const LENDERS = [
-  // ── NON-BANK ─────────────────────────────────────
+
+  // ════ NON-BANK SPECIALISTEN ════════════════════════
+
   {
-    id:'rnhb', naam:'RNHB', type:'non-bank',
-    beschrijving:'Specialist in bijzonder vastgoed: horeca, recreatie, nichesegmenten en buitenlandse klanten. Hoge flexibiliteit, hogere rente.',
+    id:'rnhb', naam:'RNHB', type:'non-bank', label:'Niche & bijzonder vastgoed',
+    beschrijving:'Marktleider in bijzonder vastgoed: horeca, recreatie, nichesegmenten en buitenlandse klanten. Hoge acceptatieflexibiliteit.',
     maxLTV:85, minDSCR:0.9, minLening:150000, maxLening:5000000,
     renteIndicatief:'6,5–9,5%',
     klantTypes:['particulier','bv'], woonlanden:['nl','eu','buiten-eu'],
-    vastgoedTypes:['woning','bedrijfspand','horeca','recreatie','mixed','overig'],
+    vastgoedTypes:['woning','bedrijfspand','horeca','recreatie','mixed','overig','appartementen'],
     trackrecordVereist:false, doelen:['aankoop','herfinanciering','overwaarde'],
     buitenland:true, horeca:true, recreatie:true,
     specialisme:'Niche & bijzonder vastgoed'
   },
   {
-    id:'nibc', naam:'NIBC', type:'non-bank',
-    beschrijving:'Mid-market buy-to-let specialist. Actief voor woningen en bedrijfspanden met stabiele huurstroom. Hogere LTV mogelijk bij sterk profiel.',
+    id:'nibc', naam:'NIBC', type:'non-bank', label:'Buy-to-let & mid-market',
+    beschrijving:'Mid-market buy-to-let specialist voor woningen en bedrijfspanden. Hogere LTV mogelijk bij sterk profiel.',
     maxLTV:82, minDSCR:1.0, minLening:200000, maxLening:10000000,
     renteIndicatief:'5,5–7,5%',
     klantTypes:['particulier','bv'], woonlanden:['nl','eu'],
-    vastgoedTypes:['woning','bedrijfspand','horeca','mixed','overig'],
+    vastgoedTypes:['woning','bedrijfspand','horeca','mixed','overig','appartementen'],
     trackrecordVereist:false, doelen:['aankoop','herfinanciering'],
     buitenland:false, horeca:true, recreatie:false,
     specialisme:'Buy-to-let & mid-market'
   },
   {
-    id:'mogelijk', naam:'Mogelijk.nl', type:'non-bank',
-    beschrijving:'Verhuur hypotheek platform voor particulieren. Eenvoudig proces, snel beslissen, gericht op woningverhuur in NL.',
+    id:'mogelijk', naam:'Mogelijk.nl', type:'non-bank', label:'Woningverhuur particulier',
+    beschrijving:'Online verhuurhypotheekplatform voor particulieren. Snel beslissen, laagdrempelig instapbedrag, gericht op NL woningverhuur.',
     maxLTV:80, minDSCR:1.1, minLening:75000, maxLening:2000000,
     renteIndicatief:'5,8–8,0%',
     klantTypes:['particulier'], woonlanden:['nl'],
-    vastgoedTypes:['woning','mixed'],
+    vastgoedTypes:['woning','mixed','appartementen'],
     trackrecordVereist:false, doelen:['aankoop','herfinanciering'],
     buitenland:false, horeca:false, recreatie:false,
     specialisme:'Woningverhuur particulier'
   },
   {
-    id:'llb', naam:'LLB Nederland', type:'non-bank',
-    beschrijving:'Sterk voor internationale klanten en NL-expats. Verhuurde woningen en stabiel buy-to-let profiel.',
+    id:'llb', naam:'LLB Nederland', type:'non-bank', label:'Internationale & expat klanten',
+    beschrijving:'Gespecialiseerd in NL-expats en EU/buiten-EU ingezetenen. Verhuurde woningen en stabiel buy-to-let profiel.',
     maxLTV:80, minDSCR:1.0, minLening:200000, maxLening:5000000,
     renteIndicatief:'6,0–8,5%',
     klantTypes:['particulier','bv'], woonlanden:['nl','eu','buiten-eu'],
-    vastgoedTypes:['woning','mixed','overig'],
+    vastgoedTypes:['woning','mixed','overig','appartementen'],
     trackrecordVereist:false, doelen:['aankoop','herfinanciering'],
     buitenland:true, horeca:false, recreatie:false,
     specialisme:'Internationale klanten'
   },
   {
-    id:'dynamic', naam:'Dynamic Credit', type:'non-bank',
-    beschrijving:'Institutionele verhuurhypotheek voor professionele beleggers met trackrecord. Scherpe rente bij meerdere panden.',
+    id:'dynamic', naam:'Dynamic Credit', type:'non-bank', label:'Professionele beleggers',
+    beschrijving:'Institutionele verhuurhypotheek voor professionele beleggers met trackrecord en portefeuille. Scherpe rente bij meerdere panden.',
     maxLTV:78, minDSCR:1.15, minLening:250000, maxLening:15000000,
     renteIndicatief:'5,2–6,8%',
     klantTypes:['particulier','bv'], woonlanden:['nl'],
-    vastgoedTypes:['woning','bedrijfspand','mixed'],
+    vastgoedTypes:['woning','bedrijfspand','mixed','appartementen'],
     trackrecordVereist:true, doelen:['aankoop','herfinanciering'],
     buitenland:false, horeca:false, recreatie:false,
     specialisme:'Professionele beleggers'
   },
-  // ── BANK ─────────────────────────────────────────
   {
-    id:'ing', naam:'ING Zakelijk', type:'bank',
+    id:'munt', naam:'Munt Hypotheken', type:'non-bank', label:'Woningverhuur & buy-to-let',
+    beschrijving:'Verhuurhypotheek voor woningen en appartementen. Solide propositie voor particulieren met eenvoudig verhuurprofiel.',
+    maxLTV:80, minDSCR:1.1, minLening:100000, maxLening:3000000,
+    renteIndicatief:'5,6–7,8%',
+    klantTypes:['particulier'], woonlanden:['nl'],
+    vastgoedTypes:['woning','appartementen','mixed'],
+    trackrecordVereist:false, doelen:['aankoop','herfinanciering'],
+    buitenland:false, horeca:false, recreatie:false,
+    specialisme:'Woningverhuur particulier'
+  },
+  {
+    id:'hanseatic', naam:'Hanseatic Bank', type:'non-bank', label:'Zakelijk vastgoed',
+    beschrijving:'Zakelijke vastgoedfinancieringen voor bedrijfspanden en gemengd gebruik. Actief in NL voor MKB-segment.',
+    maxLTV:75, minDSCR:1.2, minLening:100000, maxLening:5000000,
+    renteIndicatief:'5,9–8,2%',
+    klantTypes:['bv'], woonlanden:['nl','eu'],
+    vastgoedTypes:['bedrijfspand','mixed','overig'],
+    trackrecordVereist:false, doelen:['aankoop','herfinanciering'],
+    buitenland:false, horeca:false, recreatie:false,
+    specialisme:'Zakelijk MKB vastgoed'
+  },
+  {
+    id:'thuisborg', naam:'Thuisborg / VastgoedBelang fonds', type:'non-bank', label:'Kleine verhuurportefeuilles',
+    beschrijving:'Flexibel fonds voor kleinere verhuurportefeuilles en starters in vastgoedbelegging. Snelle doorlooptijd.',
+    maxLTV:75, minDSCR:1.1, minLening:50000, maxLening:1500000,
+    renteIndicatief:'6,5–9,0%',
+    klantTypes:['particulier','bv'], woonlanden:['nl'],
+    vastgoedTypes:['woning','appartementen'],
+    trackrecordVereist:false, doelen:['aankoop','herfinanciering'],
+    buitenland:false, horeca:false, recreatie:false,
+    specialisme:'Starters & kleine portefeuilles'
+  },
+  {
+    id:'sr', naam:'Stater / SR Finance', type:'non-bank', label:'Zakelijk & gemengd',
+    beschrijving:'Non-bank partij gericht op zakelijk en gemengd vastgoed in het MKB-segment. Maatwerk financieringsstructuren.',
+    maxLTV:80, minDSCR:1.05, minLening:150000, maxLening:7500000,
+    renteIndicatief:'6,0–8,5%',
+    klantTypes:['bv','particulier'], woonlanden:['nl'],
+    vastgoedTypes:['bedrijfspand','mixed','woning','overig'],
+    trackrecordVereist:false, doelen:['aankoop','herfinanciering','overwaarde'],
+    buitenland:false, horeca:false, recreatie:false,
+    specialisme:'MKB zakelijk & gemengd'
+  },
+  {
+    id:'triodos', naam:'Triodos Bank', type:'non-bank', label:'Duurzaam vastgoed',
+    beschrijving:'Duurzame vastgoedfinancieringen. Actief voor energiezuinige objecten (A/B-label), maatschappelijk vastgoed en biologische agrarische sector.',
+    maxLTV:75, minDSCR:1.2, minLening:200000, maxLening:8000000,
+    renteIndicatief:'5,3–7,0%',
+    klantTypes:['particulier','bv'], woonlanden:['nl'],
+    vastgoedTypes:['woning','bedrijfspand','mixed','overig'],
+    trackrecordVereist:false, doelen:['aankoop','herfinanciering'],
+    buitenland:false, horeca:false, recreatie:false,
+    specialisme:'Duurzaam & maatschappelijk vastgoed'
+  },
+  {
+    id:'westlandutrecht', naam:'Westland Utrecht', type:'non-bank', label:'Verhuurhypotheek woning',
+    beschrijving:'Verhuurhypotheek voor bestaande woningen in NL. Competitieve rente voor eenvoudige profielen met stabiel huurinkomen.',
+    maxLTV:80, minDSCR:1.1, minLening:75000, maxLening:2500000,
+    renteIndicatief:'5,5–7,5%',
+    klantTypes:['particulier'], woonlanden:['nl'],
+    vastgoedTypes:['woning','appartementen'],
+    trackrecordVereist:false, doelen:['aankoop','herfinanciering'],
+    buitenland:false, horeca:false, recreatie:false,
+    specialisme:'Verhuurhypotheek woning NL'
+  },
+  {
+    id:'annexum', naam:'Annexum / Privium', type:'non-bank', label:'Commercieel vastgoed fonds',
+    beschrijving:'Fondsstructuur voor commercieel vastgoed en grotere beleggingsportefeuilles. Actief in winkelruimte, kantoren en gemengd gebruik.',
+    maxLTV:70, minDSCR:1.25, minLening:500000, maxLening:20000000,
+    renteIndicatief:'5,8–7,5%',
+    klantTypes:['bv'], woonlanden:['nl'],
+    vastgoedTypes:['bedrijfspand','mixed','overig','horeca'],
+    trackrecordVereist:true, doelen:['aankoop','herfinanciering'],
+    buitenland:false, horeca:true, recreatie:false,
+    specialisme:'Commercieel & fonds vastgoed'
+  },
+
+  // ════ BANKEN ═══════════════════════════════════════
+
+  {
+    id:'ing', naam:'ING Zakelijk', type:'bank', label:'Zakelijk vastgoed bank',
     beschrijving:'Bancaire financiering voor zakelijk vastgoed met stabiel profiel. Lage LTV-norm, streng dossierbeleid.',
     maxLTV:75, minDSCR:1.25, minLening:100000, maxLening:5000000,
     renteIndicatief:'4,8–6,2%',
     klantTypes:['particulier','bv'], woonlanden:['nl'],
-    vastgoedTypes:['woning','bedrijfspand','mixed'],
+    vastgoedTypes:['woning','bedrijfspand','mixed','appartementen'],
     trackrecordVereist:false, doelen:['aankoop','herfinanciering'],
     buitenland:false, horeca:false, recreatie:false,
     specialisme:'Zakelijk vastgoed bank'
   },
   {
-    id:'abn', naam:'ABN AMRO Zakelijk', type:'bank',
+    id:'abn', naam:'ABN AMRO Zakelijk', type:'bank', label:'Woningvastgoed & stabiel huurprofiel',
     beschrijving:'Woningvastgoed met trackrecord. Vereist aantoonbare verhuurervaring en stabiel inkomensprofiel.',
     maxLTV:75, minDSCR:1.25, minLening:150000, maxLening:7500000,
     renteIndicatief:'4,7–6,0%',
     klantTypes:['particulier','bv'], woonlanden:['nl'],
-    vastgoedTypes:['woning','bedrijfspand'],
+    vastgoedTypes:['woning','bedrijfspand','appartementen'],
     trackrecordVereist:true, doelen:['aankoop','herfinanciering'],
     buitenland:false, horeca:false, recreatie:false,
     specialisme:'Woningvastgoed met trackrecord'
   },
   {
-    id:'rabo', naam:'Rabobank Zakelijk', type:'bank',
-    beschrijving:'Agrarisch vastgoed en zakelijk onroerend goed. Sterke voorkeur voor bestaande relaties en NL-gebaseerde ondernemers.',
+    id:'rabo', naam:'Rabobank Zakelijk', type:'bank', label:'Zakelijk & agrarisch vastgoed',
+    beschrijving:'Zakelijk onroerend goed en agrarisch vastgoed. Sterke voorkeur voor bestaande relaties en NL-gebaseerde ondernemers.',
     maxLTV:70, minDSCR:1.3, minLening:150000, maxLening:10000000,
     renteIndicatief:'4,6–5,9%',
     klantTypes:['particulier','bv'], woonlanden:['nl'],
-    vastgoedTypes:['woning','bedrijfspand','mixed'],
+    vastgoedTypes:['woning','bedrijfspand','mixed','appartementen'],
     trackrecordVereist:true, doelen:['aankoop','herfinanciering'],
     buitenland:false, horeca:false, recreatie:false,
     specialisme:'Zakelijk & agrarisch vastgoed'
   },
   {
-    id:'volksbank', naam:'de Volksbank (ASN/SNS)', type:'bank',
+    id:'volksbank', naam:'de Volksbank (ASN/SNS)', type:'bank', label:'Duurzame woningverhuur',
     beschrijving:'Duurzaam vastgoed profiel. Actief voor energiezuinige woningverhuur. Strengere LTV maar competitieve rente bij goed profiel.',
     maxLTV:72, minDSCR:1.25, minLening:100000, maxLening:3000000,
     renteIndicatief:'4,9–6,1%',
     klantTypes:['particulier'], woonlanden:['nl'],
-    vastgoedTypes:['woning'],
+    vastgoedTypes:['woning','appartementen'],
     trackrecordVereist:false, doelen:['aankoop','herfinanciering'],
     buitenland:false, horeca:false, recreatie:false,
     specialisme:'Duurzame woningverhuur'
   },
   {
-    id:'bunq', naam:'bunq (zakelijk)', type:'bank',
+    id:'bunq', naam:'bunq (zakelijk)', type:'bank', label:'Digitaal & snel',
     beschrijving:'Digitale bank met snelle besluitvorming. Geschikt voor particulieren met eenvoudig woningverhuurprofiel en laag risico.',
     maxLTV:70, minDSCR:1.2, minLening:50000, maxLening:1500000,
     renteIndicatief:'5,2–6,8%',
     klantTypes:['particulier'], woonlanden:['nl'],
-    vastgoedTypes:['woning'],
+    vastgoedTypes:['woning','appartementen'],
     trackrecordVereist:false, doelen:['aankoop','herfinanciering'],
     buitenland:false, horeca:false, recreatie:false,
     specialisme:'Digitaal & snel'
+  },
+  {
+    id:'knab', naam:'Knab Zakelijk', type:'bank', label:'Kleine portefeuilles & ZZP',
+    beschrijving:'Toegankelijke bancaire financiering voor ZZP-ers en kleine ondernemers met vastgoedbelegging. Flexibele acceptatie.',
+    maxLTV:72, minDSCR:1.2, minLening:75000, maxLening:2000000,
+    renteIndicatief:'5,0–6,5%',
+    klantTypes:['particulier','bv'], woonlanden:['nl'],
+    vastgoedTypes:['woning','appartementen'],
+    trackrecordVereist:false, doelen:['aankoop','herfinanciering'],
+    buitenland:false, horeca:false, recreatie:false,
+    specialisme:'ZZP & kleine beleggers'
+  },
+  {
+    id:'regiobank', naam:'RegioBank', type:'bank', label:'Lokaal & regionaal vastgoed',
+    beschrijving:'Regionaal georiënteerde bank. Actief voor woningverhuur in NL, persoonlijk contact en maatwerk voor lokale beleggers.',
+    maxLTV:70, minDSCR:1.25, minLening:75000, maxLening:1500000,
+    renteIndicatief:'5,1–6,4%',
+    klantTypes:['particulier'], woonlanden:['nl'],
+    vastgoedTypes:['woning','appartementen'],
+    trackrecordVereist:false, doelen:['aankoop','herfinanciering'],
+    buitenland:false, horeca:false, recreatie:false,
+    specialisme:'Lokaal & regionaal'
+  },
+  {
+    id:'obv', naam:'OBV (Obligatiebeurs Vastgoed)', type:'non-bank', label:'Alternatieve financiering',
+    beschrijving:'Alternatieve vastgoedfinancier via obligatiestructuur. Actief voor commercieel vastgoed en projectfinanciering bij grotere deals.',
+    maxLTV:75, minDSCR:1.1, minLening:500000, maxLening:25000000,
+    renteIndicatief:'6,5–9,5%',
+    klantTypes:['bv'], woonlanden:['nl'],
+    vastgoedTypes:['bedrijfspand','mixed','overig','horeca','recreatie'],
+    trackrecordVereist:true, doelen:['aankoop','herfinanciering','overwaarde'],
+    buitenland:false, horeca:true, recreatie:true,
+    specialisme:'Alternatief & projectfinancierig'
+  },
+  {
+    id:'caerus', naam:'Caerus Capital', type:'non-bank', label:'High-yield vastgoed',
+    beschrijving:'Gespecialiseerd in hogere LTV-financieringen en complexe deals. Actief voor bijzondere objecten en herstructureringen.',
+    maxLTV:88, minDSCR:0.85, minLening:200000, maxLening:10000000,
+    renteIndicatief:'7,5–11,0%',
+    klantTypes:['particulier','bv'], woonlanden:['nl','eu','buiten-eu'],
+    vastgoedTypes:['woning','bedrijfspand','horeca','recreatie','mixed','overig','appartementen'],
+    trackrecordVereist:false, doelen:['aankoop','herfinanciering','overwaarde'],
+    buitenland:true, horeca:true, recreatie:true,
+    specialisme:'High-yield & complexe deals'
   }
 ];
 
@@ -1392,7 +1654,7 @@ const S = {
     aankoopprijs:'', marktwaarde:'', huurPerMaand:'', huurType:'bestaand',
     typeVastgoed:'woning', gewensteLening:'', eigenInbreng:'',
     rente:'0.05', looptijd:'20', metAflossing:'nee',
-    dossiernr:'', adviseur:'', notitie:''
+    dossiernr:'', adviseur:'', notitie:'', adresPand:''
   }
 };
 
@@ -2106,7 +2368,7 @@ function resetApp() {
     errors:{}, autoFill:{}, clientData:{}, activeImportTab:'json',
     docs:{kvk:{multiple:false,files:[]},graydon:{multiple:false,files:[]},woz:{multiple:true,files:[]},kadaster:{multiple:true,files:[]},jaarrekeningen:{multiple:true,files:[]}},
     loading:{},
-    form:{naamKlant:'',inkomen:'',vermogen:'',aantalPanden:'',woonland:'nl',typeKlant:'particulier',doelFinanciering:'aankoop',aankoopprijs:'',marktwaarde:'',huurPerMaand:'',huurType:'bestaand',typeVastgoed:'woning',gewensteLening:'',eigenInbreng:'',rente:'0.05',looptijd:'20',metAflossing:'nee',dossiernr:'',adviseur:'',notitie:''}
+    form:{naamKlant:'',inkomen:'',vermogen:'',aantalPanden:'',woonland:'nl',typeKlant:'particulier',doelFinanciering:'aankoop',aankoopprijs:'',marktwaarde:'',huurPerMaand:'',huurType:'bestaand',typeVastgoed:'woning',gewensteLening:'',eigenInbreng:'',rente:'0.05',looptijd:'20',metAflossing:'nee',dossiernr:'',adviseur:'',notitie:'',adresPand:''}
   });
   try { localStorage.removeItem(LS_KEY); } catch(e) {}
   fullRender();
@@ -2173,50 +2435,474 @@ async function handlePdfImport(file) {
 // ════════════════════════════════════════════════════
 // ㉖ PRINT
 // ════════════════════════════════════════════════════
-function printReport() {
-  // Guard: voorkom lege print
-  if(!S.form.naamKlant?.trim() || !parseFloat(S.form.gewensteLening)) {
-    showToast('Vul eerst naam en leningsbedrag in voor het rapport.', 'warn');
-    return;
-  }
-  const datum=new Date().toLocaleDateString('nl-NL',{day:'2-digit',month:'long',year:'numeric'});
-  const tijd=new Date().toLocaleTimeString('nl-NL',{hour:'2-digit',minute:'2-digit'});
-  const ref=`MBA-${Date.now().toString().slice(-6)}`;
-  const klant=f('naamKlant')||'—';
-  const adviseur=f('adviseur')||'';
-  const dossier=f('dossiernr')||ref;
+function buildPdfHtml() {
+  const { m, conf, doss, risks, sc, readiness, acties, lenders, concl } = calcAll();
 
-  const ph=document.getElementById('PRINT_HEADER');
-  ph.style.display='flex';
-  ph.innerHTML=`
-    <div class="print-logo-wrap">
-      <img src="logo.png" style="height:36px;width:auto;filter:brightness(0) invert(1)" onerror="this.style.display='none'">
-      <div class="print-logo-text" style="margin-left:10px">
-        <div class="print-logo-name">MB Adviesgroep</div>
-        <div class="print-logo-sub">Deal Analyzer — Intern Kredietmemo</div>
-      </div>
-    </div>
-    <div class="print-meta">
-      <strong>${klant}</strong>
-      ${datum} · ${tijd}${adviseur?' · '+adviseur:''}<br>
-      Ref: ${dossier}
-    </div>`;
+  const klant     = S.form.naamKlant        || '—';
+  const adres     = S.form.adresPand        || '';
+  const doel      = S.form.doelFinanciering || 'aankoop';
+  const doelLabel = {aankoop:'Aankoop',herfinanciering:'Herfinanciering',verbouwing:'Verbouwing',anders:'Anders'}[doel] || doel;
+  const typeLabel = {woning:'Woonvastgoed',appartementen:'Appartementen',bedrijfspand:'Bedrijfspand',horeca:'Horeca exploitatieobject',recreatie:'Recreatievastgoed',anders:'Overig vastgoed'}[S.form.typeVastgoed] || S.form.typeVastgoed || '—';
+  const rentePct  = ((parseFloat(S.form.rente) || 0) * 100).toFixed(1) + '%';
+  const aflLabel  = S.form.metAflossing === 'ja' ? 'annuitair' : 'interest only';
+  const datum     = new Date().toLocaleDateString('nl-NL',{day:'numeric',month:'long',year:'numeric'});
+  const refNr     = 'MBA-' + Date.now().toString().slice(-6);
+  const adviseur  = S.form.adviseur || '';
+  const rawDossier = (S.form.dossiernr || '').trim();
+  const dossiernr = rawDossier ? (rawDossier.toUpperCase().startsWith('MBA') ? rawDossier : 'MBA-' + rawDossier) : refNr;
+  const totalFiles = totalFilesCount();
+  const filledCats = filledCategoriesCount();
+  const totalCats  = Object.keys(DOC_TYPES).length;
 
-  // Voeg pagina-scheiding hints toe voor betere layout
-  document.querySelectorAll('.section-head').forEach((el,i)=>{
-    if(i>0) el.style.pageBreakBefore='auto';
+  // Title: "Kredietmemo — [adres]" of gewoon "Kredietmemo"
+  const memoTitle = adres ? `Kredietmemo — ${adres}` : `Kredietmemo`;
+  const memoSub   = [doelLabel + ' ' + typeLabel.toLowerCase(), klant, datum].filter(Boolean).join(' · ');
+
+  // Score label / kleur
+  const scoreKleur = {good:'#15803d', blauw:'#1e4469', warn:'#b45309', oranje:'#c2410c', bad:'#991b1b'}[sc.klasse] || '#1e4469';
+  const scoreLabel = sc.label || '—';
+
+  // LTV kleur
+  const ltvKleur = m.ltv === null ? '#6b7280' : m.ltv < 70 ? '#15803d' : m.ltv <= 80 ? '#1e4469' : m.ltv <= 85 ? '#b45309' : '#991b1b';
+  const ltvNorm  = m.ltv === null ? '' : m.ltv < 70 ? 'ruim binnen norm' : m.ltv <= 80 ? 'binnen norm' : m.ltv <= 85 ? 'aan de grens' : 'boven norm';
+  const dscrNorm = m.dscr === null ? '' : m.dscr >= 1.25 ? 'voldoende' : m.dscr >= 1 ? 'onder norm 1,25' : 'onvoldoende';
+  const dscrKleur = m.dscr === null ? '#6b7280' : m.dscr >= 1.25 ? '#15803d' : m.dscr >= 1 ? '#b45309' : '#991b1b';
+  const cfKleur  = m.cf > 0 ? '#15803d' : m.cf < 0 ? '#991b1b' : '#6b7280';
+
+  // Risico's
+  const kritRisks = risks.krit || [];
+  const aandRisks = risks.aand || [];
+  const allRisks  = [...kritRisks.map(r=>({...r,niveau:'KRITISCH'})), ...aandRisks.map(r=>({...r,niveau:'AANDACHT'}))];
+
+  // Documenten tabel
+  const docLabels = { kvk:'Bedrijfsprofiel', graydon:'Kredietrapport', woz:'Taxatierapport', kadaster:'Kadasteruittreksel', jaarrekeningen:'Jaarrekening' };
+  const docRows = Object.entries(DOC_TYPES).map(([key, dt]) => {
+    const files = S.docs[key].files;
+    const hasFiles = files.length > 0;
+    const aiSum = files[0]?.ai?.summary || '';
+    const parsedSum = files[0]?.parsed?._meta?.rawSummary || '';
+    const summary = aiSum || parsedSum || (hasFiles ? files.map(f=>f.naam).join(', ') : '—');
+    let status, statusColor, statusBg;
+    if (!hasFiles) { status = 'Ontbreekt'; statusColor = '#6b7280'; statusBg = '#f3f4f6'; }
+    else {
+      const kwal = files[0]?.parsed?._meta?.documentKwaliteit;
+      if (kwal === 'goed') { status = 'Aanwezig'; statusColor = '#15803d'; statusBg = '#dcfce7'; }
+      else if (kwal === 'matig') { status = 'Let op'; statusColor = '#b45309'; statusBg = '#fef3c7'; }
+      else { status = 'Aanwezig'; statusColor = '#1d4ed8'; statusBg = '#dbeafe'; }
+    }
+    return { label: docLabels[key] || dt.label, summary, status, statusColor, statusBg };
   });
 
-  window.print();
-  setTimeout(()=>{
-    ph.style.display='none';
-    document.querySelectorAll('.section-head').forEach(el=>el.style.pageBreakBefore='');
-  },800);
+  // Financiers — top 4 gesorteerd op score
+  const topLenders = [...lenders].sort((a,b) => (b.score||0)-(a.score||0)).slice(0,5);
+
+  // Vervolgstappen (top 5 acties)
+  const stappen = acties.slice(0, 5);
+
+  // Oordeel badge
+  const oordeelBg = {good:'#dcfce7', blauw:'#dbeafe', warn:'#fef3c7', oranje:'#ffedd5', bad:'#fee2e2'}[sc.klasse] || '#dbeafe';
+  const oordeelBd = {good:'#16a34a', blauw:'#2563eb', warn:'#d97706', oranje:'#ea580c', bad:'#dc2626'}[sc.klasse] || '#2563eb';
+
+  // Aanbevolen financier(s)
+  const aanbevolen = topLenders.filter(l => l.score >= 80).map(l => l.naam).join(' of ') || topLenders[0]?.naam || '—';
+
+  return `
+<style>
+  .pdf-wrap { font-family: 'Inter', system-ui, sans-serif; font-size: 12px; color: #1f2937; background: #fff; }
+  .pdf-wrap * { box-sizing: border-box; }
+
+  /* ── Paginaheader (herhaalt op elke pagina) ── */
+  .pdf-page-header {
+    display: flex; align-items: center; justify-content: space-between;
+    background: linear-gradient(90deg,#142e47 0%,#1e4469 55%,#2B5F8E 100%);
+    color: #fff;
+    padding: 14px 20px 12px;
+    margin-bottom: 0;
+    border-bottom: 3px solid #D96B3A;
+  }
+  .pdf-logo-block { display: flex; align-items: center; gap: 10px; }
+  .pdf-logo-img { background: rgba(255,255,255,.95); border-radius: 7px; padding: 3px 5px; display:flex;align-items:center;justify-content:center; }
+  .pdf-logo-img img { height: 28px; width: auto; }
+  .pdf-logo-text { display: flex; flex-direction: column; gap: 1px; }
+  .pdf-logo-name { font-size: 15px; font-weight: 800; color: #fff; line-height: 1; }
+  .pdf-logo-sub  { font-size: 9px; color: rgba(255,255,255,.65); letter-spacing: 0.3px; }
+  .pdf-header-meta { display: flex; gap: 28px; }
+  .pdf-header-meta-item { display: flex; flex-direction: column; align-items: flex-start; }
+  .pdf-header-meta-label { font-size: 8px; font-weight: 600; color: rgba(255,255,255,.5); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 2px; }
+  .pdf-header-meta-value { font-size: 11px; font-weight: 600; color: #fff; }
+  .pdf-footer { text-align: center; font-size: 8px; color: #9ca3af; border-top: 1px solid #e5e7eb; padding-top: 5px; margin-top: 18px; }
+  .pdf-footer-page { float: right; }
+
+  /* ── Inhoudsgebied ── */
+  .pdf-body { padding: 22px 24px 0; }
+
+  /* ── Titels ── */
+  .pdf-memo-title { font-size: 26px; font-weight: 800; color: #142e47; margin: 0 0 4px; line-height: 1.15; }
+  .pdf-memo-sub   { font-size: 11px; color: #6b7280; margin-bottom: 16px; }
+  .pdf-intro      { font-size: 11.5px; line-height: 1.7; color: #374151; margin-bottom: 18px; }
+
+  /* ── Sectiekoppen ── */
+  .pdf-section-head { display: flex; align-items: center; gap: 8px; margin: 18px 0 10px; }
+  .pdf-section-num  { width: 22px; height: 22px; border-radius: 50%; background: #2B5F8E; color: #fff; font-size: 10px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .pdf-section-lbl  { font-size: 15px; font-weight: 700; color: #142e47; }
+  .pdf-section-sub  { font-size: 10px; color: #9ca3af; margin-left: auto; }
+  .pdf-section-line { flex: 1; height: 2px; background: #D96B3A; }
+
+  /* ── Samenvatting-tabel ── */
+  .pdf-sum-table { width: 100%; border-collapse: collapse; margin-bottom: 16px; }
+  .pdf-sum-table thead tr { background: #1e4469; color: #fff; }
+  .pdf-sum-table thead td { padding: 7px 10px; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
+  .pdf-sum-table tbody tr:nth-child(even) { background: #f8fafc; }
+  .pdf-sum-table tbody tr { border-bottom: 1px solid #e5e7eb; }
+  .pdf-sum-table tbody td { padding: 7px 10px; font-size: 11px; }
+  .pdf-sum-table tbody td:nth-child(odd) { font-weight: 700; color: #374151; width: 22%; }
+  .pdf-sum-table tbody td:nth-child(even) { color: #111827; width: 28%; }
+
+  /* ── KPI blokken ── */
+  .pdf-kpi-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 14px; }
+  .pdf-kpi { border: 1.5px solid #d9e1ea; border-radius: 10px; padding: 12px 14px; background: #f8fafc; }
+  .pdf-kpi-label { font-size: 9px; font-weight: 700; color: #9ca3af; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; }
+  .pdf-kpi-value { font-size: 26px; font-weight: 800; line-height: 1.1; }
+  .pdf-kpi-norm  { font-size: 9.5px; color: #6b7280; margin-top: 3px; }
+
+  /* ── Analyse paragraaf ── */
+  .pdf-analyse-p { font-size: 11px; line-height: 1.7; color: #374151; margin-bottom: 10px; }
+
+  /* ── Risico kaarten ── */
+  .pdf-risk-card { border-radius: 8px; padding: 10px 13px; margin-bottom: 8px; border: 1px solid; page-break-inside: avoid; }
+  .pdf-risk-card.kritisch { background: #fef2f2; border-color: #fecaca; }
+  .pdf-risk-card.aandacht { background: #fffbeb; border-color: #fde68a; }
+  .pdf-risk-badge { display: inline-flex; align-items: center; padding: 2px 8px; border-radius: 20px; font-size: 8px; font-weight: 800; letter-spacing: 0.8px; text-transform: uppercase; margin-bottom: 5px; }
+  .pdf-risk-badge.kritisch { background: #991b1b; color: #fff; }
+  .pdf-risk-badge.aandacht { background: #d97706; color: #fff; }
+  .pdf-risk-title { font-size: 12px; font-weight: 700; color: #111827; margin-bottom: 5px; display:inline; margin-left:6px; }
+  .pdf-risk-body { font-size: 10.5px; color: #374151; line-height: 1.6; margin-bottom: 6px; }
+  .pdf-risk-action { font-size: 10px; color: #374151; font-weight: 500; }
+  .pdf-risk-action::before { content: "→ "; font-weight: 700; color: #D96B3A; }
+
+  /* ── Document tabel ── */
+  .pdf-doc-table { width: 100%; border-collapse: collapse; margin-bottom: 14px; }
+  .pdf-doc-table thead tr { background: #1e4469; color: #fff; }
+  .pdf-doc-table thead td { padding: 7px 10px; font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
+  .pdf-doc-table tbody tr { border-bottom: 1px solid #e5e7eb; }
+  .pdf-doc-table tbody tr:nth-child(even) { background: #f8fafc; }
+  .pdf-doc-table tbody td { padding: 7px 10px; font-size: 10px; vertical-align: top; }
+  .pdf-doc-label { font-weight: 700; color: #2B5F8E; }
+  .pdf-doc-status { display: inline-block; padding: 2px 8px; border-radius: 20px; font-size: 8.5px; font-weight: 700; }
+
+  /* ── Financiers ── */
+  .pdf-lender-card { border: 1px solid #e5e7eb; border-radius: 9px; padding: 11px 14px; margin-bottom: 8px; page-break-inside: avoid; }
+  .pdf-lender-header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 8px; }
+  .pdf-lender-badge { font-size: 8px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.7px; padding: 2px 7px; border-radius: 20px; background: #f3f4f6; color: #6b7280; margin-right: 6px; }
+  .pdf-lender-name { font-size: 15px; font-weight: 800; color: #142e47; }
+  .pdf-lender-sub  { font-size: 9.5px; color: #6b7280; margin-top: 1px; }
+  .pdf-lender-score { font-size: 24px; font-weight: 800; color: #15803d; }
+  .pdf-lender-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; font-size: 10px; }
+  .pdf-lender-pro { color: #374151; padding: 2px 0; }
+  .pdf-lender-pro::before { content: "● "; color: #16a34a; font-size: 9px; }
+  .pdf-lender-con { color: #374151; padding: 2px 0; }
+  .pdf-lender-con::before { content: "– "; color: #6b7280; }
+
+  /* ── Vervolgstappen ── */
+  .pdf-steps { margin-bottom: 14px; }
+  .pdf-step  { display: flex; align-items: flex-start; gap: 10px; padding: 8px 0; border-bottom: 1px solid #f3f4f6; }
+  .pdf-step-num { width: 22px; height: 22px; border-radius: 50%; background: #2B5F8E; color: #fff; font-size: 10px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 1px; }
+  .pdf-step-title { font-size: 11.5px; font-weight: 700; color: #111827; margin-bottom: 2px; }
+  .pdf-step-sub   { font-size: 10px; color: #6b7280; }
+
+  /* ── Oordeel blok ── */
+  .pdf-verdict { display: grid; grid-template-columns: 220px 1fr; gap: 0; border: 1px solid #d9e1ea; border-radius: 10px; overflow: hidden; margin-bottom: 14px; page-break-inside: avoid; }
+  .pdf-verdict-left { background: #1e4469; color: #fff; padding: 18px 16px; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
+  .pdf-verdict-label { font-size: 8px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.2px; color: rgba(255,255,255,.55); margin-bottom: 8px; }
+  .pdf-verdict-title { font-size: 20px; font-weight: 800; color: #fff; line-height: 1.2; margin-bottom: 6px; }
+  .pdf-verdict-score { font-size: 10px; color: rgba(255,255,255,.5); }
+  .pdf-verdict-right { background: #fff; padding: 16px 18px; }
+  .pdf-verdict-advice-title { font-size: 11px; font-weight: 700; color: #374151; margin-bottom: 6px; }
+  .pdf-verdict-advice-body  { font-size: 11px; color: #374151; line-height: 1.7; }
+
+  /* ── Print overrides ── */
+  @media print {
+    .pdf-page-header { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+    .pdf-kpi { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+    .pdf-risk-card { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+    .pdf-lender-card { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+    .pdf-verdict { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+    .pdf-doc-table thead tr { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+    .pdf-sum-table thead tr { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+    .pdf-section-head { page-break-after: avoid; }
+    .pdf-risk-card { page-break-inside: avoid; }
+    .pdf-lender-card { page-break-inside: avoid; }
+    .pdf-verdict { page-break-inside: avoid; }
+    .pdf-step { page-break-inside: avoid; }
+  }
+</style>
+
+<div class="pdf-wrap">
+
+  <!-- ══ PAGINA HEADER ══ -->
+  <div class="pdf-page-header">
+    <div class="pdf-logo-block">
+      <div class="pdf-logo-img"><img src="logo.png" onerror="this.style.display='none'"></div>
+      <div class="pdf-logo-text">
+        <div class="pdf-logo-name">MB Adviesgroep</div>
+        <div class="pdf-logo-sub">Intern Kredietmemo · Vertrouwelijk</div>
+      </div>
+    </div>
+    <div class="pdf-header-meta">
+      <div class="pdf-header-meta-item">
+        <div class="pdf-header-meta-label">Referentie</div>
+        <div class="pdf-header-meta-value">${dossiernr}</div>
+      </div>
+      <div class="pdf-header-meta-item">
+        <div class="pdf-header-meta-label">Datum</div>
+        <div class="pdf-header-meta-value">${datum}</div>
+      </div>
+      <div class="pdf-header-meta-item">
+        <div class="pdf-header-meta-label">Klant</div>
+        <div class="pdf-header-meta-value">${klant}</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ BODY ══ -->
+  <div class="pdf-body">
+
+    <!-- Titel -->
+    <h1 class="pdf-memo-title">${memoTitle}</h1>
+    <div class="pdf-memo-sub">${memoSub}</div>
+
+    <!-- Intro -->
+    <p class="pdf-intro">${concl}</p>
+
+    <!-- ── Samenvatting tabel ── -->
+    <div style="font-size:13px;font-weight:700;color:#142e47;margin-bottom:8px;">Samenvatting financieringsstructuur</div>
+    <table class="pdf-sum-table">
+      <tbody>
+        <tr>
+          <td>Klant</td><td>${klant}</td>
+          <td>Aankoopprijs</td><td>${fE(m.a)}</td>
+        </tr>
+        <tr>
+          <td>Pand</td><td>${adres || '—'}</td>
+          <td>Marktwaarde</td><td>${fE(m.mv)}</td>
+        </tr>
+        <tr>
+          <td>Type</td><td>${typeLabel}</td>
+          <td>Gewenste lening</td><td>${fE(m.l)}</td>
+        </tr>
+        <tr>
+          <td>Doel</td><td>${doelLabel}</td>
+          <td>LTV</td><td>${fP(m.ltv)}${ltvNorm ? ' · ' + ltvNorm : ''}</td>
+        </tr>
+        <tr>
+          <td>Rente</td><td>${rentePct} ${aflLabel}</td>
+          <td>DSCR</td><td>${m.dscr ? m.dscr.toFixed(2) : '—'}${dscrNorm ? ' · ' + dscrNorm : ''}</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <!-- ── 1. Financiële analyse ── -->
+    <div class="pdf-section-head">
+      <div class="pdf-section-num">1</div>
+      <div class="pdf-section-lbl">Financiële analyse</div>
+      <div class="pdf-section-line"></div>
+    </div>
+
+    <div class="pdf-kpi-row">
+      <div class="pdf-kpi">
+        <div class="pdf-kpi-label">LTV</div>
+        <div class="pdf-kpi-value" style="color:${ltvKleur}">${fP(m.ltv)}</div>
+        <div class="pdf-kpi-norm">op marktwaarde · norm max 85%</div>
+      </div>
+      <div class="pdf-kpi">
+        <div class="pdf-kpi-label">DSCR</div>
+        <div class="pdf-kpi-value" style="color:${dscrKleur}">${m.dscr ? m.dscr.toFixed(2) : '—'}</div>
+        <div class="pdf-kpi-norm">debt service coverage · norm min 1,25</div>
+      </div>
+      <div class="pdf-kpi">
+        <div class="pdf-kpi-label">Cashflow</div>
+        <div class="pdf-kpi-value" style="color:${cfKleur}">${m.h ? fE(m.cf) + ' /mnd' : '—'}</div>
+        <div class="pdf-kpi-norm">netto na maandlast van ${fE(m.ml)}</div>
+      </div>
+    </div>
+
+    ${m.l > 0 ? `
+    <p class="pdf-analyse-p">
+      De lening van ${fE(m.l)} op een aankoopprijs van ${fE(m.a)} resulteert in een LTV van
+      ${m.ltvA ? fP(m.ltvA) + ' op aankoopprijs' : ''}${m.ltvA && m.ltvM ? ' en ' : ''}${m.ltvM ? fP(m.ltvM) + ' op marktwaarde' : ''}.
+      ${m.ltv !== null && m.ltv < 80 ? 'Gangbare bancaire maxima liggen op 70–85%, waardoor het risico voor de financier beperkt is.' :
+        m.ltv !== null && m.ltv <= 85 ? 'Dit ligt aan de bovenkant van gangbare bancaire normen (70–85%).' :
+        m.ltv !== null ? 'Dit overschrijdt de gangbare bancaire norm van 85%, wat de financieringsmogelijkheden beperkt.' : ''}
+      ${m.inb > 0 ? 'De eigen inbreng bedraagt ' + fE(m.inb) + (m.ibP ? ' (' + m.ibP.toFixed(1) + '%).' : '.') : ''}
+    </p>` : ''}
+
+    ${m.h > 0 ? `
+    <p class="pdf-analyse-p">
+      De kasstroompositie is ${m.dscr !== null && m.dscr >= 1.25 ? 'ruim voldoende' : m.dscr !== null && m.dscr >= 1 ? 'beperkt voldoende' : 'onvoldoende'}.
+      Het huurinkomen van ${fE(m.h)} per maand dekt de maandlast van ${fE(m.ml)} (${aflLabel}, ${rentePct})
+      ${m.dscr ? m.dscr.toFixed(1) + '× over' : ''}.
+      ${m.bh125 ? 'De minimale huurkasstroom voor een DSCR van 1,25 bedraagt ' + fE(m.bh125) + ' per maand.' : ''}
+      ${m.cf > 0 ? 'Het netto maandoverschot na rentelasten bedraagt ' + fE(m.cf) + '.' : m.cf < 0 ? 'Er is een negatief maandelijks kasstrooverschot van ' + fE(Math.abs(m.cf)) + '.' : ''}
+    </p>` : ''}
+
+    <!-- ── 2. Risico's ── -->
+    <div class="pdf-section-head">
+      <div class="pdf-section-num">2</div>
+      <div class="pdf-section-lbl">Risico's en aandachtspunten</div>
+      <div class="pdf-section-line"></div>
+      <div class="pdf-section-sub">${allRisks.length} punt${allRisks.length !== 1 ? 'en' : ''} · ${kritRisks.length} kritisch</div>
+    </div>
+
+    ${allRisks.length === 0 ? `<p class="pdf-analyse-p" style="color:#15803d;font-weight:600;">✓ Geen kritische risico's geïdentificeerd.</p>` : ''}
+
+    ${allRisks.map(r => `
+    <div class="pdf-risk-card ${r.niveau.toLowerCase()}">
+      <div><span class="pdf-risk-badge ${r.niveau.toLowerCase()}">${r.niveau}</span><span class="pdf-risk-title">${r.t}</span></div>
+      <div class="pdf-risk-body">${r.i || ''}</div>
+      ${r.a ? `<div class="pdf-risk-action">Actie: ${r.a}</div>` : ''}
+    </div>`).join('')}
+
+    <!-- ── 3. Documentanalyse ── -->
+    <div class="pdf-section-head">
+      <div class="pdf-section-num">3</div>
+      <div class="pdf-section-lbl">Documentanalyse</div>
+      <div class="pdf-section-line"></div>
+      <div class="pdf-section-sub">${filledCats} categorie${filledCats !== 1 ? 'ën' : ''} · ${totalFiles} bestand${totalFiles !== 1 ? 'en' : ''}</div>
+    </div>
+
+    <p class="pdf-analyse-p">
+      ${filledCats === 0 ? 'Er zijn nog geen documenten geüpload voor dit dossier.' :
+        filledCats === totalCats ? 'Alle documentcategorieën zijn aangeleverd voor dit dossier.' :
+        `Van de ${totalCats} documentcategorieën zijn er ${filledCats} aangeleverd. ${totalCats - filledCats} categorie${totalCats - filledCats !== 1 ? 'ën ontbreken' : ' ontbreekt'} nog.`}
+    </p>
+
+    <table class="pdf-doc-table">
+      <thead>
+        <tr>
+          <td style="width:18%">Categorie</td>
+          <td style="width:64%">Kernbevinding</td>
+          <td style="width:18%">Status</td>
+        </tr>
+      </thead>
+      <tbody>
+        ${docRows.map(d => `
+        <tr>
+          <td class="pdf-doc-label">${d.label}</td>
+          <td style="color:#374151">${d.summary}</td>
+          <td><span class="pdf-doc-status" style="background:${d.statusBg};color:${d.statusColor}">☐ ${d.status}</span></td>
+        </tr>`).join('')}
+      </tbody>
+    </table>
+
+    <!-- ── 4. Financieringsmogelijkheden ── -->
+    <div class="pdf-section-head">
+      <div class="pdf-section-num">4</div>
+      <div class="pdf-section-lbl">Financieringsmogelijkheden</div>
+      <div class="pdf-section-line"></div>
+    </div>
+
+    <p class="pdf-analyse-p">Op basis van het dealsprofiel zijn de volgende financiers beoordeeld.</p>
+
+    ${topLenders.map(l => {
+      const lScore = l.score || 0;
+      const lKleur = lScore >= 80 ? '#15803d' : lScore >= 60 ? '#1e4469' : '#b45309';
+      const pros = l.plus || [];
+      const cons = l.min || [];
+      const maxRijen = Math.max(pros.length, cons.length, 1);
+      return `
+    <div class="pdf-lender-card">
+      <div class="pdf-lender-header">
+        <div>
+          <div><span class="pdf-lender-badge">${l.type === 'bank' ? 'BANK' : 'NON-BANK'}</span></div>
+          <div class="pdf-lender-name">${l.naam}</div>
+          <div class="pdf-lender-sub">${l.label || ''} · LTV max ${l.maxLTV}% · DSCR min ${l.minDSCR} · ${fE(l.minLening)}–${fE(l.maxLening)}</div>
+        </div>
+        <div class="pdf-lender-score" style="color:${lKleur}">${lScore}%</div>
+      </div>
+      <div class="pdf-lender-cols">
+        <div>${pros.slice(0,3).map(p=>`<div class="pdf-lender-pro">${p}</div>`).join('')}</div>
+        <div>${cons.slice(0,3).map(c=>`<div class="pdf-lender-con">${c}</div>`).join('')}</div>
+      </div>
+    </div>`;
+    }).join('')}
+
+    <!-- ── 5. Vervolgstappen ── -->
+    <div class="pdf-section-head">
+      <div class="pdf-section-num">5</div>
+      <div class="pdf-section-lbl">Vervolgstappen</div>
+      <div class="pdf-section-line"></div>
+    </div>
+
+    <div class="pdf-steps">
+      ${stappen.length === 0 ? '<p class="pdf-analyse-p">Geen specifieke vervolgstappen vereist op dit moment.</p>' :
+        stappen.map((a, i) => `
+      <div class="pdf-step">
+        <div class="pdf-step-num">${i + 1}</div>
+        <div>
+          <div class="pdf-step-title">${a.t}</div>
+        </div>
+      </div>`).join('')}
+    </div>
+
+    <!-- ── 6. Samenvatting en intern oordeel ── -->
+    <div class="pdf-section-head">
+      <div class="pdf-section-num">6</div>
+      <div class="pdf-section-lbl">Samenvatting en intern oordeel</div>
+      <div class="pdf-section-line"></div>
+    </div>
+
+    <p class="pdf-analyse-p">
+      ${klant !== '—' ? `Het dossier van ${klant} betreft de ${doelLabel.toLowerCase()} van ${typeLabel.toLowerCase()}${adres ? ' aan ' + adres : ''}` : 'Dit dossier betreft'}
+      ${m.l > 0 ? ', met een gewenste lening van ' + fE(m.l) + '.' : '.'}
+      ${m.ltv !== null && m.dscr !== null ? `De financiële parameters zijn ${m.ltv < 80 && m.dscr >= 1.25 ? 'sterk' : m.ltv <= 85 && m.dscr >= 1 ? 'voldoende' : 'aan de grens'}: de loan-to-value bedraagt ${fP(m.ltv)} en de DSCR komt uit op ${m.dscr.toFixed(2)}.` : ''}
+      ${m.cf > 0 && m.h > 0 ? ' Het cashflowprofiel is positief met een maandelijks overschot van ' + fE(m.cf) + '.' : ''}
+    </p>
+
+    ${kritRisks.length > 0 ? `<p class="pdf-analyse-p">${kritRisks.length === 1 ? 'Eén kritisch aandachtspunt dient' : kritRisks.length + ' kritische aandachtspunten dienen'} te worden opgelost vóór indiening: ${kritRisks.map(r=>r.t).join('; ')}.</p>` : ''}
+
+    <div class="pdf-verdict">
+      <div class="pdf-verdict-left">
+        <div class="pdf-verdict-label">Intern oordeel</div>
+        <div class="pdf-verdict-title">${scoreLabel}</div>
+        <div class="pdf-verdict-score">Score ${sc.score} / 10</div>
+      </div>
+      <div class="pdf-verdict-right">
+        <div class="pdf-verdict-advice-title">Advies</div>
+        <div class="pdf-verdict-advice-body">
+          ${aanbevolen !== '—' ? `Aanbevolen route: ${aanbevolen}.` : ''}
+          ${kritRisks.length > 0 ? ' Los eerst de kritische punten op vóór indiening.' : stappen.length > 0 ? ' Volg de vervolgstappen voor een succesvolle indiening.' : ' Het dossier lijkt gereed voor indiening.'}
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="pdf-footer">
+      <span>MB Adviesgroep · ${klant} · ${datum}</span>
+      <span class="pdf-footer-page">Indicatief — geen rechten ontleenbaar</span>
+    </div>
+
+  </div><!-- /pdf-body -->
+</div><!-- /pdf-wrap -->
+  `;
 }
 
-function doCopy(id,btnId){
-  const el=document.getElementById(id);if(!el)return;
-  navigator.clipboard.writeText(el.innerText||el.textContent).then(()=>{const btn=document.getElementById(btnId);if(btn){btn.textContent='✓ Gekopieerd';setTimeout(()=>btn.textContent='Kopiëren',2200);}});
+function printReport() {
+  if (!S.form.naamKlant?.trim() || !parseFloat(S.form.gewensteLening)) {
+    showToast('Vul eerst naam en lening in.', 'warn');
+    return;
+  }
+
+  const report = document.getElementById('PDF_REPORT');
+  report.innerHTML = buildPdfHtml();
+  report.style.display = 'block';
+
+  document.body.classList.add('pdf-mode');
+  window.print();
+
+  setTimeout(() => {
+    document.body.classList.remove('pdf-mode');
+    report.style.display = 'none';
+  }, 800);
 }
 
 // ════════════════════════════════════════════════════
@@ -2253,7 +2939,7 @@ function scoreRing(sc,kl,sub,cap){
   const subRows = sub ? [
     ['Haalbaarheid', sub.A],
     ['Risicoprofiel', sub.B],
-    ['Dossier',      sub.C]
+    // ['Dossier', sub.C] — removed
   ] : [];
   const subHtml = subRows.length ? `
     <div style="width:100%;margin-top:6px;border-top:1px solid var(--bd-l);padding-top:6px">
@@ -2804,6 +3490,7 @@ function renderInput() {
     </div>
 
     <div class="sec-lbl"><span>Intern</span></div>
+    ${fg('Adres pand',inp('adresPand','text','Bijv. Haven 26, 1131 ER Volendam'))}
     ${fg2(fg('Dossiernr.',inp('dossiernr','text','')),fg('Adviseur',inp('adviseur','text','')))}
     <div class="fgrp">
       <label>Notitie</label>
@@ -2847,7 +3534,6 @@ function renderMain(m, sc, risks, conf, doss, readiness, acties, lenders, concl)
       <span class="snap-title">Deal Snapshot — ${datum}</span>
       <div style="display:flex;align-items:center;gap:8px">
         ${f('naamKlant')?`<span style="font-family:var(--head);font-size:10.5px;color:rgba(255,255,255,.55)">${f('naamKlant')}</span>`:''}
-        <span class="snap-gng ${gngCls}">${gngLabel}</span>
       </div>
     </div>
     <div class="snap-kpis">
@@ -2871,11 +3557,7 @@ function renderMain(m, sc, risks, conf, doss, readiness, acties, lenders, concl)
         <div class="snap-kpi-val ${!m.h||!m.ml?'neutral':m.cf>0?'good':'bad'}">${m.h&&m.ml?fE(m.cf):'—'}</div>
         <div class="snap-kpi-sub">${m.h&&m.ml?(m.cf>0?'Positief':'Negatief'):'Na lasten'}</div>
       </div>
-      <div class="snap-kpi">
-        <div class="snap-kpi-lbl">Dossier</div>
-        <div class="snap-kpi-val ${doss.klasse==='good'?'good':doss.klasse==='bad'?'bad':'warn'}">${doss.score}<span style="font-size:11px;opacity:.45;font-weight:500">/100</span></div>
-        <div class="snap-kpi-sub">${doss.label}</div>
-      </div>
+
     </div>
     <!-- Conclusie + sub-scores -->
     <div class="snap-concl" style="display:flex;gap:12px;align-items:flex-start">
@@ -3088,7 +3770,7 @@ function renderMain(m, sc, risks, conf, doss, readiness, acties, lenders, concl)
     <div class="acard" style="margin-bottom:0">
       <div class="acard-hd"><span class="acard-lbl">Dealoverzicht</span></div>
       <table class="sum-t">
-        ${[['Klant',f('naamKlant')||'—'],['Aankoopprijs',fE(m.a)],['Marktwaarde',fE(m.mv)||'—'],['Lening',fE(m.l)],['LTV',fP(m.ltv)],['DSCR',m.dscr?m.dscr.toFixed(2)+' ('+afl+')':'N/B'],['Dossier',doss.score+'/100'],['Bancair',readiness.bancair.status]].map(([k,v])=>`<tr><td>${k}</td><td>${v}</td></tr>`).join('')}
+        ${[['Klant',f('naamKlant')||'—'],['Aankoopprijs',fE(m.a)],['Marktwaarde',fE(m.mv)||'—'],['Lening',fE(m.l)],['LTV',fP(m.ltv)],['DSCR',m.dscr?m.dscr.toFixed(2)+' ('+afl+')':'N/B']].map(([k,v])=>`<tr><td>${k}</td><td>${v}</td></tr>`).join('')}
       </table>
     </div>
     <div class="acard" style="margin-bottom:0">
@@ -3127,8 +3809,6 @@ Bestanden         : ${totalFilesCount()} geüpload
 
 BEOORDELING
 Score             : ${sc.score}/10 — ${sc.label}
-Dossier           : ${doss?.score||0}/100 — ${doss?.label||'—'}
-Readiness         : ${readiness?.overallStatus||'—'}
 Oordeel           : ${concl}
 
 TOP ACTIES:
@@ -3177,18 +3857,7 @@ function renderAside(m, sc, doss, readiness) {
       </div>
     </div>
 
-    <div style="background:var(--wh);border:1px solid var(--bd);border-radius:var(--r);margin-bottom:7px;overflow:hidden;box-shadow:var(--sh)">
-      <div style="padding:8px 12px;background:var(--bg);border-bottom:1px solid var(--bd-l);font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:1.2px;color:var(--tx4)">Readiness</div>
-      <div style="padding:8px 10px">
-        <div class="doss-bar"><div class="doss-fill" style="width:${doss?.score||0}%;background:${dqC}"></div></div>
-        <div class="doss-lbl"><span style="color:var(--tx4)">Dossier</span><span style="font-weight:700;font-family:var(--mono);color:${dqC}">${doss?.score||0}/100</span></div>
-        <div class="rd-pills">
-          <div class="rd-pill"><span class="rd-pill-lbl">Bancair</span><span class="rd-pill-val ${rdCls(rdB)}">${rdB?.status||'—'}</span></div>
-          <div class="rd-pill"><span class="rd-pill-lbl">Non-bank</span><span class="rd-pill-val ${rdCls(rdNB)}">${rdNB?.status||'—'}</span></div>
-          <div class="rd-pill"><span class="rd-pill-lbl">Documenten</span><span class="rd-pill-val rd-bl">${filledCats}/${totalCats} cat. · ${totalFiles} best.</span></div>
-        </div>
-      </div>
-    </div>
+
 
     ${f('naamKlant')?`
     <div style="background:var(--wh);border:1px solid var(--bd);border-radius:var(--r);overflow:hidden;box-shadow:var(--sh);margin-bottom:7px">
